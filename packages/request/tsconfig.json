@@ -4,19 +4,20 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ESNext"],
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "strict": true,
     "sourceMap": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "esModuleInterop": true,
+    "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "../../playground/src/**/*.ts", "test",
+  ]
 }

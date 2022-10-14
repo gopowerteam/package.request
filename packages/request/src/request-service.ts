@@ -75,14 +75,14 @@ export class RequestService {
     options: RequestSendOptions,
     response: AdapterResponse
   ) {
-    // 执行上下文插件
-    RequestService.config.plugins.forEach(
-      (service) => service[leftcycle] && service[leftcycle](response, options)
-    );
-
     // 执行全局插件
     plugins.forEach(
-      (service) => service[leftcycle] && service[leftcycle](response, options)
+      (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
+    );
+
+    // 执行上下文插件
+    RequestService.config.plugins.forEach(
+      (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
     );
   }
 
@@ -108,8 +108,12 @@ export class RequestService {
    * @param response 请求响应对象
    * @returns
    */
-  private execInterceptors(response: AdapterResponse) {
+  private execInterceptors(
+    response: AdapterResponse,
+    hasException: boolean = false
+  ) {
     const interceptors = RequestService.config?.interceptors;
+
     if (
       !interceptors?.status ||
       !interceptors?.error ||
@@ -120,14 +124,20 @@ export class RequestService {
     }
 
     // 获取执行状态
-    const status = interceptors.status.exec(response);
+    const status = interceptors.status.exec(response) && !hasException;
 
+    // 执行异常拦截器
+    if (hasException) {
+      interceptors.exception.exec(response);
+    }
+
+    // 直接返回转换拦截器
     if (status) {
-      // 成功状态
-      return interceptors.status.exec(response);
+      // 成功状态转换
+      return Promise.resolve(interceptors.success.exec(response));
     } else {
-      // 失败状态
-      return interceptors.error.exec(response);
+      // 失败状态转换
+      return Promise.reject(interceptors.error.exec(response));
     }
   }
   /**
@@ -144,6 +154,9 @@ export class RequestService {
       throw new Error("请检查请求配置是否完成");
     }
 
+    // 请求异常标志
+    let hasException = false;
+
     // 获取请求适配器
     const adapter = this.getRequestAdapter();
 
@@ -151,27 +164,32 @@ export class RequestService {
     this.execRequestPlugin(plugins, options);
 
     // 开始进行请求
-
     const response = await this.startRequest(adapter, options)
       // 异常请求处理
-      .catch((response) => {
-        // 获取异常拦截器
-        const exceptionInterceptor =
-          RequestService.config?.interceptors?.exception;
-
-        // 执行异常拦截器
-        if (exceptionInterceptor) {
-          exceptionInterceptor.exec(adapter.transformResponse(response));
-        }
-
+      .catch((...response) => {
+        hasException = true;
         return response;
       })
-      .then(adapter.transformResponse);
+      .then((response) => adapter.transformResponse(response));
 
     // 执行前置插件
-    this.execResponsePlugin(PluginLifecycle.after, plugins, options, response);
+    if (!hasException) {
+      this.execResponsePlugin(
+        PluginLifecycle.after,
+        plugins,
+        options,
+        response
+      );
+    } else {
+      this.execResponsePlugin(
+        PluginLifecycle.catch,
+        plugins,
+        options,
+        response
+      );
+    }
 
     // 执行拦截器
-    return this.execInterceptors(response);
+    return this.execInterceptors(response, hasException);
   }
 }

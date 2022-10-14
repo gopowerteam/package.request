@@ -14,10 +14,10 @@ export interface RequestSetupConfig {
   qs?: IStringifyOptions;
   adapter?: InternalAdapter | RequestAdapter;
   interceptors: {
-    status: ResponseInterceptor<Boolean>;
-    success: ResponseInterceptor<Boolean>;
-    error: ResponseInterceptor<Boolean>;
-    exception: ResponseInterceptor<void>;
+    status: ResponseInterceptor;
+    success: ResponseInterceptor;
+    error: ResponseInterceptor;
+    exception: ResponseInterceptor;
   };
   plugins: RequestPlugin[];
 }

@@ -13,7 +13,7 @@ export enum RequestMethod {
 
 export interface RequestSendOptions {
   path: string;
-  method: RequestMethod;
+  method: RequestMethod | string;
   params?: any;
   data?: any;
   headers?: Record<string, string>;
