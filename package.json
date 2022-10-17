@@ -19,7 +19,7 @@
     "prerelease": "pnpm build",
     "release": "changeset publish",
     "prepare": "husky install",
-    "commit": "git add . && git-cz",
+    "commit": "git-cz",
     "preinstall": "npx only-allow pnpm"
   },
   "workspaces": [
@@ -30,15 +30,13 @@
     "prettier": "latest",
     "turbo": "latest",
     "@changesets/cli": "^2.23.0",
-    "@commitlint/config-conventional": "^17.0.3",
+    "@commitlint/cli": "17.1.2",
+    "@commitlint/config-conventional": "17.1.0",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^5.30.0",
     "@typescript-eslint/parser": "^5.30.0",
     "commitizen": "^4.2.4",
-    "commitlint": "^17.0.3",
-    "commitlint-config-cz": "^0.13.3",
-    "cz-conventional-changelog": "^3.3.0",
-    "cz-customizable": "^6.6.0",
+    "cz-customizable": "7.0.0",
     "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.1.0",
@@ -54,5 +52,15 @@
     "node": ">=14.0.0"
   },
   "dependencies": {},
-  "packageManager": "pnpm@7.11.0"
+  "packageManager": "pnpm@7.11.0",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  }
 }
