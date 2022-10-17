@@ -16,8 +16,5 @@
     "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
-  "include": [
-    "src",
-    "../../playground/src/**/*.ts", "test",
-  ]
+  "include": ["src", "../../playground/src/**/*.ts", "test"]
 }

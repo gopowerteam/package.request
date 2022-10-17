@@ -13,9 +13,7 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "dev": "vite",
-    "build": "tsup",
-    "preview": "vite preview"
+    "build": "tsup"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
