@@ -1,9 +1,9 @@
 module.exports = {
-  '**/*.{ts,tsx}': [
+  '!(**/*.spec.*)**/*.{ts,tsx}': [
     'eslint --cache --fix --max-warnings=0',
     'prettier --write'
   ],
-  '**/*.{js,jsx}': [
+  '!(**/*.spec.*)**/*.{js,jsx}': [
     'eslint --cache --fix --max-warnings=0 ',
     'prettier --write'
   ]

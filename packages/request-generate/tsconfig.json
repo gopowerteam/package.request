@@ -13,9 +13,11 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "preserveValueImports": true,
+    "importsNotUsedAsValues": "error",
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

@@ -27,6 +27,8 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@babel/core": "7.19.1",
+    "@babel/eslint-parser": "7.19.1",
     "prettier": "latest",
     "turbo": "latest",
     "@changesets/cli": "^2.23.0",
