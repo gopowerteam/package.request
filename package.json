@@ -19,7 +19,7 @@
     "prerelease": "pnpm build",
     "release": "changeset publish",
     "prepare": "husky install",
-    "commit": "git add . && cz",
+    "commit": "git add . && git-cz",
     "preinstall": "npx only-allow pnpm"
   },
   "workspaces": [
