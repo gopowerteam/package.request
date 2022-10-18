@@ -19,5 +19,5 @@
     "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src", "test"]
+  "include": ["src/**/*.ts", "test/**/*.spec.ts"]
 }

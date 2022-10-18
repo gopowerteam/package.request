@@ -1,0 +1,5 @@
+{{#if imports}}
+{{#each imports}}
+import type { {{{this}}} } from './{{{this}}}';
+{{/each}}
+{{/if}}

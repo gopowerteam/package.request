@@ -1,10 +1,5 @@
-import { OpenAPIVersion } from '../config/enum.config'
-import { Model } from './model'
-import { Service } from './service'
+import type { Model } from '../entities/model'
 
-export type generateClient = {
-  name?: string
-  version: OpenAPIVersion
+export type GenerateClient = {
   models: Model[]
-  services: Service[]
 }

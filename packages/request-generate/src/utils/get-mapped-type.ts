@@ -24,13 +24,10 @@ const TYPE_MAPPINGS = new Map<string, string>([
 /**
  * 获取对应类型
  */
-export const parseMappedType = (
-  type: string,
-  format?: string
-): string | undefined => {
+export const getMappedType = (type: string, format?: string): string => {
   if (format === 'binary') {
     return 'binary'
   }
 
-  return TYPE_MAPPINGS.get(type)
+  return TYPE_MAPPINGS.get(type) || 'any'
 }
