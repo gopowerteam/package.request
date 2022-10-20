@@ -7,6 +7,7 @@ export function parseV2(document: OpenAPIV2.Document): GenerateClient {
   const models = parseModels(document)
 
   return {
-    models
+    models,
+    services: []
   }
 }

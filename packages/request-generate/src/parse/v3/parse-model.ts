@@ -7,14 +7,13 @@ export function parseModel(name: string, definition: OpenAPIV3.SchemaObject) {
 
   // 生成字段
   model.fields = parseFields(definition)
-  model.imports = parseImports(model)
+  // 导入模型
+  const imports = model.fields
+    .filter((field) => field.imports)
+    .reduce<string[]>((r, m) => [...r, ...(m.imports || [])], [])
+    .filter((m) => m !== name)
+
+  model.imports = Array.from(new Set(imports))
 
   return model
-}
-
-function parseImports(model: Model) {
-  return model.fields
-    .filter((field) => field.isRef && field.ref)
-    .map((field) => field.ref as string)
-    .filter((ref) => ref !== model.name)
 }

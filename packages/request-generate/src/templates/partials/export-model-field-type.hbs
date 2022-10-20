@@ -1,9 +1,5 @@
-{{~#if isRef~}}
-  {{~#is-array ref~}}
-    {{~#each ref~}}{{{this}}}{{#unless @last}} | {{/unless}}{{~/each~}}
-  {{~else~}}
-    {{{ref}}}
-  {{~/is-array~}}
+{{~#if ref~}}
+  {{{ref}}}
 {{~else~}}
   {{{type}}}
 {{~/if~}}

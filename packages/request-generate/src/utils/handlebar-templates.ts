@@ -13,7 +13,6 @@ export function registerHandlebarTemplates() {
 }
 
 function registerHandlebarPartials() {
-  registerHandlebarPartial('is-array')
   registerHandlebarPartial('is-required')
   registerHandlebarPartial('export-header')
   registerHandlebarPartial('export-description')

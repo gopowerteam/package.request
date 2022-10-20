@@ -24,7 +24,7 @@ const TYPE_MAPPINGS = new Map<string, string>([
 /**
  * 获取对应类型
  */
-export const getMappedType = (type: string, format?: string): string => {
+export const getMappedType = (type = 'object', format?: string): string => {
   if (format === 'binary') {
     return 'binary'
   }
