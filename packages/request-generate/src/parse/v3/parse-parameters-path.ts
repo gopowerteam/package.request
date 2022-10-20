@@ -12,6 +12,7 @@ export function parseParametersPath(
       const parameter = new OperationParameter()
 
       parameter.name = p.name
+      parameter.description = p.description
       parameter.in = 'path'
       parameter.type = type
       parameter.ref = ref

@@ -4,6 +4,7 @@ import * as path from 'node:path'
 import Handlebars from 'handlebars'
 import { equalHelper } from '../templates/helpers/equal.helper'
 import { isArrayHelper } from '../templates/helpers/is-array.helper'
+import { toUpperHelper } from '../templates/helpers/to-upper.helper'
 
 export function registerHandlebarTemplates() {
   // 注册Partials
@@ -14,18 +15,38 @@ export function registerHandlebarTemplates() {
 
 function registerHandlebarPartials() {
   registerHandlebarPartial('is-required')
+
   registerHandlebarPartial('export-header')
   registerHandlebarPartial('export-description')
   registerHandlebarPartial('export-model-import')
   registerHandlebarPartial('export-model-type')
   registerHandlebarPartial('export-model-field')
-  registerHandlebarPartial('export-model-field-type')
+  registerHandlebarPartial('export-schema-type')
+
+  registerHandlebarPartial('export-service-import')
+  registerHandlebarPartial('export-service-class')
+  registerHandlebarPartial('export-service-namespace')
+  registerHandlebarPartial('export-service-namespace-type')
+  registerHandlebarPartial('export-service-operation')
+  registerHandlebarPartial('export-operation-params-path')
+  registerHandlebarPartial('export-operation-params-query')
+  registerHandlebarPartial('export-operation-params-body')
+  registerHandlebarPartial('export-operation-response')
 }
 
 function registerHandlebarHelpers() {
-  Handlebars.registerHelper(isArrayHelper.name, isArrayHelper.fn)
-  Handlebars.registerHelper(equalHelper.name, equalHelper.fn)
+  registerHandlebarHelper(equalHelper)
+  registerHandlebarHelper(isArrayHelper)
+  registerHandlebarHelper(toUpperHelper)
 }
+
+function registerHandlebarHelper(helper: {
+  name: string
+  fn: Handlebars.HelperDelegate
+}) {
+  Handlebars.registerHelper(helper.name, helper.fn)
+}
+
 /**
  * 注册Handlebar模板
  */
@@ -33,6 +54,7 @@ function registerHandlebarPartial(input: string) {
   const template = loadHandlebarTemplate(`partials/${input}`)
   Handlebars.registerPartial(input, template)
 }
+
 /**
  * 加载模板
  * @returns

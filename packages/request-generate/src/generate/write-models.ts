@@ -14,7 +14,7 @@ export function writeModels(
   client: GenerateClient,
   options: GenerateApplicationOptions
 ) {
-  if (!options.exportModels && client.models) {
+  if (!options.exportModels || !client.models) {
     return
   }
 

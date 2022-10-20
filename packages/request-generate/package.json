@@ -19,6 +19,7 @@
   "types": "./dist/index.d.ts",
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
+    "@gopowerteam/request": "*",
     "@types/jest": "^29.1.2",
     "@types/node": "16",
     "@types/qs": "^6.9.7",
@@ -34,6 +35,7 @@
     "camelcase": "^7.0.0",
     "handlebars": "^4.7.7",
     "qs": "^6.11.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "rxjs": "^7.5.7"
   }
 }

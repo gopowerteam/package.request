@@ -4,6 +4,7 @@ import { getOperationName } from '../../utils/get-operation-name'
 import { parseParametersBody } from './parse-parameters-body'
 import { parseParametersPath } from './parse-parameters-path'
 import { parseParametersQuery } from './parse-parameters-query'
+import { parseSchemaType } from './parse-schema-type'
 
 export function parseOperation(
   path: string,
@@ -12,7 +13,10 @@ export function parseOperation(
 ) {
   const name = getOperationName(path, method, operationObject)
 
-  const operation = new Operation(name, method)
+  const operation = new Operation(name, method, path)
+
+  // Operation注释
+  operation.description = operationObject.summary
 
   if (operationObject.requestBody) {
     operation.parametersBody = parseParametersBody(operationObject.requestBody)
@@ -23,13 +27,43 @@ export function parseOperation(
     operation.parametersQuery = parseParametersQuery(operationObject.parameters)
   }
 
+  // 解析返回类型
+  const responseSchema = parseResponseType(operationObject.responses)
+
   operation.imports = Array.from(
     new Set([
       ...(operation.parametersBody?.imports || []),
       ...(operation.parametersPath.flatMap((p) => p.imports) || []),
-      ...(operation.parametersQuery.flatMap((p) => p.imports) || [])
+      ...(operation.parametersQuery.flatMap((p) => p.imports) || []),
+      ...(responseSchema?.imports || [])
     ])
   )
 
+  operation.responseRef = responseSchema?.ref || 'void'
+
   return operation
+}
+
+function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
+  const SUCCESS_STATUS_CODE = '200'
+  const response = responses?.[SUCCESS_STATUS_CODE]
+
+  // 引用直接类型转换
+  if (response && '$ref' in response) {
+    return parseSchemaType(responses)
+  }
+
+  if (
+    response &&
+    'content' in response &&
+    response?.content?.['application/json']?.schema
+  ) {
+    return parseSchemaType(response?.content?.['application/json']?.schema)
+  }
+
+  return {
+    type: 'void',
+    ref: 'void',
+    imports: []
+  }
 }

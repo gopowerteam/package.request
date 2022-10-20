@@ -29,7 +29,10 @@ module.exports = {
       extends: [
         // typescript支持引入
         'plugin:@typescript-eslint/recommended'
-      ]
+      ],
+      rules: {
+        '@typescript-eslint/no-explicit-any': ['off']
+      }
     }
   ]
 }

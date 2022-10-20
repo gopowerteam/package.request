@@ -6,7 +6,11 @@ describe('测试请求生成逻辑', () => {
       gateway: 'https://mall-service.gopowerteam.cn/admin',
       openapi: '/api-docs',
       output: './generated',
-      exportModels: true
+      exportModels: true,
+      exportServices: {
+        responseType: 'observable',
+        excludeQueryParams: ['page', 'size', 'order']
+      }
     })
 
     expect(true).toBe(true)

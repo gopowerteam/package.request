@@ -1,13 +1,13 @@
 import {
   AdapterResponse,
   RequestAdapter,
-  RequestAdapterOptions,
-} from "../interfaces/request-adapter.interface";
-import axios, { AxiosInstance } from "axios";
-import { RequestService } from "../request-service";
+  RequestAdapterOptions
+} from '../interfaces/request-adapter.interface'
+import axios, { AxiosInstance } from 'axios'
+import { RequestService } from '../request-service'
 
 export class AxiosAdapter implements RequestAdapter {
-  private static axiosInstance: AxiosInstance;
+  private static axiosInstance: AxiosInstance
 
   /**
    * 获取Axios实例
@@ -17,12 +17,12 @@ export class AxiosAdapter implements RequestAdapter {
       AxiosAdapter.axiosInstance = axios.create({
         timeout: RequestService.config.timeout,
         headers: {
-          "Content-Type": "application/json",
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      })
     }
 
-    return AxiosAdapter.axiosInstance;
+    return AxiosAdapter.axiosInstance
   }
 
   /**
@@ -35,19 +35,19 @@ export class AxiosAdapter implements RequestAdapter {
     pathURL,
     headers,
     method,
-    params,
-    data,
+    paramsQuery,
+    paramsBody
   }: RequestAdapterOptions) {
-    const axiosInstance = this.getAxiosInstance();
+    const axiosInstance = this.getAxiosInstance()
 
     return axiosInstance.request({
       method,
       baseURL,
       headers,
-      params,
-      data,
-      url: pathURL,
-    });
+      params: paramsQuery,
+      data: paramsBody,
+      url: pathURL
+    })
   }
 
   /**
@@ -60,7 +60,7 @@ export class AxiosAdapter implements RequestAdapter {
       data: response.data,
       statusText: response.statusText,
       status: response.status,
-      headers: response.headers,
-    };
+      headers: response.headers
+    }
   }
 }

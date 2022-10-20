@@ -1,0 +1,11 @@
+namespace RequestQueryParams {
+{{#each operations}}
+  {{#if parametersQuery}}
+  export type {{to-upper name true}} = {
+    {{#each parametersQuery}}
+    {{>export-service-namespace-type}}
+    {{/each}}
+  }
+  {{/if}}
+{{/each}}
+}

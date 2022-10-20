@@ -58,16 +58,16 @@ var _AxiosAdapter = class {
     pathURL,
     headers,
     method,
-    params,
-    data
+    paramsQuery,
+    paramsBody
   }) {
     const axiosInstance = this.getAxiosInstance();
     return axiosInstance.request({
       method,
       baseURL,
       headers,
-      params,
-      data,
+      params: paramsQuery,
+      data: paramsBody,
       url: pathURL
     });
   }
@@ -125,14 +125,24 @@ var _RequestService = class {
       (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
     );
   }
+  parseRequestPath(path, paramsPath) {
+    if (paramsPath) {
+      return Object.entries(paramsPath).reduce(
+        (r, [key, value]) => r.replace(`{${key}}`, value.toString()),
+        path
+      );
+    } else {
+      return path;
+    }
+  }
   startRequest(adapter, options) {
     return adapter.request({
       baseURL: _RequestService.config.gateway,
-      pathURL: options.path,
-      params: options.params,
-      data: options.data,
+      pathURL: this.parseRequestPath(options.path, options.paramsPath),
+      method: options.method,
       headers: options.headers || {},
-      method: options.method
+      paramsQuery: options.paramsQuery,
+      paramsBody: options.paramsBody
     });
   }
   execInterceptors(response, hasException = false) {
@@ -163,19 +173,9 @@ var _RequestService = class {
       return response2;
     }).then((response2) => adapter.transformResponse(response2));
     if (!hasException) {
-      this.execResponsePlugin(
-        "after" /* after */,
-        plugins,
-        options,
-        response
-      );
+      this.execResponsePlugin("after" /* after */, plugins, options, response);
     } else {
-      this.execResponsePlugin(
-        "catch" /* catch */,
-        plugins,
-        options,
-        response
-      );
+      this.execResponsePlugin("catch" /* catch */, plugins, options, response);
     }
     return this.execInterceptors(response, hasException);
   }

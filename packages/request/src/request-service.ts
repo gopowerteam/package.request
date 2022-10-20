@@ -1,30 +1,30 @@
-import { AxiosAdapter } from "./adapters/axios.adapter";
+import { AxiosAdapter } from './adapters/axios.adapter'
 import {
   AdapterResponse,
-  RequestAdapter,
-} from "./interfaces/request-adapter.interface";
+  RequestAdapter
+} from './interfaces/request-adapter.interface'
 import {
   PluginLifecycle,
   RequestPlugin,
-  ResponseLifecycle,
-} from "./interfaces/request-plugin.interface";
-import { RequestSendOptions } from "./interfaces/request-send.interface";
-import { RequestSetupConfig } from "./interfaces/request-setup.interface";
+  ResponseLifecycle
+} from './interfaces/request-plugin.interface'
+import { RequestSendOptions } from './interfaces/request-send.interface'
+import { RequestSetupConfig } from './interfaces/request-setup.interface'
 
 export class RequestService {
-  static config: RequestSetupConfig;
+  static config: RequestSetupConfig
 
-  static instance: RequestService;
+  static instance: RequestService
 
   /**
    * 获取服务请求单例
    */
   public static getInstance(): RequestService {
     if (this.instance) {
-      return this.instance;
+      return this.instance
     }
 
-    return new RequestService();
+    return new RequestService()
   }
 
   /**
@@ -32,18 +32,18 @@ export class RequestService {
    * @returns
    */
   private getRequestAdapter(): RequestAdapter {
-    if (typeof RequestService.config.adapter === "string") {
+    if (typeof RequestService.config.adapter === 'string') {
       switch (RequestService.config.adapter) {
-        case "axios":
-          return new AxiosAdapter();
+        case 'axios':
+          return new AxiosAdapter()
       }
     }
 
     if (!RequestService.config.adapter) {
-      throw new Error("请检查是否配置请求Adatper");
+      throw new Error('请检查是否配置请求Adatper')
     }
 
-    return RequestService.config.adapter;
+    return RequestService.config.adapter
   }
 
   /**
@@ -58,10 +58,10 @@ export class RequestService {
     // 执行上下文插件
     RequestService.config.plugins.forEach(
       (service) => service.before && service.before(options)
-    );
+    )
 
     // 执行全局插件
-    plugins.forEach((service) => service.before && service.before(options));
+    plugins.forEach((service) => service.before && service.before(options))
   }
 
   /**
@@ -78,12 +78,29 @@ export class RequestService {
     // 执行全局插件
     plugins.forEach(
       (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
-    );
+    )
 
     // 执行上下文插件
     RequestService.config.plugins.forEach(
       (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
-    );
+    )
+  }
+
+  /**
+   * 转换请求路径
+   */
+  private parseRequestPath(
+    path: string,
+    paramsPath?: Record<string, string | number>
+  ): string {
+    if (paramsPath) {
+      return Object.entries(paramsPath).reduce<string>(
+        (r, [key, value]) => r.replace(`{${key}}`, value.toString()),
+        path
+      )
+    } else {
+      return path
+    }
   }
 
   /**
@@ -95,12 +112,12 @@ export class RequestService {
   private startRequest(adapter: RequestAdapter, options: RequestSendOptions) {
     return adapter.request({
       baseURL: RequestService.config.gateway,
-      pathURL: options.path,
-      params: options.params,
-      data: options.data,
-      headers: options.headers || {},
+      pathURL: this.parseRequestPath(options.path, options.paramsPath),
       method: options.method,
-    });
+      headers: options.headers || {},
+      paramsQuery: options.paramsQuery,
+      paramsBody: options.paramsBody
+    })
   }
 
   /**
@@ -108,11 +125,8 @@ export class RequestService {
    * @param response 请求响应对象
    * @returns
    */
-  private execInterceptors(
-    response: AdapterResponse,
-    hasException: boolean = false
-  ) {
-    const interceptors = RequestService.config?.interceptors;
+  private execInterceptors(response: AdapterResponse, hasException = false) {
+    const interceptors = RequestService.config?.interceptors
 
     if (
       !interceptors?.status ||
@@ -120,24 +134,24 @@ export class RequestService {
       !interceptors?.success ||
       !interceptors?.exception
     ) {
-      throw new Error("请检查拦截器配置");
+      throw new Error('请检查拦截器配置')
     }
 
     // 获取执行状态
-    const status = interceptors.status.exec(response) && !hasException;
+    const status = interceptors.status.exec(response) && !hasException
 
     // 执行异常拦截器
     if (hasException) {
-      interceptors.exception.exec(response);
+      interceptors.exception.exec(response)
     }
 
     // 直接返回转换拦截器
     if (status) {
       // 成功状态转换
-      return Promise.resolve(interceptors.success.exec(response));
+      return Promise.resolve(interceptors.success.exec(response))
     } else {
       // 失败状态转换
-      return Promise.reject(interceptors.error.exec(response));
+      return Promise.reject(interceptors.error.exec(response))
     }
   }
   /**
@@ -151,45 +165,35 @@ export class RequestService {
     plugins: RequestPlugin[] = []
   ): Promise<any> {
     if (!RequestService.config) {
-      throw new Error("请检查请求配置是否完成");
+      throw new Error('请检查请求配置是否完成')
     }
 
     // 请求异常标志
-    let hasException = false;
+    let hasException = false
 
     // 获取请求适配器
-    const adapter = this.getRequestAdapter();
+    const adapter = this.getRequestAdapter()
 
     // 执行前置插件
-    this.execRequestPlugin(plugins, options);
+    this.execRequestPlugin(plugins, options)
 
     // 开始进行请求
     const response = await this.startRequest(adapter, options)
       // 异常请求处理
       .catch((...response) => {
-        hasException = true;
-        return response;
+        hasException = true
+        return response
       })
-      .then((response) => adapter.transformResponse(response));
+      .then((response) => adapter.transformResponse(response))
 
     // 执行前置插件
     if (!hasException) {
-      this.execResponsePlugin(
-        PluginLifecycle.after,
-        plugins,
-        options,
-        response
-      );
+      this.execResponsePlugin(PluginLifecycle.after, plugins, options, response)
     } else {
-      this.execResponsePlugin(
-        PluginLifecycle.catch,
-        plugins,
-        options,
-        response
-      );
+      this.execResponsePlugin(PluginLifecycle.catch, plugins, options, response)
     }
 
     // 执行拦截器
-    return this.execInterceptors(response, hasException);
+    return this.execInterceptors(response, hasException)
   }
 }

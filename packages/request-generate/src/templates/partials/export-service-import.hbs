@@ -1,0 +1,9 @@
+{{#if imports}}
+{{#each imports}}
+import type { {{{this}}} } from '../models/{{{this}}}';
+{{/each}}
+{{/if}}
+{{#equal responseType 'observable'}}
+import { from, type Observable } from 'rxjs';
+{{/equal}}
+import { RequestService, RequestPlugin } from '@gopowerteam/request';

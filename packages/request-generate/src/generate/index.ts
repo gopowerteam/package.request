@@ -10,8 +10,9 @@ import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
 import type { GenerateClient } from '../types/generate-client'
-import { writeModels } from './write-models'
 import { registerHandlebarTemplates } from '../utils/handlebar-templates'
+import { writeModels } from './write-models'
+import { writeServices } from './write-services'
 
 type UnkownVersionDocument = OpenAPIV3.Document & OpenAPIV2.Document
 
@@ -83,9 +84,8 @@ export class Generate {
   ) {
     // 写入model
     writeModels(client, options)
-
     // 写入Service
-    // writeService()
+    writeServices(client, options)
   }
 }
 

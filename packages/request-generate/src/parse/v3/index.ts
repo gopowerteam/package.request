@@ -5,10 +5,11 @@ import { parseServices } from './parse-services'
 export function parseV3(document: OpenAPIV3.Document) {
   // 转换Model对象
   const models = parseModels(document)
-  parseServices(document)
+  // 转换Service对象
+  const services = parseServices(document)
 
   return {
     models,
-    services: []
+    services
   }
 }

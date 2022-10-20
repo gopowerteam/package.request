@@ -1,0 +1,36 @@
+{{>export-description}}
+public {{{name}}}(
+  {{>export-operation-params-path}}
+  {{>export-operation-params-query}}
+  {{>export-operation-params-body}}
+  requestPlugins: RequestPlugin[] = []
+): {{>export-operation-response }} {
+  // 请求数据
+  const result = this.request.send(
+    {
+      path: '{{{path}}}',
+      method: '{{{method}}}',
+      {{#if parametersPath}}
+      {{#each parametersPath}}
+      paramsPath: {
+        {{{name}}},
+      },
+      {{/each}}
+      {{/if}}
+      {{#if parametersQuery}}
+      paramsQuery: requestQuery,
+      {{/if}}
+      {{#if parametersBody}}
+      paramsBody: requestBody,
+      {{/if}}
+    },
+    requestPlugins
+  );
+
+  {{#equal responseType 'observable'}}
+  return from(result)
+  {{else}}
+  return result
+  {{/equal}}
+}
+

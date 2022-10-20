@@ -1,0 +1,9 @@
+export class {{{name}}}Service {
+  // 请求实例
+  private request = RequestService.getInstance();
+
+  {{#each operations}}
+  {{>export-service-operation}}
+  {{/each}}
+}
+

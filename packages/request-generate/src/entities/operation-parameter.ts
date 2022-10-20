@@ -7,6 +7,8 @@ export class OperationParameter {
   type: string
   // 参数引用
   ref?: string
+  // 参数注释
+  description?: string
   // 导入类型
   imports: string[] = []
 }

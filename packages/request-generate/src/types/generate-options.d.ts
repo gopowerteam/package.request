@@ -25,6 +25,8 @@ export type GenerateOptions = {
       method: string,
       object: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject
     ) => string
+    excludeQueryParams?: string[]
+    responseType?: 'promise' | 'observable'
   }
   // 多应用列表
   applications?: Record<string, string>
