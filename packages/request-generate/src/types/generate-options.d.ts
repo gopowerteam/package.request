@@ -16,17 +16,17 @@ export type GenerateOptions = {
   logger?: boolean
   // 输出Model路径
   exportServices?: {
-    serviceResolve?: (
-      path: string,
-      method: string,
-      object: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject,
-      tags: OpenAPIV2.TagObject[]
-    ) => string
-    operationResolve?: (
-      path: string,
-      method: string,
+    serviceResolve?: (options: {
+      path: string
+      method: string
       object: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject
-    ) => string
+      tags: OpenAPIV2.TagObject[]
+    }) => string
+    operationResolve?: (options: {
+      path: string
+      method: string
+      object: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject
+    }) => string
     excludeQueryParams?: string[]
     responseType?: 'promise' | 'observable'
   }

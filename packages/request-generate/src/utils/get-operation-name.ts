@@ -16,7 +16,7 @@ export function getOperationName(
   const resolve = Generate.options?.exportServices?.operationResolve
 
   if (resolve) {
-    return resolve(path, method, operationObject)
+    return resolve({ path, method, object: operationObject })
   } else {
     return operationObject.operationId || ''
   }

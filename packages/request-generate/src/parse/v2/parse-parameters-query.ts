@@ -1,10 +1,10 @@
-import type { OpenAPIV3 } from 'openapi-types'
+import type { OpenAPIV2 } from 'openapi-types'
 import { OperationParameter } from '../../entities/operation-parameter'
 import { Generate } from '../../generate'
 import { parseSchemaType } from './parse-schema-type'
 
 export function parseParametersQuery(
-  parameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[]
+  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[]
 ) {
   const excludeParams = Generate.options?.exportServices?.excludeQueryParams
 

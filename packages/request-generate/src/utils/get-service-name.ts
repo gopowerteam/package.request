@@ -20,7 +20,7 @@ export function getServiceName(
   const resolve = Generate.options?.exportServices?.serviceResolve
 
   if (resolve) {
-    return resolve(path, method, operationObject, tags)
+    return resolve({ path, method, object: operationObject, tags })
   } else {
     return operationObject.tags?.map((tag) => getCamelName(tag)) || 'Default'
   }

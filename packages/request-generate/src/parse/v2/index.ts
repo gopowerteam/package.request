@@ -1,13 +1,15 @@
 import type { OpenAPIV2 } from 'openapi-types'
-import type { GenerateClient } from '../../types/generate-client'
 import { parseModels } from './parse-models'
+import { parseServices } from './parse-services'
 
-export function parseV2(document: OpenAPIV2.Document): GenerateClient {
-  // 生成models
+export function parseV2(document: OpenAPIV2.Document) {
+  // 转换Model对象
   const models = parseModels(document)
+  // 转换Service对象
+  const services = parseServices(document)
 
   return {
     models,
-    services: []
+    services
   }
 }

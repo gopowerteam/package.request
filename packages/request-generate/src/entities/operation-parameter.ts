@@ -11,6 +11,8 @@ export class OperationParameter {
   enums?: string[]
   // 参数注释
   description?: string
+  // 是否必填
+  required?: boolean
   // 导入类型
   imports: string[] = []
 }
