@@ -1,8 +1,14 @@
 import type { Options } from 'tsup'
 
 export default <Options>{
-  entryPoints: ['src/*.ts'],
+  entry: ['src/index.ts'],
+  format: ['cjs'],
+  dts: true,
+  splitting: true,
   clean: true,
-  format: ['cjs', 'esm'],
-  dts: true
+  treeShaking: true,
+  platform: 'node',
+  target: 'node16',
+  external: ['rxjs', 'axios', '@apidevtools/swagger-parser'],
+  shims: true
 }

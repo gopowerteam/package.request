@@ -2,7 +2,7 @@
   "name": "@gopowerteam/request-generate",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "commonjs",
   "files": [
     "dist",
     "README.md"
@@ -12,18 +12,28 @@
     "request-generate"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "postbuild": "npm run copy-templates",
+    "copy-templates": "copyfiles -a -u 2 src/templates/* src/templates/**/* ./dist/templates"
   },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "devDependencies": {
-    "@apidevtools/swagger-parser": "^10.1.0",
     "@gopowerteam/request": "*",
     "@types/jest": "^29.1.2",
     "@types/node": "16",
     "@types/qs": "^6.9.7",
     "@types/rimraf": "^3.0.2",
+    "commander": "^9.4.1",
+    "copyfiles": "^2.4.1",
     "jest": "^29.1.2",
     "openapi-types": "^12.0.2",
     "ts-jest": "^29.0.3",
@@ -32,10 +42,10 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "camelcase": "^7.0.0",
     "handlebars": "^4.7.7",
     "qs": "^6.11.0",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.5.7"
+    "rxjs": "^7.5.7",
+    "@apidevtools/swagger-parser": "^10.1.0"
   }
 }

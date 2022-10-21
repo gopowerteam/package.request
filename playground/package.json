@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "ts-node ./src/index.ts"
+    "dev:request": "ts-node ./src/request/index.ts",
+    "dev:request-generate": "ts-node ./src/request-generate/index.ts"
   },
   "dependencies": {
     "@gopowerteam/request": "*",

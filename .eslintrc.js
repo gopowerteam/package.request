@@ -17,6 +17,7 @@ module.exports = {
       files: ['**/*.{js,jsx}'],
       parser: '@babel/eslint-parser',
       parserOptions: {
+        requireConfigFile: false,
         sourceType: 'module',
         allowImportExportEverywhere: false,
         ecmaFeatures: {

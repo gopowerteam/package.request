@@ -1,5 +1,5 @@
 import type { Service } from '../entities/service'
-import { loadHandlebarTemplate } from '../utils/handlebar-templates'
+import { loadHandlebarTemplate } from '../template'
 import { writeFile } from './write-file'
 import Handlebars from 'handlebars'
 

@@ -1,1 +1,3 @@
-export * from './generate'
+import { Generate } from './generate'
+
+export default Generate.startup

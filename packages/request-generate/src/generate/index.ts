@@ -10,7 +10,7 @@ import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
 import type { GenerateClient } from '../types/generate-client'
-import { registerHandlebarTemplates } from '../utils/handlebar-templates'
+import { registerHandlebarTemplates } from '../template'
 import { writeModels } from './write-models'
 import { writeServices } from './write-services'
 
@@ -88,5 +88,3 @@ export class Generate {
     writeServices(client, options)
   }
 }
-
-export const generate = Generate.startup

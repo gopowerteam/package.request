@@ -2,9 +2,9 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import Handlebars from 'handlebars'
-import { equalHelper } from '../templates/helpers/equal.helper'
-import { isArrayHelper } from '../templates/helpers/is-array.helper'
-import { toUpperHelper } from '../templates/helpers/to-upper.helper'
+import { equalHelper } from './template-helpers/equal.helper'
+import { isArrayHelper } from './template-helpers/is-array.helper'
+import { toUpperHelper } from './template-helpers/to-upper.helper'
 
 export function registerHandlebarTemplates() {
   // 注册Partials
@@ -60,11 +60,6 @@ function registerHandlebarPartial(input: string) {
  * @returns
  */
 export function loadHandlebarTemplate(input: string) {
-  const templatePath = path.resolve(
-    __dirname,
-    '..',
-    'templates',
-    `${input}.hbs`
-  )
+  const templatePath = path.resolve(__dirname, 'templates', `${input}.hbs`)
   return fs.readFileSync(templatePath, 'utf-8')
 }

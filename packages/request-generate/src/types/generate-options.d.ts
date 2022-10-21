@@ -12,6 +12,8 @@ export type GenerateOptions = {
   output: string
   // 输出Model路径
   exportModels: boolean
+  // 开启日志输出
+  logger: boolean
   // 输出Model路径
   exportServices?: {
     serviceResolve?: (

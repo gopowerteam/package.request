@@ -1,4 +1,5 @@
 import type { Model } from '../entities/model'
+import type { Service } from '../entities/service'
 
 export type GenerateClient = {
   // 模型列表
