@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from 'openapi-types'
 import type { Model } from '../../entities/model'
+import { getCamelName } from '../../utils/get-camel-name'
 import { parseModel } from './parse-model'
 // import { parseType } from './parse-type'
 
@@ -15,7 +16,7 @@ export function parseModels(document: OpenAPIV3.Document) {
           definitionName
         ] as OpenAPIV3.SchemaObject
         // 生成model对象
-        const model = parseModel(definitionName, definition)
+        const model = parseModel(getCamelName(definitionName), definition)
 
         models.push(model)
       }

@@ -7,7 +7,7 @@ export function parseParametersPath(
 ) {
   return parameters.reduce<OperationParameter[]>((r, p) => {
     if (!('$ref' in p) && p.in === 'path' && p.schema) {
-      const { type, ref, imports } = parseSchemaType(p.schema)
+      const { type, ref, imports, enums } = parseSchemaType(p.schema)
 
       const parameter = new OperationParameter()
 
@@ -17,6 +17,7 @@ export function parseParametersPath(
       parameter.type = type
       parameter.ref = ref
       parameter.imports = imports || []
+      parameter.enums = enums
 
       r.push(parameter)
     }

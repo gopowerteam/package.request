@@ -15,7 +15,7 @@ export function parseParametersQuery(
       p.schema &&
       !(excludeParams && excludeParams.includes(p.name))
     ) {
-      const { type, ref, imports } = parseSchemaType(p.schema)
+      const { type, ref, imports, enums } = parseSchemaType(p.schema)
 
       const parameter = new OperationParameter()
 
@@ -25,6 +25,7 @@ export function parseParametersQuery(
       parameter.type = type
       parameter.ref = ref
       parameter.imports = imports || []
+      parameter.enums = enums
 
       r.push(parameter)
     }

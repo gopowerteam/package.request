@@ -11,14 +11,14 @@ export function parseField(
   const field = new Field(name, required)
 
   // 解析类型
-  const { type, ref, imports } = parseSchemaType(properties)
+  const { type, ref, imports, enums } = parseSchemaType(properties)
 
   field.type = type
   field.ref = ref
   field.imports = imports
+  field.enums = enums
 
   if (!('$ref' in properties)) {
-    field.enum = properties.enum
     field.description = properties.description
   }
 

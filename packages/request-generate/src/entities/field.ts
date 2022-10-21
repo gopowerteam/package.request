@@ -8,7 +8,7 @@ export class Field {
   // 引用类型
   ref?: string
   // 字段枚举
-  enum?: string[]
+  enums?: string[]
   // 描述信息
   description?: string
   // 导入类型

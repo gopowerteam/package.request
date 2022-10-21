@@ -1,5 +1,11 @@
 {{~#if ref~}}
-  {{{ref}}}
+{{{ref}}}
 {{~else~}}
-  {{{type}}}
+{{~#if enums~}}
+{{~#each enums~}}
+'{{{this}}}'{{#unless @last}} | {{/unless}}
+{{~/each~}}
+{{else}}
+{{{type}}}
+{{~/if~}}
 {{~/if~}}

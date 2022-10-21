@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from 'openapi-types'
 import type { SchemaType } from '../../types/schema-type'
+import { getCamelName } from '../../utils/get-camel-name'
 import { getMappedType } from '../../utils/get-mapped-type'
 import { stripNamespace } from './strip-namespace'
 
@@ -9,7 +10,7 @@ export function parseSchemaType(
   // ReferenceObject类型
   if ('$ref' in schema) {
     // 获取引用类型
-    const ref = stripNamespace(schema.$ref)
+    const ref = getCamelName(stripNamespace(schema.$ref))
 
     return {
       type: 'any',
@@ -28,14 +29,15 @@ export function parseSchemaType(
   ) {
     return {
       type: getMappedType(schema.type || 'any'),
-      ref: undefined
+      ref: undefined,
+      enums: schema.enum
     }
   }
 
   // ArrayReferenceObject类型
   if (schema.type === 'array' && '$ref' in schema.items) {
     // 获取引用类型
-    const ref = stripNamespace(schema.items.$ref)
+    const ref = getCamelName(stripNamespace(schema.items.$ref))
 
     return {
       type: 'any[]',
@@ -64,11 +66,15 @@ export function parseSchemaType(
       return {
         type: hasRef ? 'any' : ofSchemaArray.map((s) => s.type).join('|'),
         ref: hasRef
-          ? ofSchemaArray.map((s) => s.ref || s.type).join('|')
+          ? ofSchemaArray
+              .map((s) => (s.ref && getCamelName(s.ref)) || s.type)
+              .join('|')
           : undefined,
         imports: hasRef
           ? ofSchemaArray.reduce<string[]>(
-              (r, s) => (s.ref && !r.includes(s.ref) && r.push(s.ref), r),
+              (r, s) => (
+                s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
+              ),
               []
             )
           : undefined

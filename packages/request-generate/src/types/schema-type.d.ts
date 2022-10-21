@@ -5,4 +5,6 @@ export type SchemaType = {
   ref?: string
   // 导入类型
   imports?: string[]
+  // 枚举
+  enums?: string[]
 }
