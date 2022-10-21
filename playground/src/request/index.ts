@@ -1,13 +1,12 @@
-import { RequestService, setup } from '@gopowerteam/request'
+import { setup } from '@gopowerteam/request'
 import { RequestSetupConfig } from '@gopowerteam/request'
-
 import {
   ErrorInterceptors,
   ExceptionInterceptors,
   StatusInterceptors,
   SuccessInterceptors
 } from './response-interceptors'
-
+import { AppService } from '../generated/services/AppService'
 const config: RequestSetupConfig = {
   gateway: 'https://mall-service.gopowerteam.cn',
   adapter: 'axios',
@@ -22,19 +21,12 @@ const config: RequestSetupConfig = {
 
 async function bootstrap() {
   setup(config)
-  // 请求实例
-  const request = RequestService.getInstance()
 
-  // 请求数据
-  const data = await request.send(
-    {
-      path: '/api/admin/app/app-base',
-      method: 'GET'
-    },
-    []
-  )
+  const appService = new AppService()
 
-  console.log(data)
+  appService.appBase().then((data) => {
+    console.log(data)
+  })
 }
 
 bootstrap()

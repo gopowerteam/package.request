@@ -3,10 +3,11 @@ import generate from '@gopowerteam/request-generate'
 generate({
   gateway: 'https://mall-service.gopowerteam.cn/admin',
   openapi: '/api-docs',
-  output: './generated',
+  output: './src/generated',
+  logger: true,
   exportModels: true,
   exportServices: {
-    responseType: 'observable',
+    responseType: 'promise',
     excludeQueryParams: ['page', 'size', 'order']
   }
 })
