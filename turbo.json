@@ -8,6 +8,9 @@
     "lint": {
       "outputs": []
     },
+    "release": {
+      "dependsOn": [""]
+    },
     "dev": {
       "cache": false,
       "dependsOn": ["^build"]

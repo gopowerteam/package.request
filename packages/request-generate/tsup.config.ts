@@ -1,4 +1,5 @@
 import type { Options } from 'tsup'
+import fs from 'fs-extra'
 
 export default <Options>{
   entry: ['src/index.ts'],
@@ -10,5 +11,10 @@ export default <Options>{
   platform: 'node',
   target: 'node16',
   external: ['rxjs', 'axios', '@apidevtools/swagger-parser'],
-  shims: true
+  shims: true,
+  onSuccess() {
+    return fs.copy('./src/templates', './dist/templates', {
+      overwrite: true
+    })
+  }
 }
