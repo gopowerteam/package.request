@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.4
+
+### Patch Changes
+
+- 添加类型导出
+
 ## 0.1.3
 
 ### Patch Changes

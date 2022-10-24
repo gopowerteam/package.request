@@ -1,11 +1,12 @@
 {
   "name": "@gopowerteam/request-generate",
   "private": false,
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "commonjs",
   "files": [
     "dist",
     "bin",
+    "vite-plugin.d.ts",
     "README.md"
   ],
   "bin": {

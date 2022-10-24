@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.5
+
+### Patch Changes
+
+- 添加类型导出
+
 ## 0.1.4
 
 ### Patch Changes
