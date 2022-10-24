@@ -1,4 +1,3 @@
-import { AxiosAdapter } from './adapters/axios.adapter'
 import {
   AdapterResponse,
   RequestAdapter
@@ -32,13 +31,6 @@ export class RequestService {
    * @returns
    */
   private getRequestAdapter(): RequestAdapter {
-    if (typeof RequestService.config.adapter === 'string') {
-      switch (RequestService.config.adapter) {
-        case 'axios':
-          return new AxiosAdapter()
-      }
-    }
-
     if (!RequestService.config.adapter) {
       throw new Error('请检查是否配置请求Adatper')
     }

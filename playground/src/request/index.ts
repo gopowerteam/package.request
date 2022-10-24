@@ -1,4 +1,4 @@
-import { setup } from '@gopowerteam/request'
+import { AxiosAdapter, setup } from '@gopowerteam/request'
 import { RequestSetupConfig } from '@gopowerteam/request'
 import {
   ErrorInterceptors,
@@ -9,7 +9,7 @@ import {
 import { AppService } from '../generated/services/AppService'
 const config: RequestSetupConfig = {
   gateway: 'https://mall-service.gopowerteam.cn',
-  adapter: 'axios',
+  adapter: new AxiosAdapter(),
   interceptors: {
     status: new StatusInterceptors(),
     success: new SuccessInterceptors(),

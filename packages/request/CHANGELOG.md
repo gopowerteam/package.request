@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.3
+
+### Patch Changes
+
+- 更新 adapter 导出
+
 ## 0.1.1
 
 ### Patch Changes

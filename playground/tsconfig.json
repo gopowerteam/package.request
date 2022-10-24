@@ -13,5 +13,5 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true
   },
-  "include": ["src", "../packages/request/src/**/*.ts"]
+  "include": ["src"]
 }

@@ -1,3 +1,4 @@
+import { AxiosAdapter } from '../src'
 import { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'
@@ -11,7 +12,7 @@ import {
 
 const config: RequestSetupConfig = {
   gateway: 'https://mall-service.gopowerteam.cn',
-  adapter: 'axios',
+  adapter: new AxiosAdapter(),
   interceptors: {
     status: new StatusInterceptors(),
     success: new SuccessInterceptors(),
