@@ -2,15 +2,21 @@ import type { Options } from 'tsup'
 import fs from 'fs-extra'
 
 export default <Options>{
-  entry: ['src/index.ts'],
-  format: ['cjs'],
+  entry: ['src/index.ts', 'src/vite-plugin/index.ts'],
+  format: ['cjs', 'esm'],
   dts: true,
   splitting: true,
   clean: true,
   treeShaking: true,
   platform: 'node',
   target: 'node16',
-  external: ['rxjs', 'axios', '@apidevtools/swagger-parser'],
+  external: [
+    'rxjs',
+    'axios',
+    'handlebars',
+    '@apidevtools/swagger-parser',
+    'vite'
+  ],
   shims: true,
   onSuccess() {
     return fs.copy('./src/templates', './dist/templates', {

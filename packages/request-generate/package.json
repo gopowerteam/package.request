@@ -1,7 +1,7 @@
 {
   "name": "@gopowerteam/request-generate",
   "private": false,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "commonjs",
   "files": [
     "dist",
@@ -26,6 +26,11 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
+    },
+    "./vite-plugin": {
+      "require": "./dist/vite-plugin/index.js",
+      "import": "./dist/vite-plugin/index.mjs",
+      "types": "./dist/vite-plugin/index.d.ts"
     }
   },
   "devDependencies": {
@@ -41,7 +46,8 @@
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "tsup": "^6.2.3",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "vite": "^3.1.8"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",

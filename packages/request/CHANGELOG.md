@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.4
+
+### Patch Changes
+
+- 更新类型导出
+
 ## 0.1.3
 
 ### Patch Changes
