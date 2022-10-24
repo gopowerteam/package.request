@@ -4,5 +4,6 @@ export default <Options>{
   entryPoints: ['src/index.ts'],
   clean: true,
   format: ['cjs', 'esm'],
-  dts: true
+  dts: true,
+  external: ['axios']
 }
