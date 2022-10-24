@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.1
+
+### Patch Changes
+
+- 更新导出类型
+
 ## 0.1.0
 
 ### Minor Changes

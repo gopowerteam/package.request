@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.2
+
+### Patch Changes
+
+- 更新导出类型
+
 ## 0.1.0
 
 ### Minor Changes

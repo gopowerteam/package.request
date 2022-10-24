@@ -76,14 +76,16 @@ export class RequestService {
     response: AdapterResponse
   ) {
     // 执行全局插件
-    plugins.forEach(
-      (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
-    )
+    plugins.forEach((plugin) => {
+      const leftcycleFn = plugin[leftcycle]
+      leftcycleFn && leftcycleFn(response, options)
+    })
 
     // 执行上下文插件
-    RequestService.config.plugins.forEach(
-      (plugin) => plugin[leftcycle] && plugin[leftcycle](response, options)
-    )
+    RequestService.config.plugins.forEach((plugin) => {
+      const leftcycleFn = plugin[leftcycle]
+      leftcycleFn && leftcycleFn(response, options)
+    })
   }
 
   /**

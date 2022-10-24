@@ -5,11 +5,11 @@ import { RequestSendOptions } from './request-send.interface'
  * 请求插件
  */
 export interface RequestPlugin {
-  before: (options: RequestSendOptions) => void
+  before?: (options: RequestSendOptions) => void
 
-  after: (response: AdapterResponse, options: RequestSendOptions) => void
+  after?: (response: AdapterResponse, options: RequestSendOptions) => void
 
-  catch: (response: AdapterResponse, options: RequestSendOptions) => void
+  catch?: (response: AdapterResponse, options: RequestSendOptions) => void
 }
 
 export enum PluginLifecycle {
