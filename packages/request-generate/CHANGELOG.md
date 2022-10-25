@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.7
+
+### Patch Changes
+
+- 修复 paramters path 模板
+
 ## 0.1.6
 
 ### Patch Changes

@@ -11,11 +11,11 @@ public {{{name}}}(
       path: '{{{path}}}',
       method: '{{{method}}}',
       {{#if parametersPath}}
-      {{#each parametersPath}}
       paramsPath: {
+        {{#each parametersPath}}
         {{{name}}},
+        {{/each}}
       },
-      {{/each}}
       {{/if}}
       {{#if parametersQuery}}
       paramsQuery: requestQuery,
