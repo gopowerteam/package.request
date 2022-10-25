@@ -1,1 +1,1 @@
-export * from './dist/vite-plugin/index.d'
+export { default } from './dist/vite-plugin/index.d'
