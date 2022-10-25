@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.6
+
+### Patch Changes
+
+- 修复 openapi v2 类型 parse
+
 ## 0.1.4
 
 ### Patch Changes

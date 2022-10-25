@@ -37,7 +37,15 @@ describe('测试请求生成逻辑', () => {
           }
         },
         responseType: 'promise',
-        excludeQueryParams: ['page', 'size', 'order']
+        excludeQueryParams: [
+          'pageNumber',
+          'pageSize',
+          'paged',
+          'unpaged',
+          'order',
+          'sort',
+          'offset'
+        ]
       }
     })
 

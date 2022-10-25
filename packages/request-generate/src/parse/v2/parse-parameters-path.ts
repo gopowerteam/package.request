@@ -6,8 +6,10 @@ export function parseParametersPath(
   parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[]
 ) {
   return parameters.reduce<OperationParameter[]>((r, p) => {
-    if (!('$ref' in p) && p.in === 'path' && p.schema) {
-      const { type, ref, imports, enums } = parseSchemaType(p.schema)
+    if (!('$ref' in p) && p.in === 'path') {
+      const { type, ref, imports, enums } = parseSchemaType(
+        p as OpenAPIV2.SchemaObject
+      )
 
       const parameter = new OperationParameter()
 

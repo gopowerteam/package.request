@@ -12,10 +12,11 @@ export function parseParametersQuery(
     if (
       !('$ref' in p) &&
       p.in === 'query' &&
-      p.schema &&
-      !(excludeParams && excludeParams.includes(p.name))
+      !(excludeParams && excludeParams.includes(p.name.split('.')[0]))
     ) {
-      const { type, ref, imports, enums } = parseSchemaType(p.schema)
+      const { type, ref, imports, enums } = parseSchemaType(
+        p as OpenAPIV2.SchemaObject
+      )
 
       const parameter = new OperationParameter()
 
