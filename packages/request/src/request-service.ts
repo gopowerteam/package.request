@@ -70,13 +70,13 @@ export class RequestService {
     // 执行全局插件
     plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
-      leftcycleFn && leftcycleFn(response, options)
+      leftcycleFn && leftcycleFn.bind(plugin)(response, options)
     })
 
     // 执行上下文插件
     RequestService.config.plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
-      leftcycleFn && leftcycleFn(response, options)
+      leftcycleFn && leftcycleFn.bind(plugin)(response, options)
     })
   }
 
