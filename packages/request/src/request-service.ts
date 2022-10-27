@@ -173,12 +173,12 @@ export class RequestService {
 
     // 开始进行请求
     const response = await this.startRequest(adapter, options)
-      // 异常请求处理
-      .catch((...response) => {
-        hasException = true
-        return response
-      })
       .then((response) => adapter.transformResponse(response))
+      // 异常请求处理
+      .catch((exception) => {
+        hasException = true
+        return adapter.transformException(exception)
+      })
 
     // 执行前置插件
     if (!hasException) {

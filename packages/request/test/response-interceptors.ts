@@ -20,7 +20,7 @@ export class ErrorInterceptors implements ResponseInterceptor {
 }
 
 export class ExceptionInterceptors implements ResponseInterceptor {
-  exec() {
-    console.log('发生异常')
+  exec(data: AdapterResponse) {
+    console.log('发生异常', data)
   }
 }

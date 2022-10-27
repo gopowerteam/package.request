@@ -1,4 +1,4 @@
-import { AxiosAdapter } from '../src'
+import { AxiosAdapter } from '../src/adapters'
 import { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'

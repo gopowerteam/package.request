@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.6
+
+### Patch Changes
+
+- 更新 RequestAdapter 接口
+
 ## 0.1.5
 
 ### Patch Changes
