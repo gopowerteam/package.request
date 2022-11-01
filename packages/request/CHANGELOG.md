@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.10
+
+### Patch Changes
+
+- 更新 axios 适配器
+
 ## 0.1.9
 
 ### Patch Changes

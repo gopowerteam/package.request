@@ -84,7 +84,10 @@ describe('测试RequestService', () => {
     await request.send(
       {
         path: '/api/admin/app/app-base',
-        method: 'GET'
+        method: 'GET',
+        paramsQuery: {
+          a: [1, 2, 3, 4, 5]
+        }
       },
       [plugin]
     )

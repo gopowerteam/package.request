@@ -21,11 +21,11 @@ export class AxiosAdapter implements RequestAdapter {
           'Content-Type': 'application/json'
         },
         paramsSerializer: {
-          encode: (params) =>
+          serialize: (params) =>
             qs.stringify(
               params,
               RequestService.config.qs || {
-                arrayFormat: 'indices',
+                arrayFormat: 'repeat',
                 skipNulls: true,
                 allowDots: true,
                 encodeValuesOnly: true,
