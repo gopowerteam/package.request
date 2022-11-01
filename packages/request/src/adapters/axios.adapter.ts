@@ -5,6 +5,7 @@ import {
 } from '../interfaces/request-adapter.interface'
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
 import { RequestService } from '../request-service'
+import * as qs from 'qs'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance
@@ -18,6 +19,19 @@ export class AxiosAdapter implements RequestAdapter {
         timeout: RequestService.config.timeout,
         headers: {
           'Content-Type': 'application/json'
+        },
+        paramsSerializer: {
+          encode: (params) =>
+            qs.stringify(
+              params,
+              RequestService.config.qs || {
+                arrayFormat: 'indices',
+                skipNulls: true,
+                allowDots: true,
+                encodeValuesOnly: true,
+                encode: true
+              }
+            )
         }
       })
     }
