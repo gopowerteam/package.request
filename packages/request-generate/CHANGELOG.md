@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.8
+
+### Patch Changes
+
+- 更新 reponse media 类型支持
+
 ## 0.1.7
 
 ### Patch Changes

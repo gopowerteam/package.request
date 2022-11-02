@@ -48,6 +48,8 @@ function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
   const SUCCESS_STATUS_CODE = '200'
   const response = responses?.[SUCCESS_STATUS_CODE]
 
+  const medias = ['*/*', 'application/json']
+
   // 引用直接类型转换
   if (response && '$ref' in response) {
     return parseSchemaType(responses)
@@ -56,9 +58,17 @@ function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
   if (
     response &&
     'content' in response &&
-    response?.content?.['application/json']?.schema
+    medias.some((media) => !!response?.content?.[media]?.schema)
   ) {
-    return parseSchemaType(response?.content?.['application/json']?.schema)
+    // 查找media类型
+    const mediaType = medias.find(
+      (media) => !!response?.content?.[media]?.schema
+    )
+
+    // 获取media schema
+    const schema = response?.content?.[mediaType!]?.schema
+
+    return parseSchemaType(schema!)
   }
 
   return {
