@@ -18,8 +18,10 @@ describe('测试请求生成逻辑', () => {
 
   test('测试OpenAPIV2', async () => {
     await generate({
-      gateway:
-        'https://gateway.local.xbt-dev.top/xbt-platform-dingtalk-service',
+      gateway: 'https://gateway.local.xbt-dev.top',
+      applications: {
+        'dingtalk-service': 'xbt-platform-dingtalk-service'
+      },
       openapi: '/v2/api-docs',
       output: './generated/v2',
       exportModels: true,

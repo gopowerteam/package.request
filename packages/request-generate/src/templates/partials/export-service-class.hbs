@@ -1,6 +1,7 @@
 export class {{{name}}}Service {
   // 请求实例
   private request = RequestService.getInstance();
+  private service = '{{{application}}}'
 
   {{#each operations}}
   {{>export-service-operation}}

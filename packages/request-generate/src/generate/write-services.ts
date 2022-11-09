@@ -27,6 +27,9 @@ export function writeServices(
   // 写入Services
   client.services.forEach((service) => {
     const filename = `${service.name}Service.ts`
+    // 设置应用名称
+    service.application = options.application
+
     writeService(service, path.join(output, filename))
   })
 }

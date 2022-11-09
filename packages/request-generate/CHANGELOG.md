@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.9
+
+### Patch Changes
+
+- 添加 applications 支持
+
 ## 0.1.8
 
 ### Patch Changes

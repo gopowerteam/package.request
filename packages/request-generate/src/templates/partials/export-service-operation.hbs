@@ -8,6 +8,7 @@ public {{{name}}}(
   // 请求数据
   const result = this.request.send(
     {
+      service: this.service,
       path: '{{{path}}}',
       method: '{{{method}}}',
       {{#if parametersPath}}

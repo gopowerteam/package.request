@@ -18,7 +18,11 @@ function createOptions(
 ) {
   return {
     name,
-    input: `${options.gateway}${application}${options.openapi}`,
+    application,
+    input: `${options.gateway}/${application}/${options.openapi}`.replace(
+      /\/{2,3}/g,
+      '/'
+    ),
     output: name ? path.join(options.output, name) : options.output,
     exportModels: options.exportModels
   }

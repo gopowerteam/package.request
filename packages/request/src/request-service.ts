@@ -85,8 +85,13 @@ export class RequestService {
    */
   private parseRequestPath(
     path: string,
-    paramsPath?: Record<string, string | number>
+    paramsPath?: Record<string, string | number>,
+    service?: string
   ): string {
+    if (service) {
+      path = `/${service}/${path}`.replace(/\/{2,3}/g, '/')
+    }
+
     if (paramsPath) {
       return Object.entries(paramsPath).reduce<string>(
         (r, [key, value]) => r.replace(`{${key}}`, value.toString()),
@@ -106,7 +111,11 @@ export class RequestService {
   private startRequest(adapter: RequestAdapter, options: RequestSendOptions) {
     return adapter.request({
       baseURL: RequestService.config.gateway,
-      pathURL: this.parseRequestPath(options.path, options.paramsPath),
+      pathURL: this.parseRequestPath(
+        options.path,
+        options.paramsPath,
+        options.service
+      ),
       method: options.method,
       headers: options.headers || {},
       paramsQuery: options.paramsQuery,

@@ -11,6 +11,8 @@ export class Service {
 
   // 服务名称
   name: string
+  // 应用名称
+  application?: string
   // 导出Model
   imports: string[] = []
   // 操作列表

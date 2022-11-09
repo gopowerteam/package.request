@@ -43,6 +43,8 @@ export type GenerateApplicationOptions = Pick<
 > & {
   // 服务名称
   name?: string
+  // 应用名称
+  application?: string
   // OPENAPI地址
   input: string
 }
