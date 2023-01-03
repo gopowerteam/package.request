@@ -65,5 +65,8 @@
     "commitizen": {
       "path": "node_modules/cz-customizable"
     }
+  },
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org"
   }
 }

@@ -66,6 +66,13 @@ export function parseSchemaType(
     }
   }
 
+  if (!('$ref' in schema) && schema.type === 'object') {
+    return {
+      type: getMappedType(schema.type),
+      ref: 'any'
+    }
+  }
+
   // TODO: 多类型处理
 
   throw new Error('无法解析相应的schema')

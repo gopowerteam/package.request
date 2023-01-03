@@ -20,7 +20,7 @@ describe('测试请求生成逻辑', () => {
     await generate({
       gateway: 'https://gateway.local.xbt-dev.top',
       applications: {
-        'dingtalk-service': 'xbt-platform-dingtalk-service'
+        'mall-service': 'xbt-platform-mall-service'
       },
       openapi: '/v2/api-docs',
       output: './generated/v2',

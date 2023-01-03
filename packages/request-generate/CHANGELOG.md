@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.10
+
+### Patch Changes
+
+- 补充 ref:object 类型支持
+
 ## 0.1.9
 
 ### Patch Changes
