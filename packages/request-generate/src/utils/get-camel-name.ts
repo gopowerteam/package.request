@@ -6,8 +6,9 @@ export function getCamelName(value: string) {
 
   return value
     .replace(/^[^a-zA-Z]+/g, '')
-    .replace(/[^\w-]+/g, '-')
-    .replace(/-/g, '')
+    .replace(/[^\w-]+/g, '_')
     .replace(/^\S/, (s) => s.toUpperCase())
+    .replace(/_[a-zA-Z]/g, (s) => s.toUpperCase())
+    .replace(/_/g, '')
     .trim()
 }

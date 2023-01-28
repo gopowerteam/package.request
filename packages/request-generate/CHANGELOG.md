@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.11
+
+### Patch Changes
+
+- 更新 model name 生成
+
 ## 0.1.10
 
 ### Patch Changes
