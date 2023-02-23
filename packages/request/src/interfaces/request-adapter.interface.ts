@@ -1,6 +1,13 @@
 import { RequestMethod } from './request-send.interface'
+import { RequestSetupConfig } from './request-setup.interface'
 
 export interface RequestAdapter {
+  /**
+   *  注入全局配置文件
+   * @param config
+   * @returns
+   */
+  injectConfig?: (config: RequestSetupConfig) => void
   /**
    * 发送请求
    */
@@ -32,5 +39,10 @@ export interface AdapterResponse {
   data: Record<string, any>
   status: number
   statusText: string
-  headers: Record<string, string | string[] | undefined>
+  headers: AdapterResponseHeaders
 }
+
+export type AdapterResponseHeaders = Record<
+  string,
+  string | string[] | number | boolean | undefined
+>

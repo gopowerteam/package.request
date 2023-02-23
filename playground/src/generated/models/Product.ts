@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Category } from './Category'
+import type { ProductVersion } from './ProductVersion'
 
 export type Product = {
   id: string
@@ -46,13 +47,9 @@ export type Product = {
    */
   category: Category
   /**
-   * 属性
+   * 所有商品配置
    */
-  attrs: string[]
-  /**
-   * 规格项
-   */
-  specs: string[]
+  versions: ProductVersion[]
   /**
    * 最低价
    */
@@ -61,4 +58,8 @@ export type Product = {
    * 最高价
    */
   maxPrice: any
+  /**
+   * 当前商品配置
+   */
+  property: any
 }

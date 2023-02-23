@@ -4,30 +4,68 @@
 import type { CreateCategoryInput } from '../models/CreateCategoryInput'
 import type { Category } from '../models/Category'
 import type { UpdateCategoryInput } from '../models/UpdateCategoryInput'
-import { RequestService, RequestPlugin } from '@gopowerteam/request'
-
+import {
+  RequestService,
+  RequestGenerateType,
+  type RequestSendOptions,
+  type RequestPlugin,
+  type RequestGenerateOptions
+} from '@gopowerteam/request'
 export class CategoryService {
   // 请求实例
   private request = RequestService.getInstance()
+  private service = ''
+
+  private generateRequest(
+    requestSendOptions: RequestSendOptions,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ) {
+    switch (true) {
+      case requestGenerateOptions?.type === RequestGenerateType.URL:
+        // 生成URL
+        return this.request.toURL(requestSendOptions, requestPlugins)
+      default: {
+        // 请求数据
+        const result = this.request.send(requestSendOptions, requestPlugins)
+
+        return result
+      }
+    }
+  }
 
   /**
    * 创建分类
    */
   public createCategory(
     requestBody: CreateCategoryInput,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Category> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/category',
-        method: 'post',
-        paramsBody: requestBody
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public createCategory(
+    requestBody: CreateCategoryInput,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category>
+  public createCategory(
+    requestBody: CreateCategoryInput,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/category',
+      method: 'post',
+      paramsBody: requestBody
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -35,19 +73,33 @@ export class CategoryService {
    */
   public findCategory(
     requestQuery: RequestQueryParams.FindCategory,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Category[]> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/category',
-        method: 'get',
-        paramsQuery: requestQuery
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public findCategory(
+    requestQuery: RequestQueryParams.FindCategory,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category[]>
+  public findCategory(
+    requestQuery: RequestQueryParams.FindCategory,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category[]> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/category',
+      method: 'get',
+      paramsQuery: requestQuery
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -56,22 +108,38 @@ export class CategoryService {
   public updateCategory(
     id: string,
     requestBody: UpdateCategoryInput,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Category> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/category/{id}',
-        method: 'put',
-        paramsPath: {
-          id
-        },
-        paramsBody: requestBody
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public updateCategory(
+    id: string,
+    requestBody: UpdateCategoryInput,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category>
+  public updateCategory(
+    id: string,
+    requestBody: UpdateCategoryInput,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/category/{id}',
+      method: 'put',
+      paramsPath: {
+        id
       },
-      requestPlugins
-    )
+      paramsBody: requestBody
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -79,21 +147,35 @@ export class CategoryService {
    */
   public getCategory(
     id: string,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Category> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/category/{id}',
-        method: 'get',
-        paramsPath: {
-          id
-        }
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public getCategory(
+    id: string,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category>
+  public getCategory(
+    id: string,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Category> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/category/{id}',
+      method: 'get',
+      paramsPath: {
+        id
+      }
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -101,21 +183,35 @@ export class CategoryService {
    */
   public deleteCategory(
     id: string,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<void> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/category/{id}',
-        method: 'delete',
-        paramsPath: {
-          id
-        }
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public deleteCategory(
+    id: string,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void>
+  public deleteCategory(
+    id: string,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/category/{id}',
+      method: 'delete',
+      paramsPath: {
+        id
+      }
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 }
 

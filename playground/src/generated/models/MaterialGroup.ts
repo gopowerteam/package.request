@@ -2,9 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CreateMaterialGroupInput = {
+export type MaterialGroup = {
+  id: string
   /**
-   * 素材名称
+   * 素材分组名称
    */
   name: string
 }

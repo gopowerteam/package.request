@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ProductAttr } from './ProductAttr'
 
-export type Administrator = {
+export type ProductAttrItem = {
   id: string
   /**
    * 创建日期
@@ -13,12 +14,15 @@ export type Administrator = {
    */
   updatedAt: string
   /**
-   * 用户名
+   * 属性项名称
    */
-  username: string
+  name: string
   /**
-   * 姓名
+   * 图片
    */
-  realname: string
-  password: string
+  image: string
+  /**
+   * 所属属性
+   */
+  attr: ProductAttr
 }

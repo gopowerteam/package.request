@@ -5,30 +5,68 @@ import type { CreateBannerInput } from '../models/CreateBannerInput'
 import type { Banner } from '../models/Banner'
 import type { UpdateBannerInput } from '../models/UpdateBannerInput'
 import type { ChangeBannerOrderInput } from '../models/ChangeBannerOrderInput'
-import { RequestService, RequestPlugin } from '@gopowerteam/request'
-
+import {
+  RequestService,
+  RequestGenerateType,
+  type RequestSendOptions,
+  type RequestPlugin,
+  type RequestGenerateOptions
+} from '@gopowerteam/request'
 export class BannerService {
   // 请求实例
   private request = RequestService.getInstance()
+  private service = ''
+
+  private generateRequest(
+    requestSendOptions: RequestSendOptions,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ) {
+    switch (true) {
+      case requestGenerateOptions?.type === RequestGenerateType.URL:
+        // 生成URL
+        return this.request.toURL(requestSendOptions, requestPlugins)
+      default: {
+        // 请求数据
+        const result = this.request.send(requestSendOptions, requestPlugins)
+
+        return result
+      }
+    }
+  }
 
   /**
    * 创建Banner
    */
   public createBanner(
     requestBody: CreateBannerInput,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Banner> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner',
-        method: 'post',
-        paramsBody: requestBody
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public createBanner(
+    requestBody: CreateBannerInput,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner>
+  public createBanner(
+    requestBody: CreateBannerInput,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner',
+      method: 'post',
+      paramsBody: requestBody
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -36,19 +74,33 @@ export class BannerService {
    */
   public findBanner(
     requestQuery: RequestQueryParams.FindBanner,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Banner[]> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner',
-        method: 'get',
-        paramsQuery: requestQuery
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public findBanner(
+    requestQuery: RequestQueryParams.FindBanner,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner[]>
+  public findBanner(
+    requestQuery: RequestQueryParams.FindBanner,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner[]> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner',
+      method: 'get',
+      paramsQuery: requestQuery
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -57,22 +109,38 @@ export class BannerService {
   public updateBanner(
     id: string,
     requestBody: UpdateBannerInput,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Banner> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner/{id}',
-        method: 'put',
-        paramsPath: {
-          id
-        },
-        paramsBody: requestBody
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public updateBanner(
+    id: string,
+    requestBody: UpdateBannerInput,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner>
+  public updateBanner(
+    id: string,
+    requestBody: UpdateBannerInput,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner/{id}',
+      method: 'put',
+      paramsPath: {
+        id
       },
-      requestPlugins
-    )
+      paramsBody: requestBody
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -80,21 +148,35 @@ export class BannerService {
    */
   public getBanner(
     id: string,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<Banner> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner/{id}',
-        method: 'get',
-        paramsPath: {
-          id
-        }
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public getBanner(
+    id: string,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner>
+  public getBanner(
+    id: string,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<Banner> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner/{id}',
+      method: 'get',
+      paramsPath: {
+        id
+      }
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -102,21 +184,35 @@ export class BannerService {
    */
   public deleteBanner(
     id: string,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<void> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner/{id}',
-        method: 'delete',
-        paramsPath: {
-          id
-        }
-      },
-      requestPlugins
-    )
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public deleteBanner(
+    id: string,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void>
+  public deleteBanner(
+    id: string,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner/{id}',
+      method: 'delete',
+      paramsPath: {
+        id
+      }
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 
   /**
@@ -125,22 +221,38 @@ export class BannerService {
   public changeBannerOrder(
     id: string,
     requestBody: ChangeBannerOrderInput,
-    requestPlugins: RequestPlugin[] = []
-  ): Promise<void> {
-    // 请求数据
-    const result = this.request.send(
-      {
-        path: '/api/admin/banner/change-order/{id}',
-        method: 'patch',
-        paramsPath: {
-          id
-        },
-        paramsBody: requestBody
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions: RequestGenerateOptions & {
+      type: RequestGenerateType.URL
+    }
+  ): string
+  public changeBannerOrder(
+    id: string,
+    requestBody: ChangeBannerOrderInput,
+    requestPlugins: RequestPlugin[],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void>
+  public changeBannerOrder(
+    id: string,
+    requestBody: ChangeBannerOrderInput,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ): Promise<void> | string {
+    const requestSendOptions = {
+      service: this.service,
+      path: '/api/admin/banner/change-order/{id}',
+      method: 'patch',
+      paramsPath: {
+        id
       },
-      requestPlugins
-    )
+      paramsBody: requestBody
+    }
 
-    return result
+    return this.generateRequest(
+      requestSendOptions,
+      requestPlugins,
+      requestGenerateOptions
+    )
   }
 }
 

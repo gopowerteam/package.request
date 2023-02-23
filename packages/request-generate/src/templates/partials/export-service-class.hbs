@@ -3,6 +3,34 @@ export class {{{name}}}Service {
   private request = RequestService.getInstance();
   private service = '{{{application}}}'
 
+  private generateRequest(
+    requestSendOptions: RequestSendOptions,
+    requestPlugins: RequestPlugin[] = [],
+    requestGenerateOptions?: RequestGenerateOptions
+  ){
+    switch(true){
+      case requestGenerateOptions?.type === RequestGenerateType.URL:
+        // 生成URL
+        return this.request.toURL(
+          requestSendOptions,
+          requestPlugins
+        );
+      default: {
+        // 请求数据
+        const result =  this.request.send(
+          requestSendOptions,
+          requestPlugins
+        );
+
+        {{#equal responseType 'observable'}}
+        return from(result)
+        {{else}}
+        return result
+        {{/equal}}
+      }
+    }
+  }
+
   {{#each operations}}
   {{>export-service-operation}}
   {{/each}}

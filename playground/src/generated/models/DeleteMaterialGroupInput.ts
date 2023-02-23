@@ -6,5 +6,5 @@ export type DeleteMaterialGroupInput = {
   /**
    * 删除后移动到的目标分组ID
    */
-  target: string
+  target?: string
 }

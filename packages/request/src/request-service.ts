@@ -1,3 +1,4 @@
+import qs from 'qs'
 import {
   AdapterResponse,
   RequestAdapter
@@ -157,6 +158,7 @@ export class RequestService {
       return Promise.reject(interceptors.error.exec(response))
     }
   }
+
   /**
    * 发送请求
    * @param {RequestSendOptions} options 请求选项
@@ -198,5 +200,44 @@ export class RequestService {
 
     // 执行拦截器
     return this.execInterceptors(response, hasException)
+  }
+
+  /**
+   * 生成请求路径
+   * @param {RequestSendOptions} options 请求选项
+   * @param {RequestPlugin[]} plugins 请求插件
+   * @returns
+   */
+  public toURL(
+    options: RequestSendOptions,
+    plugins: RequestPlugin[] = []
+  ): string {
+    if (!RequestService.config) {
+      throw new Error('请检查请求配置是否完成')
+    }
+
+    if (plugins && plugins.length) {
+      // 执行前置插件
+      this.execRequestPlugin(plugins, options)
+    }
+
+    const baseURL = RequestService.config.gateway
+    const pathURL = this.parseRequestPath(
+      options.path,
+      options.paramsPath,
+      options.service
+    )
+    const queryString = qs.stringify(
+      options.paramsQuery,
+      RequestService.config.qs || {
+        arrayFormat: 'repeat',
+        skipNulls: true,
+        allowDots: true,
+        encodeValuesOnly: true,
+        encode: true
+      }
+    )
+
+    return `${baseURL}${pathURL}${queryString}`
   }
 }

@@ -3,6 +3,9 @@
 /* eslint-disable */
 
 export type UpdateBannerInput = {
+  /**
+   * Banner标题
+   */
   title?: string
   /**
    * Banner图片

@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CreateProductAttrItemInput = {
+export type ProductAttrItemInput = {
   /**
    * 属性ID
    */
-  id: string
+  attrId: string
   /**
    * 属性项名称
    */

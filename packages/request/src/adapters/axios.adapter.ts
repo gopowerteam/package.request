@@ -1,22 +1,27 @@
 import {
   AdapterResponse,
+  AdapterResponseHeaders,
   RequestAdapter,
   RequestAdapterOptions
 } from '../interfaces/request-adapter.interface'
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
-import { RequestService } from '../request-service'
 import * as qs from 'qs'
+import { RequestSetupConfig } from '../interfaces'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance
+  private config: RequestSetupConfig
 
+  public injectConfig(config: RequestSetupConfig) {
+    this.config = config
+  }
   /**
    * 获取Axios实例
    */
   private getAxiosInstance() {
     if (!AxiosAdapter.axiosInstance) {
       AxiosAdapter.axiosInstance = axios.create({
-        timeout: RequestService.config.timeout,
+        timeout: this.config?.timeout,
         headers: {
           'Content-Type': 'application/json'
         },
@@ -24,7 +29,7 @@ export class AxiosAdapter implements RequestAdapter {
           serialize: (params) =>
             qs.stringify(
               params,
-              RequestService.config.qs || {
+              this.config?.qs || {
                 arrayFormat: 'repeat',
                 skipNulls: true,
                 allowDots: true,
@@ -74,7 +79,7 @@ export class AxiosAdapter implements RequestAdapter {
       data: response.data,
       statusText: response.statusText,
       status: response.status,
-      headers: response.headers
+      headers: response.headers as AdapterResponseHeaders
     }
   }
 
@@ -88,7 +93,7 @@ export class AxiosAdapter implements RequestAdapter {
       data: exception.response?.data || {},
       statusText: exception.response?.statusText || '',
       status: exception.response?.status || 400,
-      headers: exception.response?.headers || {}
+      headers: (exception.response?.headers as AdapterResponseHeaders) || {}
     }
   }
 }

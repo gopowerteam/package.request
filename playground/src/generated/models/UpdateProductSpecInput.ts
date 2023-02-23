@@ -2,10 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CreateProductSpecInput = {
+export type UpdateProductSpecInput = {
   /**
-   * 属性项组合[]
+   * 价格
    */
-  items: string[]
   price: number
 }

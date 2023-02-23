@@ -2,9 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CreateMaterialGroupInput = {
+export type ProductSpecInput = {
   /**
-   * 素材名称
+   * SpecId
    */
-  name: string
+  id: string
+  price: number
 }

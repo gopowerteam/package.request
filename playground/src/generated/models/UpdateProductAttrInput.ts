@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CreateMaterialGroupInput = {
+export type UpdateProductAttrInput = {
   /**
-   * 素材名称
+   * 属性名称
    */
   name: string
 }

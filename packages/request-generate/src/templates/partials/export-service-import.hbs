@@ -6,4 +6,4 @@ import type { {{{this}}} } from '../models/{{{this}}}';
 {{#equal responseType 'observable'}}
 import { from, type Observable } from 'rxjs';
 {{/equal}}
-import { RequestService, type RequestPlugin } from '@gopowerteam/request';
+import { RequestService, RequestGenerateType, type RequestSendOptions, type RequestPlugin, type RequestGenerateOptions } from '@gopowerteam/request';

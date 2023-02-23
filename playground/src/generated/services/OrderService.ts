@@ -1,11 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AppInitInput } from '../models/AppInitInput'
-import type { AppBaseResponse } from '../models/AppBaseResponse'
-import type { LoginInput } from '../models/LoginInput'
-import type { TokenResponse } from '../models/TokenResponse'
-import type { Administrator } from '../models/Administrator'
+import type { SubmitOrderInput } from '../models/SubmitOrderInput'
+import type { ProductOrder } from '../models/ProductOrder'
+import type { PaymentOrder } from '../models/PaymentOrder'
 import {
   RequestService,
   RequestGenerateType,
@@ -13,7 +11,7 @@ import {
   type RequestPlugin,
   type RequestGenerateOptions
 } from '@gopowerteam/request'
-export class AppService {
+export class OrderService {
   // 请求实例
   private request = RequestService.getInstance()
   private service = ''
@@ -37,28 +35,28 @@ export class AppService {
   }
 
   /**
-   * 系统初始化
+   * 提交订单
    */
-  public appInit(
-    requestBody: AppInitInput,
+  public submitOrder(
+    requestBody: SubmitOrderInput,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions: RequestGenerateOptions & {
       type: RequestGenerateType.URL
     }
   ): string
-  public appInit(
-    requestBody: AppInitInput,
+  public submitOrder(
+    requestBody: SubmitOrderInput,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<void>
-  public appInit(
-    requestBody: AppInitInput,
+  ): Promise<ProductOrder>
+  public submitOrder(
+    requestBody: SubmitOrderInput,
     requestPlugins: RequestPlugin[] = [],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<void> | string {
+  ): Promise<ProductOrder> | string {
     const requestSendOptions = {
       service: this.service,
-      path: '/api/admin/app/app-init',
+      path: '/api/admin/order/submit',
       method: 'post',
       paramsBody: requestBody
     }
@@ -71,60 +69,32 @@ export class AppService {
   }
 
   /**
-   * 获取系统基本信息
+   * 支付订单
    */
-  public appBase(
+  public paymentOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions: RequestGenerateOptions & {
       type: RequestGenerateType.URL
     }
   ): string
-  public appBase(
+  public paymentOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<AppBaseResponse>
-  public appBase(
+  ): Promise<PaymentOrder>
+  public paymentOrder(
+    id: string,
     requestPlugins: RequestPlugin[] = [],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<AppBaseResponse> | string {
+  ): Promise<PaymentOrder> | string {
     const requestSendOptions = {
       service: this.service,
-      path: '/api/admin/app/app-base',
-      method: 'get'
-    }
-
-    return this.generateRequest(
-      requestSendOptions,
-      requestPlugins,
-      requestGenerateOptions
-    )
-  }
-
-  /**
-   * 管理员登录
-   */
-  public login(
-    requestBody: LoginInput,
-    requestPlugins: RequestPlugin[],
-    requestGenerateOptions: RequestGenerateOptions & {
-      type: RequestGenerateType.URL
-    }
-  ): string
-  public login(
-    requestBody: LoginInput,
-    requestPlugins: RequestPlugin[],
-    requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<TokenResponse>
-  public login(
-    requestBody: LoginInput,
-    requestPlugins: RequestPlugin[] = [],
-    requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<TokenResponse> | string {
-    const requestSendOptions = {
-      service: this.service,
-      path: '/api/admin/app/login',
+      path: '/api/admin/order/payment/{id}',
       method: 'post',
-      paramsBody: requestBody
+      paramsPath: {
+        id
+      }
     }
 
     return this.generateRequest(
@@ -135,26 +105,32 @@ export class AppService {
   }
 
   /**
-   * 刷新Token
+   * 取消订单
    */
-  public token(
+  public cancelOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions: RequestGenerateOptions & {
       type: RequestGenerateType.URL
     }
   ): string
-  public token(
+  public cancelOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<TokenResponse>
-  public token(
+  ): Promise<ProductOrder>
+  public cancelOrder(
+    id: string,
     requestPlugins: RequestPlugin[] = [],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<TokenResponse> | string {
+  ): Promise<ProductOrder> | string {
     const requestSendOptions = {
       service: this.service,
-      path: '/api/admin/app/token',
-      method: 'get'
+      path: '/api/admin/order/cancel/{id}',
+      method: 'put',
+      paramsPath: {
+        id
+      }
     }
 
     return this.generateRequest(
@@ -165,26 +141,32 @@ export class AppService {
   }
 
   /**
-   * 获取当前用户信息
+   * 删除订单
    */
-  public getCurrentAdmin(
+  public deleteOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions: RequestGenerateOptions & {
       type: RequestGenerateType.URL
     }
   ): string
-  public getCurrentAdmin(
+  public deleteOrder(
+    id: string,
     requestPlugins: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<Administrator>
-  public getCurrentAdmin(
+  ): Promise<ProductOrder>
+  public deleteOrder(
+    id: string,
     requestPlugins: RequestPlugin[] = [],
     requestGenerateOptions?: RequestGenerateOptions
-  ): Promise<Administrator> | string {
+  ): Promise<ProductOrder> | string {
     const requestSendOptions = {
       service: this.service,
-      path: '/api/admin/app/current',
-      method: 'get'
+      path: '/api/admin/order/{id}',
+      method: 'delete',
+      paramsPath: {
+        id
+      }
     }
 
     return this.generateRequest(
