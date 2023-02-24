@@ -227,16 +227,17 @@ export class RequestService {
       options.paramsPath,
       options.service
     )
-    const queryString = qs.stringify(
-      options.paramsQuery,
-      RequestService.config.qs || {
+    const queryString = qs.stringify(options.paramsQuery, {
+      ...{
         arrayFormat: 'repeat',
         skipNulls: true,
         allowDots: true,
         encodeValuesOnly: true,
         encode: true
-      }
-    )
+      },
+      ...(RequestService.config.qs || {}),
+      addQueryPrefix: true
+    })
 
     return `${baseURL}${pathURL}${queryString}`
   }

@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.13
+
+### Patch Changes
+
+- fixed template
+
 ## 0.1.12
 
 ### Patch Changes

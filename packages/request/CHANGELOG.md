@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.13
+
+### Patch Changes
+
+- fixed generate request url
+
 ## 0.1.12
 
 ### Patch Changes
