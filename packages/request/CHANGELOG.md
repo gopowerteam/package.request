@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.14
+
+### Patch Changes
+
+- 添加 AppendParams 支持
+
 ## 0.1.13
 
 ### Patch Changes

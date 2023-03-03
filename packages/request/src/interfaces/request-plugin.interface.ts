@@ -5,7 +5,10 @@ import { RequestSendOptions } from './request-send.interface'
  * 请求插件
  */
 export interface RequestPlugin {
-  before?: (options: RequestSendOptions) => void
+  before?: (
+    options: RequestSendOptions,
+    appendParams?: (params: Record<string, any>) => void
+  ) => void
 
   after?: (response: AdapterResponse, options: RequestSendOptions) => void
 

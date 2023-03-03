@@ -33,6 +33,7 @@ export interface RequestAdapterOptions {
   method: RequestMethod | string
   paramsQuery?: Record<string, any>
   paramsBody?: any
+  extraParams?: any
 }
 
 export interface AdapterResponse {

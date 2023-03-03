@@ -48,13 +48,23 @@ export class RequestService {
     plugins: RequestPlugin[] = [],
     options: RequestSendOptions
   ) {
-    // 执行上下文插件
-    RequestService.config.plugins.forEach(
-      (service) => service.before && service.before(options)
-    )
+    const extraParams = {}
+
+    const appendParams = (params: Record<string, any>) => {
+      Object.assign(extraParams, params || {})
+    }
 
     // 执行全局插件
-    plugins.forEach((service) => service.before && service.before(options))
+    RequestService.config.plugins.forEach(
+      (service) => service.before && service.before(options, appendParams)
+    )
+
+    // 执行上下文插件
+    plugins.forEach(
+      (service) => service.before && service.before(options, appendParams)
+    )
+
+    return extraParams
   }
 
   /**
@@ -109,7 +119,11 @@ export class RequestService {
    * @param options
    * @returns
    */
-  private startRequest(adapter: RequestAdapter, options: RequestSendOptions) {
+  private startRequest(
+    adapter: RequestAdapter,
+    options: RequestSendOptions,
+    extraParams?: Record<string, any>
+  ) {
     return adapter.request({
       baseURL: RequestService.config.gateway,
       pathURL: this.parseRequestPath(
@@ -120,7 +134,8 @@ export class RequestService {
       method: options.method,
       headers: options.headers || {},
       paramsQuery: options.paramsQuery,
-      paramsBody: options.paramsBody
+      paramsBody: options.paramsBody,
+      extraParams
     })
   }
 
@@ -180,10 +195,10 @@ export class RequestService {
     const adapter = this.getRequestAdapter()
 
     // 执行前置插件
-    this.execRequestPlugin(plugins, options)
+    const extraParams = this.execRequestPlugin(plugins, options)
 
     // 开始进行请求
-    const response = await this.startRequest(adapter, options)
+    const response = await this.startRequest(adapter, options, extraParams)
       .then((response) => adapter.transformResponse(response))
       // 异常请求处理
       .catch((exception) => {
