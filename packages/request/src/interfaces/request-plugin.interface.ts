@@ -7,7 +7,7 @@ import { RequestSendOptions } from './request-send.interface'
 export interface RequestPlugin {
   before?: (
     options: RequestSendOptions,
-    appendParams?: (params: Record<string, any>) => void
+    appendParams: (params: Record<string, any>) => void
   ) => void
 
   after?: (response: AdapterResponse, options: RequestSendOptions) => void

@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.15
+
+### Patch Changes
+
+- 修改类型提示
+
 ## 0.1.14
 
 ### Patch Changes
