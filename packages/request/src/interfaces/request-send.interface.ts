@@ -19,4 +19,5 @@ export interface RequestSendOptions {
   paramsPath?: Record<string, string | number>
   paramsQuery?: Record<string, any>
   paramsBody?: any
+  responseType?: string
 }

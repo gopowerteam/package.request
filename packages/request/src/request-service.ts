@@ -120,7 +120,8 @@ export class RequestService {
       method: options.method,
       headers: options.headers || {},
       paramsQuery: options.paramsQuery,
-      paramsBody: options.paramsBody
+      paramsBody: options.paramsBody,
+      responseType: options.responseType
     })
   }
 
