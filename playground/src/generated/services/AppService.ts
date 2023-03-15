@@ -48,7 +48,7 @@ export class AppService {
   ): string
   public appInit(
     requestBody: AppInitInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public appInit(
@@ -80,7 +80,7 @@ export class AppService {
     }
   ): string
   public appBase(
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<AppBaseResponse>
   public appBase(
@@ -112,7 +112,7 @@ export class AppService {
   ): string
   public login(
     requestBody: LoginInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<TokenResponse>
   public login(
@@ -144,7 +144,7 @@ export class AppService {
     }
   ): string
   public token(
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<TokenResponse>
   public token(
@@ -174,7 +174,7 @@ export class AppService {
     }
   ): string
   public getCurrentAdmin(
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Administrator>
   public getCurrentAdmin(

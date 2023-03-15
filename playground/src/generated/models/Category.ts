@@ -3,7 +3,14 @@
 /* eslint-disable */
 
 export type Category = {
+  /**
+   * ID
+   */
   id: string
+  /**
+   * 启用状态
+   */
+  enable: boolean
   /**
    * 创建日期
    */

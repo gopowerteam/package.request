@@ -6,7 +6,14 @@ import type { ProductAttr } from './ProductAttr'
 import type { ProductSpec } from './ProductSpec'
 
 export type ProductVersion = {
+  /**
+   * ID
+   */
   id: string
+  /**
+   * 启用状态
+   */
+  enable: boolean
   /**
    * 创建日期
    */
@@ -15,6 +22,14 @@ export type ProductVersion = {
    * 更新日期
    */
   updatedAt: string
+  /**
+   * 创建人
+   */
+  creator: string
+  /**
+   * 操作人
+   */
+  operator: string
   /**
    * 版本号
    */

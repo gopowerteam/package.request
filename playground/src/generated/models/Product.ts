@@ -5,7 +5,14 @@ import type { Category } from './Category'
 import type { ProductVersion } from './ProductVersion'
 
 export type Product = {
+  /**
+   * ID
+   */
   id: string
+  /**
+   * 启用状态
+   */
+  enable: boolean
   /**
    * 创建日期
    */
@@ -14,6 +21,18 @@ export type Product = {
    * 更新日期
    */
   updatedAt: string
+  /**
+   * 删除时间
+   */
+  deletedAt: string
+  /**
+   * 创建人
+   */
+  creator: string
+  /**
+   * 操作人
+   */
+  operator: string
   /**
    * 标题
    */
@@ -53,13 +72,13 @@ export type Product = {
   /**
    * 最低价
    */
-  minPrice: any
+  minPrice: number
   /**
    * 最高价
    */
-  maxPrice: any
+  maxPrice: number
   /**
    * 当前商品配置
    */
-  property: any
+  property?: ProductVersion
 }

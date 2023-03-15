@@ -47,7 +47,7 @@ export class BannerService {
   ): string
   public createBanner(
     requestBody: CreateBannerInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Banner>
   public createBanner(
@@ -81,7 +81,7 @@ export class BannerService {
   ): string
   public findBanner(
     requestQuery: RequestQueryParams.FindBanner,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Banner[]>
   public findBanner(
@@ -117,7 +117,7 @@ export class BannerService {
   public updateBanner(
     id: string,
     requestBody: UpdateBannerInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Banner>
   public updateBanner(
@@ -155,7 +155,7 @@ export class BannerService {
   ): string
   public getBanner(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Banner>
   public getBanner(
@@ -191,7 +191,7 @@ export class BannerService {
   ): string
   public deleteBanner(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public deleteBanner(
@@ -229,7 +229,7 @@ export class BannerService {
   public changeBannerOrder(
     id: string,
     requestBody: ChangeBannerOrderInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public changeBannerOrder(

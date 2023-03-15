@@ -28,6 +28,14 @@ export function parseParametersQuery(
       parameter.imports = imports || []
       parameter.enums = enums
 
+      if (
+        p.name.includes('.') &&
+        !p.name.startsWith('.') &&
+        !p.name.endsWith('.')
+      ) {
+        parameter.name = `"${p.name}"`
+      }
+
       r.push(parameter)
     }
 

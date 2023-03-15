@@ -49,7 +49,7 @@ export class MaterialService {
   ): string
   public createMaterial(
     requestBody: CreateMaterialInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Material[]>
   public createMaterial(
@@ -83,7 +83,7 @@ export class MaterialService {
   ): string
   public findMaterial(
     requestQuery: RequestQueryParams.FindMaterial,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Material[]>
   public findMaterial(
@@ -117,7 +117,7 @@ export class MaterialService {
   ): string
   public deleteMaterialBatch(
     requestQuery: RequestQueryParams.DeleteMaterialBatch,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public deleteMaterialBatch(
@@ -149,7 +149,7 @@ export class MaterialService {
     }
   ): string
   public findMaterialGroup(
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<MaterialGroupResponse[]>
   public findMaterialGroup(
@@ -181,7 +181,7 @@ export class MaterialService {
   ): string
   public createMaterialGroup(
     requestBody: CreateMaterialGroupInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Material>
   public createMaterialGroup(
@@ -217,7 +217,7 @@ export class MaterialService {
   public updateMaterialGroup(
     id: string,
     requestBody: UpdateMaterialGroupInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Material>
   public updateMaterialGroup(
@@ -257,7 +257,7 @@ export class MaterialService {
   public deleteMaterialGroup(
     id: string,
     requestBody: DeleteMaterialGroupInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Material>
   public deleteMaterialGroup(
@@ -295,7 +295,7 @@ export class MaterialService {
   ): string
   public changeGroupBatch(
     requestQuery: RequestQueryParams.ChangeGroupBatch,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public changeGroupBatch(

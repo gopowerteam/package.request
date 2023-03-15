@@ -39,7 +39,7 @@ export class QiniuService {
     }
   ): string
   public getUploadToken(
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<GetUploadTokenResponse>
   public getUploadToken(

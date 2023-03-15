@@ -1,5 +1,17 @@
 # @gopowerteam/request-generate
 
+## 0.1.15
+
+### Patch Changes
+
+- fixed split params
+
+## 0.1.14
+
+### Patch Changes
+
+- add built-in type
+
 ## 0.1.13
 
 ### Patch Changes

@@ -4,6 +4,9 @@
 import type { MaterialGroup } from './MaterialGroup'
 
 export type Material = {
+  /**
+   * ID
+   */
   id: string
   /**
    * 创建日期
@@ -13,6 +16,18 @@ export type Material = {
    * 更新日期
    */
   updatedAt: string
+  /**
+   * 删除时间
+   */
+  deletedAt: string
+  /**
+   * 创建人
+   */
+  creator: string
+  /**
+   * 操作人
+   */
+  operator: string
   /**
    * 素材Key
    */

@@ -46,7 +46,7 @@ export class OrderService {
   ): string
   public submitOrder(
     requestBody: SubmitOrderInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductOrder>
   public submitOrder(
@@ -80,7 +80,7 @@ export class OrderService {
   ): string
   public paymentOrder(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<PaymentOrder>
   public paymentOrder(
@@ -116,7 +116,7 @@ export class OrderService {
   ): string
   public cancelOrder(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductOrder>
   public cancelOrder(
@@ -152,7 +152,7 @@ export class OrderService {
   ): string
   public deleteOrder(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductOrder>
   public deleteOrder(

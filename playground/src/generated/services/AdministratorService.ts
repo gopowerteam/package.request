@@ -49,7 +49,7 @@ export class AdministratorService {
   ): string
   public createAdministrator(
     requestBody: CreateAdministratorInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Administrator>
   public createAdministrator(
@@ -83,7 +83,7 @@ export class AdministratorService {
   ): string
   public findAdministrator(
     requestQuery: RequestQueryParams.FindAdministrator,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<PageAdministrator>
   public findAdministrator(
@@ -119,7 +119,7 @@ export class AdministratorService {
   public updateAdministrator(
     id: string,
     requestBody: UpdateAdministratorInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Administrator>
   public updateAdministrator(
@@ -157,7 +157,7 @@ export class AdministratorService {
   ): string
   public getAdministrator(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Administrator>
   public getAdministrator(
@@ -193,7 +193,7 @@ export class AdministratorService {
   ): string
   public deleteAdministrator(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public deleteAdministrator(
@@ -229,7 +229,7 @@ export class AdministratorService {
   ): string
   public resetAdministratorPassword(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<AdministratorResetPasswordResponse>
   public resetAdministratorPassword(
@@ -267,7 +267,7 @@ export class AdministratorService {
   public updateAdministratorPassword(
     id: string,
     requestBody: UpdatePasswordInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public updateAdministratorPassword(

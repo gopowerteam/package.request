@@ -5,7 +5,18 @@ import type { ProductOrder } from './ProductOrder'
 import type { ProductSpec } from './ProductSpec'
 
 export type ProductOrderItem = {
+  /**
+   * ID
+   */
   id: string
+  /**
+   * 创建人
+   */
+  creator: string
+  /**
+   * 操作人
+   */
+  operator: string
   /**
    * 标题
    */

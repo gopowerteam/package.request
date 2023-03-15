@@ -3,6 +3,9 @@
 /* eslint-disable */
 
 export type MaterialGroupResponse = {
+  /**
+   * ID
+   */
   id?: string
   /**
    * 素材分组名称

@@ -34,13 +34,21 @@ export function parseParametersQuery(
         !p.name.startsWith('.') &&
         !p.name.endsWith('.')
       ) {
-        const [name, subName] = p.name.split('.')
-
-        parameter.name = name
-        parameter.ref = `{ ${subName}${parameter.required ? '?' : ''}: ${
-          ref || 'any'
-        } }`
+        parameter.name = `"${p.name}"`
       }
+
+      // if (
+      //   p.name.includes('.') &&
+      //   !p.name.startsWith('.') &&
+      //   !p.name.endsWith('.')
+      // ) {
+      //   const [name, subName] = p.name.split('.')
+
+      //   parameter.name = name
+      //   parameter.ref = `{ ${subName}${parameter.required ? '?' : ''}: ${
+      //     ref || 'any'
+      //   } }`
+      // }
 
       r.push(parameter)
     }

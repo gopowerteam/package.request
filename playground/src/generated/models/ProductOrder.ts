@@ -5,6 +5,9 @@ import type { ProductOrderItem } from './ProductOrderItem'
 import type { PaymentOrder } from './PaymentOrder'
 
 export type ProductOrder = {
+  /**
+   * ID
+   */
   id: string
   /**
    * 创建日期
@@ -14,6 +17,18 @@ export type ProductOrder = {
    * 更新日期
    */
   updatedAt: string
+  /**
+   * 删除时间
+   */
+  deletedAt: string
+  /**
+   * 创建人
+   */
+  creator: string
+  /**
+   * 操作人
+   */
+  operator: string
   /**
    * 商品订单状态
    */

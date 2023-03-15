@@ -46,7 +46,7 @@ export class CategoryService {
   ): string
   public createCategory(
     requestBody: CreateCategoryInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Category>
   public createCategory(
@@ -80,7 +80,7 @@ export class CategoryService {
   ): string
   public findCategory(
     requestQuery: RequestQueryParams.FindCategory,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Category[]>
   public findCategory(
@@ -116,7 +116,7 @@ export class CategoryService {
   public updateCategory(
     id: string,
     requestBody: UpdateCategoryInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Category>
   public updateCategory(
@@ -154,7 +154,7 @@ export class CategoryService {
   ): string
   public getCategory(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Category>
   public getCategory(
@@ -190,7 +190,7 @@ export class CategoryService {
   ): string
   public deleteCategory(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<void>
   public deleteCategory(

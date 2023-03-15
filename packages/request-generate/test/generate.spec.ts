@@ -20,7 +20,8 @@ describe('测试请求生成逻辑', () => {
     await generate({
       gateway: 'https://gateway.local.xbt-dev.top',
       applications: {
-        'mall-service': 'xbt-platform-mall-service'
+        'mall-service': 'xbt-platform-mall-service',
+        'customer-service': 'xbt-platform-sales-customer-service'
       },
       openapi: '/v2/api-docs',
       output: './generated/v2',

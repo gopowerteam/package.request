@@ -57,7 +57,7 @@ export class ProductService {
   ): string
   public findProduct(
     requestQuery: RequestQueryParams.FindProduct,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<PageProduct>
   public findProduct(
@@ -91,7 +91,7 @@ export class ProductService {
   ): string
   public createProduct(
     requestBody: CreateProductInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Product>
   public createProduct(
@@ -125,7 +125,7 @@ export class ProductService {
   ): string
   public getProduct(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Product>
   public getProduct(
@@ -163,7 +163,7 @@ export class ProductService {
   public updateProduct(
     id: string,
     requestBody: UpdateProductInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Product>
   public updateProduct(
@@ -201,7 +201,7 @@ export class ProductService {
   ): string
   public findVersion(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductVersion[]>
   public findVersion(
@@ -237,7 +237,7 @@ export class ProductService {
   ): string
   public createProductVersion(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductVersion>
   public createProductVersion(
@@ -273,7 +273,7 @@ export class ProductService {
   ): string
   public getVersion(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductVersion>
   public getVersion(
@@ -311,7 +311,7 @@ export class ProductService {
   public publishProduct(
     id: string,
     versionId: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Product>
   public publishProduct(
@@ -349,7 +349,7 @@ export class ProductService {
   ): string
   public unpublishProduct(
     id: string,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<Product>
   public unpublishProduct(
@@ -387,7 +387,7 @@ export class ProductService {
   public setupProductAttrs(
     id: string,
     requestBody: SetupProductAttrsInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductAttr[]>
   public setupProductAttrs(
@@ -427,7 +427,7 @@ export class ProductService {
   public setupProductAttrItems(
     id: string,
     requestBody: SetupProductAttrItemsInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductSpec[]>
   public setupProductAttrItems(
@@ -465,7 +465,7 @@ export class ProductService {
   ): string
   public setupProductSpecs(
     requestBody: SetupProductSpecsInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductSpec[]>
   public setupProductSpecs(
@@ -501,7 +501,7 @@ export class ProductService {
   public updateProductAttr(
     id: string,
     requestBody: UpdateProductAttrInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductAttr>
   public updateProductAttr(
@@ -541,7 +541,7 @@ export class ProductService {
   public updateProductAttrItem(
     id: string,
     requestBody: UpdateProductAttrItemInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductAttrItem>
   public updateProductAttrItem(
@@ -581,7 +581,7 @@ export class ProductService {
   public updateProductSpec(
     id: string,
     requestBody: UpdateProductSpecInput,
-    requestPlugins: RequestPlugin[],
+    requestPlugins?: RequestPlugin[],
     requestGenerateOptions?: RequestGenerateOptions
   ): Promise<ProductSpec>
   public updateProductSpec(

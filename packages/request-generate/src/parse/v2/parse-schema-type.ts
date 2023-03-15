@@ -1,5 +1,6 @@
 import type { OpenAPIV2 } from 'openapi-types'
 import type { SchemaType } from '../../types/schema-type'
+import { getBuiltInType } from '../../utils/get-built-in-type'
 import { getCamelName } from '../../utils/get-camel-name'
 import { getMappedType } from '../../utils/get-mapped-type'
 import { stripNamespace } from './strip-namespace'
@@ -45,11 +46,12 @@ export function parseSchemaType(
   ) {
     // 获取引用类型
     const ref = getCamelName(stripNamespace(schema.items.$ref))
+    const type = getBuiltInType(ref)
 
     return {
       type: 'any[]',
-      ref: `${ref}[]`,
-      imports: [ref]
+      ref: `${type ?? ref}[]`,
+      imports: type ? undefined : [ref]
     }
   }
 
