@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.16
+
+### Patch Changes
+
+- filter empty & null & undefined value
+
 ## 0.1.15
 
 ### Patch Changes
