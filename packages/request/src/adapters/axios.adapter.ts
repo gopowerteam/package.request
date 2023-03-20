@@ -34,7 +34,12 @@ export class AxiosAdapter implements RequestAdapter {
                 skipNulls: true,
                 allowDots: true,
                 encodeValuesOnly: true,
-                encode: true
+                encode: true,
+                sort: (a: string, b: string) => a.localeCompare(b),
+                filter: (_, value) =>
+                  ['', undefined, null].some((v) => v === value)
+                    ? undefined
+                    : value
               }
             )
         }
