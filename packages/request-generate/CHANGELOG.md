@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.16
+
+### Patch Changes
+
+- 添加多请求获取
+
 ## 0.1.15
 
 ### Patch Changes
