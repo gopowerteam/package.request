@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.17
+
+### Patch Changes
+
+- update package.json
+
 ## 0.1.16
 
 ### Patch Changes
