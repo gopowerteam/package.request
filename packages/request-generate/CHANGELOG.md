@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.18
+
+### Patch Changes
+
+- fixed came-name convert
+
 ## 0.1.17
 
 ### Patch Changes
