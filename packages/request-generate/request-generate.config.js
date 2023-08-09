@@ -7,6 +7,7 @@ module.exports = {
   output: './generated',
   exportModels: true,
   logger: true,
+  appendService: false,
   exportServices: {
     responseType: 'observable',
     excludeQueryParams: ['page', 'size', 'order']

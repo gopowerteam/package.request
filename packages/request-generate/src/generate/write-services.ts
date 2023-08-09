@@ -4,6 +4,7 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import rimraf from 'rimraf'
 import { writeService } from './write-service'
+import { Generate } from '.'
 
 export function writeServices(
   client: GenerateClient,
@@ -28,7 +29,8 @@ export function writeServices(
   client.services.forEach((service) => {
     const filename = `${service.name}Service.ts`
     // 设置应用名称
-    service.application = options.application
+    service.application =
+      Generate.options.appendService === false ? '' : options.application
 
     writeService(service, path.join(output, filename))
   })

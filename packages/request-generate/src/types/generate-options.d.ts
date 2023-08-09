@@ -32,6 +32,8 @@ export type GenerateOptions = {
   }
   // 多应用列表
   applications?: Record<string, string>
+  // 追加service
+  appendService?: boolean
 }
 
 /**
