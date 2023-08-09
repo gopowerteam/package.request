@@ -1,5 +1,12 @@
 # @gopowerteam/request-generate
 
+## 0.1.19
+
+### Patch Changes
+
+- ed08fd3: add appendService options
+- add append-service option
+
 ## 0.1.18
 
 ### Patch Changes
