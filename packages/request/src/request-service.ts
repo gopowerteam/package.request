@@ -44,7 +44,7 @@ export class RequestService {
    * @param plugins
    * @param options
    */
-  private execRequestPlugin(
+  private async execRequestPlugin(
     plugins: RequestPlugin[] = [],
     options: RequestSendOptions
   ) {
@@ -55,14 +55,17 @@ export class RequestService {
     }
 
     // 执行全局插件
-    RequestService.config.plugins.forEach(
-      (service) => service.before && service.before(options, appendParams)
-    )
+    for (const plugin of RequestService.config.plugins) {
+      if (plugin.before) {
+        await plugin.before(options, appendParams)
+      }
+    }
 
-    // 执行上下文插件
-    plugins.forEach(
-      (service) => service.before && service.before(options, appendParams)
-    )
+    for (const plugin of plugins) {
+      if (plugin.before) {
+        await plugin.before(options, appendParams)
+      }
+    }
 
     return extraParams
   }
@@ -195,7 +198,7 @@ export class RequestService {
     const adapter = this.getRequestAdapter()
 
     // 执行前置插件
-    const extraParams = this.execRequestPlugin(plugins, options)
+    const extraParams = await this.execRequestPlugin(plugins, options)
 
     // 开始进行请求
     const response = await this.startRequest(adapter, options, extraParams)

@@ -8,7 +8,7 @@ export interface RequestPlugin {
   before?: (
     options: RequestSendOptions,
     appendParams: (params: Record<string, any>) => void
-  ) => void
+  ) => void | Promise<void>
 
   after?: (response: AdapterResponse, options: RequestSendOptions) => void
 

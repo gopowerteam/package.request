@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.17
+
+### Patch Changes
+
+- add async before plugin support
+
 ## 0.1.16
 
 ### Patch Changes
