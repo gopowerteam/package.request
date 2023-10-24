@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict'
+require('ts-node').register()
 
 const path = require('node:path')
 const fs = require('node:fs')
@@ -20,6 +21,7 @@ const params = program
   .opts()
 
 const configFilePaths = [
+  'request.config.ts',
   'request-generate.config.cjs',
   'request-generate.config.js'
 ]
@@ -38,8 +40,10 @@ function loadConfigFile(filePath) {
     fs.existsSync(path.resolve(process.cwd(), file))
   )
 
-  if (configFilePath) {
+  if (configFilePath.endsWith('js')) {
     return require(path.resolve(process.cwd(), configFilePath))
+  } else if (configFilePath.endsWith('ts')) {
+    return require(path.resolve(process.cwd(), configFilePath)).default
   } else {
     throw new Error('无法找到RequestGenerate配置文件')
   }

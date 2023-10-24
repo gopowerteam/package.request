@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type {
+  ApplicationConfig,
   GenerateApplicationOptions,
   GenerateOptions
 } from '../types/generate-options'
@@ -14,15 +15,32 @@ import type {
 function createOptions(
   options: GenerateOptions,
   name?: string,
-  application = ''
+  application?: ApplicationConfig
 ) {
+  const { service, openapi } = (() => {
+    if (!application) {
+      return {
+        service: '',
+        openapi: options.openapi
+      }
+    }
+    if (typeof application === 'string') {
+      return {
+        service: application,
+        openapi: options.openapi
+      }
+    } else {
+      return {
+        service: application.key,
+        openapi: application.openapi
+      }
+    }
+  })()
+
   return {
     name,
-    application,
-    input: `${options.gateway}/${application}/${options.openapi}`.replace(
-      /\/{2,3}/g,
-      '/'
-    ),
+    application: service,
+    input: `${options.gateway}/${service}/${openapi}`.replace(/\/{2,3}/g, '/'),
     output: name ? path.join(options.output, name) : options.output,
     exportModels: options.exportModels
   }

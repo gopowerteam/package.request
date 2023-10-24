@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.20
+
+### Patch Changes
+
+- update defineConfig
+
 ## 0.1.19
 
 ### Patch Changes

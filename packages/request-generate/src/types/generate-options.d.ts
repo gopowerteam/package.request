@@ -31,10 +31,17 @@ export type GenerateOptions = {
     responseType?: 'promise' | 'observable'
   }
   // 多应用列表
-  applications?: Record<string, string>
+  applications?: Record<string, ApplicationConfig>
   // 追加service
   appendService?: boolean
 }
+
+export type ApplicationConfig =
+  | {
+      key: string
+      openapi: string
+    }
+  | string
 
 /**
  * 生成应用选项
