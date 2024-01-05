@@ -1,16 +1,17 @@
-#!/usr/bin/env node
-'use strict'
-require('ts-node').register()
+#!/usr/bin/env tsx
 
-const path = require('node:path')
-const fs = require('node:fs')
-const { program } = require('commander')
+import path from 'node:path'
+import fs from 'node:fs'
+import { program } from 'commander'
+import { fileURLToPath } from 'node:url';
 
-const RequestGenerate = require(path.resolve(
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const RequestGenerate = await import(path.resolve(
   __dirname,
   '..',
   'dist',
-  'index.js'
+  'index.mjs'
 ))
 
 const params = program
@@ -31,7 +32,7 @@ const configFilePaths = [
  * @param {*} filePath
  * @returns
  */
-function loadConfigFile(filePath) {
+async function loadConfigFile(filePath) {
   if (filePath) {
     configFilePaths.unshift(filePath)
   }
@@ -40,17 +41,22 @@ function loadConfigFile(filePath) {
     fs.existsSync(path.resolve(process.cwd(), file))
   )
 
+  if(!configFilePath){
+    throw new Error("Not Find Config File.")
+  }
+
   if (configFilePath.endsWith('js')) {
-    return require(path.resolve(process.cwd(), configFilePath))
+    return import(path.resolve(process.cwd(), configFilePath))
   } else if (configFilePath.endsWith('ts')) {
-    return require(path.resolve(process.cwd(), configFilePath)).default
+    return import(path.resolve(process.cwd(), configFilePath))
   } else {
     throw new Error('无法找到RequestGenerate配置文件')
   }
 }
 
 if (RequestGenerate) {
-  const config = loadConfigFile(params.config)
+  const { default: config } = await loadConfigFile(params.config)
+
   RequestGenerate.default(config)
     .then(() => {
       console.log('接口文件生成完成')
