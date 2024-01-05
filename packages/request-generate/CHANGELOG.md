@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.24
+
+### Patch Changes
+
+- update bin
+
 ## 0.1.23
 
 ### Patch Changes

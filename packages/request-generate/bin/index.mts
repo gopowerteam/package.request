@@ -7,12 +7,12 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const RequestGenerate = await import(path.resolve(
+const RequestGenerate = await import(`file://${path.resolve(
   __dirname,
   '..',
   'dist',
   'index.mjs'
-))
+)}`)
 
 const params = program
   .name('@gopowerteam/request-generate')
@@ -46,9 +46,9 @@ async function loadConfigFile(filePath) {
   }
 
   if (configFilePath.endsWith('js')) {
-    return import(path.resolve(process.cwd(), configFilePath))
+    return import(`file://${path.resolve(process.cwd(), configFilePath)}`)
   } else if (configFilePath.endsWith('ts')) {
-    return import(path.resolve(process.cwd(), configFilePath))
+    return import(`file://${path.resolve(process.cwd(), configFilePath)}`)
   } else {
     throw new Error('无法找到RequestGenerate配置文件')
   }
