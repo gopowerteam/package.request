@@ -1,7 +1,7 @@
 {
   "name": "@gopowerteam/request-generate",
   "private": false,
-  "version": "0.1.21",
+  "version": "0.1.22",
   "type": "commonjs",
   "files": [
     "dist",
@@ -10,7 +10,7 @@
     "README.md"
   ],
   "bin": {
-    "request-generate": "bin/index.js"
+    "request-generate": "bin/index.cjs"
   },
   "keywords": [
     "gopowerteam",
