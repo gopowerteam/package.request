@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import type { ResolvedConfig, Plugin } from 'vite'
-import * as Handlebars from 'handlebars'
+import Handlebars from 'handlebars'
 import { generateCodeTemplate, generateDeclareTemplate } from './templates'
 // 虚拟模块ID
 const MODULE_ID = 'virtual:request'

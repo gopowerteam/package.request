@@ -185,7 +185,7 @@ export class RequestService {
    */
   public async send(
     options: RequestSendOptions,
-    plugins: RequestPlugin[] = []
+    requestPlugins: (RequestPlugin | undefined)[] = []
   ): Promise<any> {
     if (!RequestService.config) {
       throw new Error('请检查请求配置是否完成')
@@ -196,6 +196,7 @@ export class RequestService {
 
     // 获取请求适配器
     const adapter = this.getRequestAdapter()
+    const plugins = requestPlugins.filter(Boolean) as RequestPlugin[]
 
     // 执行前置插件
     const extraParams = await this.execRequestPlugin(plugins, options)

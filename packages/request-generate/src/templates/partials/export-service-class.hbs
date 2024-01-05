@@ -5,7 +5,7 @@ export class {{{name}}}Service {
 
   private generateRequest(
     requestSendOptions: RequestSendOptions,
-    requestPlugins: RequestPlugin[] = [],
+    requestPlugins: (RequestPlugin | undefined)[] = [],
     requestGenerateOptions?: RequestGenerateOptions
   ){
     switch(true){

@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.21
+
+### Patch Changes
+
+- fixed import handlebars
+
 ## 0.1.20
 
 ### Patch Changes
