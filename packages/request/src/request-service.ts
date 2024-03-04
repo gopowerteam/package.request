@@ -229,7 +229,7 @@ export class RequestService {
    */
   public toURL(
     options: RequestSendOptions,
-    plugins: RequestPlugin[] = []
+    plugins: (RequestPlugin | undefined)[] = []
   ): string {
     if (!RequestService.config) {
       throw new Error('请检查请求配置是否完成')
@@ -237,7 +237,10 @@ export class RequestService {
 
     if (plugins && plugins.length) {
       // 执行前置插件
-      this.execRequestPlugin(plugins, options)
+      this.execRequestPlugin(
+        plugins.filter(Boolean) as RequestPlugin[],
+        options
+      )
     }
 
     const baseURL = RequestService.config.gateway
