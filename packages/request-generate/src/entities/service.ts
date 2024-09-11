@@ -5,8 +5,8 @@ export class Service {
   constructor(name: string) {
     this.name = name
 
-    this.responseType =
-      Generate.options?.exportServices?.responseType || 'promise'
+    this.responseType
+      = Generate.options?.exportServices?.responseType || 'promise'
   }
 
   // 服务名称

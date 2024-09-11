@@ -9,7 +9,7 @@ import { parseSchemaType } from './parse-schema-type'
 export function parseOperation(
   path: string,
   method: string,
-  operationObject: OpenAPIV3.OperationObject
+  operationObject: OpenAPIV3.OperationObject,
 ) {
   const name = getOperationName(path, method, operationObject)
 
@@ -33,10 +33,10 @@ export function parseOperation(
   operation.imports = Array.from(
     new Set([
       ...(operation.parametersBody?.imports || []),
-      ...(operation.parametersPath.flatMap((p) => p.imports) || []),
-      ...(operation.parametersQuery.flatMap((p) => p.imports) || []),
-      ...(responseSchema?.imports || [])
-    ])
+      ...(operation.parametersPath.flatMap(p => p.imports) || []),
+      ...(operation.parametersQuery.flatMap(p => p.imports) || []),
+      ...(responseSchema?.imports || []),
+    ]),
   )
 
   operation.responseRef = responseSchema?.ref || 'void'
@@ -56,13 +56,13 @@ function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
   }
 
   if (
-    response &&
-    'content' in response &&
-    medias.some((media) => !!response?.content?.[media]?.schema)
+    response
+    && 'content' in response
+    && medias.some(media => !!response?.content?.[media]?.schema)
   ) {
     // 查找media类型
     const mediaType = medias.find(
-      (media) => !!response?.content?.[media]?.schema
+      media => !!response?.content?.[media]?.schema,
     )
 
     // 获取media schema
@@ -74,6 +74,6 @@ function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
   return {
     type: 'void',
     ref: 'void',
-    imports: []
+    imports: [],
   }
 }

@@ -1,4 +1,4 @@
-import type { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
+import type { OpenAPIV2, OpenAPIV3 } from 'openapi-types'
 import { OpenAPIVersion } from '../config/enum.config'
 
 /**
@@ -7,7 +7,7 @@ import { OpenAPIVersion } from '../config/enum.config'
  * @returns
  */
 export function getOpenAPIVersion(
-  document: OpenAPIV3.Document & OpenAPIV2.Document
+  document: OpenAPIV3.Document & OpenAPIV2.Document,
 ) {
   const version = document?.swagger || document?.openapi
 

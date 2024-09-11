@@ -1,4 +1,4 @@
-import { ResponseInterceptor, AdapterResponse } from '@gopowerteam/request/src'
+import type { AdapterResponse, ResponseInterceptor } from '@gopowerteam/request/src'
 
 export class StatusInterceptors implements ResponseInterceptor {
   exec() {
@@ -20,6 +20,6 @@ export class ErrorInterceptors implements ResponseInterceptor {
 
 export class ExceptionInterceptors implements ResponseInterceptor {
   exec() {
-    console.log('发生异常')
+    console.error('发生异常')
   }
 }

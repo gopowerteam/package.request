@@ -1,5 +1,4 @@
 import { AxiosAdapter } from '../src/adapters'
-import { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'
 import { TestRequestPlugin } from './request-plugin'
@@ -7,8 +6,9 @@ import {
   ErrorInterceptors,
   ExceptionInterceptors,
   StatusInterceptors,
-  SuccessInterceptors
+  SuccessInterceptors,
 } from './response-interceptors'
+import type { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
 
 const config: RequestSetupConfig = {
   gateway: 'https://mall-service.gopowerteam.cn',
@@ -17,13 +17,13 @@ const config: RequestSetupConfig = {
     status: new StatusInterceptors(),
     success: new SuccessInterceptors(),
     error: new ErrorInterceptors(),
-    exception: new ExceptionInterceptors()
+    exception: new ExceptionInterceptors(),
   },
-  plugins: []
+  plugins: [],
 }
 
 describe('测试RequestService', () => {
-  test('测试正常请求', async () => {
+  it('测试正常请求', async () => {
     setup(config)
     // 请求实例
     const request = RequestService.getInstance()
@@ -32,16 +32,16 @@ describe('测试RequestService', () => {
     const data = await request.send(
       {
         path: '/api/admin/app/app-base',
-        method: 'GET'
+        method: 'GET',
       },
-      []
+      [],
     )
 
     // 校验结果
     expect(typeof data).toBe('object')
   })
 
-  test('测试异常请求', async () => {
+  it('测试异常请求', async () => {
     // 替换异常方法
     const errorHandle = jest.fn()
     const exceptionHandle = jest.fn()
@@ -56,9 +56,9 @@ describe('测试RequestService', () => {
       .send(
         {
           path: '/api/admin/app/app---',
-          method: 'GET'
+          method: 'GET',
         },
-        []
+        [],
       )
       .catch(errorHandle)
     // 校验执行
@@ -66,7 +66,7 @@ describe('测试RequestService', () => {
     expect(errorHandle).toHaveBeenCalled()
   })
 
-  test('测试插件正常生命周期', async () => {
+  it('测试插件正常生命周期', async () => {
     // 配置RequestService
     const beforeHook = jest.fn()
     const afterHook = jest.fn()
@@ -86,10 +86,10 @@ describe('测试RequestService', () => {
         path: '/api/admin/app/app-base',
         method: 'GET',
         paramsQuery: {
-          a: [1, 2, 3, 4, 5]
-        }
+          a: [1, 2, 3, 4, 5],
+        },
       },
-      [plugin]
+      [plugin],
     )
 
     // 校验执行
@@ -97,7 +97,7 @@ describe('测试RequestService', () => {
     expect(afterHook).toHaveBeenCalled()
   })
 
-  test('测试插件异常生命周期', async () => {
+  it('测试插件异常生命周期', async () => {
     // 配置RequestService
     const catchHook = jest.fn()
 
@@ -114,9 +114,9 @@ describe('测试RequestService', () => {
       .send(
         {
           path: '/api/admin/app/app-base',
-          method: 'POST'
+          method: 'POST',
         },
-        [plugin]
+        [plugin],
       )
       .catch(() => {
         //

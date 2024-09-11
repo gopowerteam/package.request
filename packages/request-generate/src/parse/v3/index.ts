@@ -10,6 +10,6 @@ export function parseV3(document: OpenAPIV3.Document) {
 
   return {
     models,
-    services
+    services,
   }
 }

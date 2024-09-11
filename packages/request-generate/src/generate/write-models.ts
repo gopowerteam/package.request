@@ -1,18 +1,19 @@
-import type { GenerateClient } from '../types/generate-client'
-import type { GenerateApplicationOptions } from '../types/generate-options'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { writeModel } from './write-model'
 import rimraf from 'rimraf'
+import { updateProgress } from '../progress'
+import { writeModel } from './write-model'
+import type { GenerateClient } from '../types/generate-client'
+import type { GenerateApplicationOptions } from '../types/generate-options'
+
 /**
  * 写入Model文件
  * @param client
  * @param options
- * @returns
  */
 export function writeModels(
   client: GenerateClient,
-  options: GenerateApplicationOptions
+  options: GenerateApplicationOptions,
 ) {
   if (!options.exportModels || !client.models) {
     return
@@ -33,5 +34,6 @@ export function writeModels(
   client.models.forEach((model) => {
     const filename = `${model.name}.ts`
     writeModel(model, path.join(output, filename))
+    updateProgress(options.name || 'default', 'model')
   })
 }

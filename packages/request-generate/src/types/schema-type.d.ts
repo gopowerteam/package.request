@@ -1,4 +1,4 @@
-export type SchemaType = {
+export interface SchemaType {
   // 字段类型
   type: string
   // 引用类型

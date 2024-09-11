@@ -3,7 +3,7 @@ import type { OpenAPIV2, OpenAPIV3 } from 'openapi-types'
 /**
  * 生成全局选项
  */
-export type GenerateOptions = {
+export interface GenerateOptions {
   // 网关地址
   gateway: string
   // OpenAPI地址
@@ -38,9 +38,9 @@ export type GenerateOptions = {
 
 export type ApplicationConfig =
   | {
-      key: string
-      openapi: string
-    }
+    key: string
+    openapi: string
+  }
   | string
 
 /**

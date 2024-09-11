@@ -3,10 +3,10 @@ import { OperationParameter } from '../../entities/operation-parameter'
 import { parseSchemaType } from './parse-schema-type'
 
 export function parseParametersBody(
-  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.Parameter)[]
+  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.Parameter)[],
 ): OperationParameter | undefined {
   const requestBody = parameters.find(
-    (parameter) => !('$ref' in parameter) && parameter.in === 'body'
+    parameter => !('$ref' in parameter) && parameter.in === 'body',
   )
 
   if (requestBody && 'schema' in requestBody) {
@@ -21,7 +21,7 @@ export function parseParametersBody(
     parameter.imports = imports || []
 
     return parameter
-  } else {
-    return
   }
+
+  return undefined
 }

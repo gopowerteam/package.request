@@ -1,5 +1,5 @@
-import { RequestSetupConfig } from './interfaces/request-setup.interface'
 import { RequestService } from './request-service'
+import type { RequestSetupConfig } from './interfaces/request-setup.interface'
 
 export function setup(config: RequestSetupConfig) {
   // 注入全局配置

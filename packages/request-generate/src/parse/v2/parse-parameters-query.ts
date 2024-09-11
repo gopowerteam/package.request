@@ -4,18 +4,18 @@ import { Generate } from '../../generate'
 import { parseSchemaType } from './parse-schema-type'
 
 export function parseParametersQuery(
-  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[]
+  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
 ) {
   const excludeParams = Generate.options?.exportServices?.excludeQueryParams
 
   return parameters.reduce<OperationParameter[]>((r, p) => {
     if (
-      !('$ref' in p) &&
-      p.in === 'query' &&
-      !(excludeParams && excludeParams.includes(p.name.split('.')[0]))
+      !('$ref' in p)
+      && p.in === 'query'
+      && !(excludeParams && excludeParams.includes(p.name.split('.')[0]))
     ) {
       const { type, ref, imports, enums } = parseSchemaType(
-        p as OpenAPIV2.SchemaObject
+        p as OpenAPIV2.SchemaObject,
       )
 
       const parameter = new OperationParameter()
@@ -30,9 +30,9 @@ export function parseParametersQuery(
       parameter.enums = enums
 
       if (
-        p.name.includes('.') &&
-        !p.name.startsWith('.') &&
-        !p.name.endsWith('.')
+        p.name.includes('.')
+        && !p.name.startsWith('.')
+        && !p.name.endsWith('.')
       ) {
         parameter.name = `"${p.name}"`
       }

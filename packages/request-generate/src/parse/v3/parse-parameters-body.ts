@@ -3,7 +3,7 @@ import { OperationParameter } from '../../entities/operation-parameter'
 import { parseSchemaType } from './parse-schema-type'
 
 export function parseParametersBody(
-  requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject
+  requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
 ): OperationParameter {
   const { type, ref, imports } = parseBodyType(requestBody)
 
@@ -19,7 +19,7 @@ export function parseParametersBody(
 }
 
 function parseBodyType(
-  requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject
+  requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
 ) {
   // 引用直接类型转换
   if ('$ref' in requestBody) {
@@ -27,8 +27,8 @@ function parseBodyType(
   }
 
   if (
-    'content' in requestBody &&
-    requestBody?.content['application/json']?.schema
+    'content' in requestBody
+    && requestBody?.content['application/json']?.schema
   ) {
     const schema = requestBody?.content['application/json']?.schema
 

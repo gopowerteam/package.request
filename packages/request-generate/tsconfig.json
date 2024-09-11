@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
     "lib": ["esnext"],
+    "module": "commonjs",
     "moduleResolution": "node",
-    "strict": true,
-    "alwaysStrict": true,
-    "sourceMap": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "noEmit": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "skipLibCheck": true,
-    "strictPropertyInitialization": false
+    "noEmit": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "test/**/*.spec.ts"]
+  "include": ["src/**/*.ts", "test/**/*.spec.ts", "src/types/global.d.ts"]
 }

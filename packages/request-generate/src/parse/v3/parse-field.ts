@@ -5,7 +5,7 @@ import { parseSchemaType } from './parse-schema-type'
 export function parseField(
   name: string,
   properties: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-  required = false
+  required = false,
 ) {
   // 创建字段
   const field = new Field(name, required)

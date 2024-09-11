@@ -1,12 +1,12 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import type { SchemaType } from '../../types/schema-type'
 import { getBuiltInType } from '../../utils/get-built-in-type'
 import { getCamelName } from '../../utils/get-camel-name'
 import { getMappedType } from '../../utils/get-mapped-type'
 import { stripNamespace } from './strip-namespace'
+import type { SchemaType } from '../../types/schema-type'
 
 export function parseSchemaType(
-  schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject
+  schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 ): SchemaType {
   // ReferenceObject类型
   if ('$ref' in schema) {
@@ -16,22 +16,22 @@ export function parseSchemaType(
     return {
       type: 'any',
       ref,
-      imports: [ref]
+      imports: [ref],
     }
   }
 
   // NonArraySchemaObjectType类型
   if (
-    !('$ref' in schema) &&
-    schema.type !== 'array' &&
-    !schema.allOf &&
-    !schema.anyOf &&
-    !schema.oneOf
+    !('$ref' in schema)
+    && schema.type !== 'array'
+    && !schema.allOf
+    && !schema.anyOf
+    && !schema.oneOf
   ) {
     return {
       type: getMappedType(schema.type || 'any'),
       ref: undefined,
-      enums: schema.enum
+      enums: schema.enum,
     }
   }
 
@@ -44,7 +44,7 @@ export function parseSchemaType(
     return {
       type: 'any[]',
       ref: `${type ?? ref}[]`,
-      imports: type ? undefined : [ref]
+      imports: type ? undefined : [ref],
     }
   }
 
@@ -52,7 +52,7 @@ export function parseSchemaType(
   if (schema.type === 'array' && !('$ref' in schema.items)) {
     return {
       type: `${getMappedType(schema.items.type)}[]`,
-      ref: undefined
+      ref: undefined,
     }
   }
 
@@ -60,26 +60,27 @@ export function parseSchemaType(
   if (schema.allOf || schema.anyOf || schema.oneOf) {
     const ofSchema = schema.allOf || schema.anyOf || schema.oneOf
 
-    const ofSchemaArray = ofSchema?.map((s) => parseSchemaType(s))
+    const ofSchemaArray = ofSchema?.map(s => parseSchemaType(s))
 
     if (ofSchemaArray) {
-      const hasRef = ofSchemaArray.some((s) => s.ref)
+      const hasRef = ofSchemaArray.some(s => s.ref)
 
       return {
-        type: hasRef ? 'any' : ofSchemaArray.map((s) => s.type).join('|'),
+        type: hasRef ? 'any' : ofSchemaArray.map(s => s.type).join('|'),
         ref: hasRef
           ? ofSchemaArray
-              .map((s) => (s.ref && getCamelName(s.ref)) || s.type)
-              .join('|')
+            .map(s => (s.ref && getCamelName(s.ref)) || s.type)
+            .join('|')
           : undefined,
         imports: hasRef
           ? ofSchemaArray.reduce<string[]>(
-              (r, s) => (
-                s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
-              ),
-              []
-            )
-          : undefined
+            (r, s) => (
+              // eslint-disable-next-line no-sequences
+              s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
+            ),
+            [],
+          )
+          : undefined,
       }
     }
   }

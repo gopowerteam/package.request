@@ -1,5 +1,5 @@
-import { AdapterResponse } from '../src/interfaces/request-adapter.interface'
-import { ResponseInterceptor } from '../src/interfaces/response-interceptor.interface'
+import type { AdapterResponse } from '../src/interfaces/request-adapter.interface'
+import type { ResponseInterceptor } from '../src/interfaces/response-interceptor.interface'
 
 export class StatusInterceptors implements ResponseInterceptor {
   exec() {
@@ -21,6 +21,6 @@ export class ErrorInterceptors implements ResponseInterceptor {
 
 export class ExceptionInterceptors implements ResponseInterceptor {
   exec(data: AdapterResponse) {
-    console.log('发生异常', data)
+    console.error('发生异常', data)
   }
 }

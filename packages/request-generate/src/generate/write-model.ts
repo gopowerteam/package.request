@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars'
-import type { Model } from '../entities/model'
 import { loadHandlebarTemplate } from '../template'
 import { writeFile } from './write-file'
+import type { Model } from '../entities/model'
 
 export function writeModel(model: Model, output: string) {
   const templateSource = loadHandlebarTemplate('export-model')

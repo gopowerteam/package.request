@@ -1,35 +1,40 @@
 {
   "name": "@gopowerteam/request",
-  "private": false,
-  "version": "0.1.20",
   "type": "module",
-  "files": [
-    "dist",
-    "adapters.d.ts",
-    "README.md"
-  ],
+  "version": "0.1.20",
+  "private": false,
   "keywords": [
     "gopowerteam",
     "request"
   ],
-  "scripts": {
-    "test": "jest --coverage",
-    "build": "tsup"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js",
+      "require": "./dist/adapters/index.cjs"
+    }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./adapters": {
-      "require": "./dist/adapters/index.cjs",
-      "import": "./dist/adapters/index.js",
-      "types": "./dist/adapters/index.d.ts"
-    }
+  "files": [
+    "README.md",
+    "adapters.d.ts",
+    "dist"
+  ],
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "tsup",
+    "lint": "eslint . --fix"
+  },
+  "dependencies": {
+    "axios": "^1.3.4",
+    "qs": "^6.11.0"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",
@@ -39,9 +44,5 @@
     "ts-jest": "^29.0.5",
     "tsup": "^6.6.3",
     "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "axios": "^1.3.4",
-    "qs": "^6.11.0"
   }
 }

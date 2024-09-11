@@ -8,7 +8,7 @@ export function parseService(
   method: string,
   operationObject: OpenAPIV3.OperationObject,
   tags: OpenAPIV3.TagObject[],
-  services: Service[]
+  services: Service[],
 ) {
   const toNames = (name: string | string[]) =>
     Array.isArray(name) ? name : [name]
@@ -18,8 +18,8 @@ export function parseService(
       path,
       method,
       operationObject as OpenAPIV3.OperationObject,
-      tags || []
-    )
+      tags || [],
+    ),
   )
 
   // 生成Operation
@@ -27,7 +27,7 @@ export function parseService(
 
   // 生成Service
   names.forEach((name) => {
-    let service = services.find((service) => service.name === name)
+    let service = services.find(service => service.name === name)
 
     if (!service) {
       service = new Service(name)
@@ -40,7 +40,7 @@ export function parseService(
 
     // 生成Imports
     service.operations
-      .flatMap((operation) => operation.imports)
+      .flatMap(operation => operation.imports)
       .forEach((model) => {
         if (service && !service.imports.includes(model)) {
           service.imports.push(model)

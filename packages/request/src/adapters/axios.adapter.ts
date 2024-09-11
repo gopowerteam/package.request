@@ -1,12 +1,13 @@
-import {
+import axios from 'axios'
+import * as qs from 'qs'
+import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
+import type { RequestSetupConfig } from '../interfaces'
+import type {
   AdapterResponse,
   AdapterResponseHeaders,
   RequestAdapter,
-  RequestAdapterOptions
+  RequestAdapterOptions,
 } from '../interfaces/request-adapter.interface'
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
-import * as qs from 'qs'
-import { RequestSetupConfig } from '../interfaces'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance
@@ -15,6 +16,7 @@ export class AxiosAdapter implements RequestAdapter {
   public injectConfig(config: RequestSetupConfig) {
     this.config = config
   }
+
   /**
    * 获取Axios实例
    */
@@ -23,10 +25,10 @@ export class AxiosAdapter implements RequestAdapter {
       AxiosAdapter.axiosInstance = axios.create({
         timeout: this.config?.timeout,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         paramsSerializer: {
-          serialize: (params) =>
+          serialize: params =>
             qs.stringify(
               params,
               this.config?.qs || {
@@ -37,12 +39,12 @@ export class AxiosAdapter implements RequestAdapter {
                 encode: true,
                 sort: (a: string, b: string) => a.localeCompare(b),
                 filter: (_, value) =>
-                  ['', undefined, null].some((v) => v === value)
+                  ['', undefined, null].includes(value)
                     ? undefined
-                    : value
-              }
-            )
-        }
+                    : value,
+              },
+            ),
+        },
       })
     }
 
@@ -51,7 +53,6 @@ export class AxiosAdapter implements RequestAdapter {
 
   /**
    * 发送请求
-   * @param options 请求参数
    * @returns AxiosResponse
    */
   public request({
@@ -61,7 +62,7 @@ export class AxiosAdapter implements RequestAdapter {
     method,
     paramsQuery,
     paramsBody,
-    extraParams = {}
+    extraParams = {},
   }: RequestAdapterOptions) {
     const axiosInstance = this.getAxiosInstance()
 
@@ -72,35 +73,34 @@ export class AxiosAdapter implements RequestAdapter {
       params: paramsQuery,
       data: paramsBody,
       url: pathURL,
-      ...extraParams
+      ...extraParams,
     })
   }
 
   /**
    * 转换Response
    * @param response
-   * @returns
+   * @returns AdapterResponse
    */
   public transformResponse(response: AxiosResponse): AdapterResponse {
     return {
       data: response.data,
       statusText: response.statusText,
       status: response.status,
-      headers: response.headers as AdapterResponseHeaders
+      headers: response.headers as AdapterResponseHeaders,
     }
   }
 
   /**
    * 转换Response
-   * @param response
-   * @returns
+   * @returns AdapterResponse
    */
   public transformException(exception: AxiosError): AdapterResponse {
     return {
       data: exception.response?.data || {},
       statusText: exception.response?.statusText || '',
       status: exception.response?.status || 400,
-      headers: (exception.response?.headers as AdapterResponseHeaders) || {}
+      headers: (exception.response?.headers as AdapterResponseHeaders) || {},
     }
   }
 }

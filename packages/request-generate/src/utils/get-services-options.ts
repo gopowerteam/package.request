@@ -2,37 +2,37 @@ import path from 'node:path'
 import type {
   ApplicationConfig,
   GenerateApplicationOptions,
-  GenerateOptions
+  GenerateOptions,
 } from '../types/generate-options'
 
 /**
  * 创建单服务配置项
  * @param options
  * @param name
- * @param service
- * @returns
+ * @param application
  */
 function createOptions(
   options: GenerateOptions,
   name?: string,
-  application?: ApplicationConfig
+  application?: ApplicationConfig,
 ) {
   const { service, openapi } = (() => {
     if (!application) {
       return {
         service: '',
-        openapi: options.openapi
+        openapi: options.openapi,
       }
     }
     if (typeof application === 'string') {
       return {
         service: application,
-        openapi: options.openapi
+        openapi: options.openapi,
       }
-    } else {
+    }
+    else {
       return {
         service: application.key,
-        openapi: application.openapi
+        openapi: application.openapi,
       }
     }
   })()
@@ -42,23 +42,24 @@ function createOptions(
     application: service,
     input: `${options.gateway}/${service}/${openapi}`.replace(/\/{2,3}/g, '/'),
     output: name ? path.join(options.output, name) : options.output,
-    exportModels: options.exportModels
+    exportModels: options.exportModels,
   }
 }
 
 /**
  * 创建服务项
  * @param options
- * @returns
+ * @returns GenerateApplicationOptions[]
  */
 export function generateServiceOptions(
-  options: GenerateOptions
+  options: GenerateOptions,
 ): GenerateApplicationOptions[] {
   if (options.applications && Object.keys(options.applications).length) {
     return Object.entries(options.applications).map(([name, application]) =>
-      createOptions(options, name, application)
+      createOptions(options, name, application),
     )
-  } else {
+  }
+  else {
     return [createOptions(options)]
   }
 }

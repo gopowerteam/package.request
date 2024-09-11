@@ -15,13 +15,14 @@ export function getServiceName(
   path: string,
   method: string,
   operationObject: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject,
-  tags: OpenAPIV2.TagObject[] | OpenAPIV3.TagObject[]
+  tags: OpenAPIV2.TagObject[] | OpenAPIV3.TagObject[],
 ): string | string[] {
   const resolve = Generate.options?.exportServices?.serviceResolve
 
   if (resolve) {
     return resolve({ path, method, object: operationObject, tags })
-  } else {
-    return operationObject.tags?.map((tag) => getCamelName(tag)) || 'Default'
+  }
+  else {
+    return operationObject.tags?.map(tag => getCamelName(tag)) || 'Default'
   }
 }

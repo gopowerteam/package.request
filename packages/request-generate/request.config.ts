@@ -10,6 +10,6 @@ module.exports = {
   appendService: false,
   exportServices: {
     responseType: 'observable',
-    excludeQueryParams: ['page', 'size', 'order']
-  }
+    excludeQueryParams: ['page', 'size', 'order'],
+  },
 }

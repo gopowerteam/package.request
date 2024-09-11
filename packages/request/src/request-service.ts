@@ -1,15 +1,17 @@
 import qs from 'qs'
 import {
-  AdapterResponse,
-  RequestAdapter
-} from './interfaces/request-adapter.interface'
-import {
   PluginLifecycle,
-  RequestPlugin,
-  ResponseLifecycle
 } from './interfaces/request-plugin.interface'
-import { RequestSendOptions } from './interfaces/request-send.interface'
-import { RequestSetupConfig } from './interfaces/request-setup.interface'
+import type {
+  AdapterResponse,
+  RequestAdapter,
+} from './interfaces/request-adapter.interface'
+import type {
+  RequestPlugin,
+  ResponseLifecycle,
+} from './interfaces/request-plugin.interface'
+import type { RequestSendOptions } from './interfaces/request-send.interface'
+import type { RequestSetupConfig } from './interfaces/request-setup.interface'
 
 export class RequestService {
   static config: RequestSetupConfig
@@ -29,7 +31,7 @@ export class RequestService {
 
   /**
    * 获取RequestAdatper
-   * @returns
+   * @returns RequestAdapter
    */
   private getRequestAdapter(): RequestAdapter {
     if (!RequestService.config.adapter) {
@@ -46,7 +48,7 @@ export class RequestService {
    */
   private async execRequestPlugin(
     plugins: RequestPlugin[] = [],
-    options: RequestSendOptions
+    options: RequestSendOptions,
   ) {
     const extraParams = {}
 
@@ -72,25 +74,27 @@ export class RequestService {
 
   /**
    * 执行前置插件逻辑
-   * @param plugins
-   * @param options
    */
   private execResponsePlugin(
     leftcycle: ResponseLifecycle,
     plugins: RequestPlugin[] = [],
     options: RequestSendOptions,
-    response: AdapterResponse
+    response: AdapterResponse,
   ) {
     // 执行全局插件
     plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
-      leftcycleFn && leftcycleFn.bind(plugin)(response, options)
+      if (leftcycleFn) {
+        leftcycleFn.bind(plugin)(response, options)
+      }
     })
 
     // 执行上下文插件
     RequestService.config.plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
-      leftcycleFn && leftcycleFn.bind(plugin)(response, options)
+      if (leftcycleFn) {
+        leftcycleFn.bind(plugin)(response, options)
+      }
     })
   }
 
@@ -100,7 +104,7 @@ export class RequestService {
   private parseRequestPath(
     path: string,
     paramsPath?: Record<string, string | number>,
-    service?: string
+    service?: string,
   ): string {
     if (service) {
       path = `/${service}/${path}`.replace(/\/{2,3}/g, '/')
@@ -109,9 +113,10 @@ export class RequestService {
     if (paramsPath) {
       return Object.entries(paramsPath).reduce<string>(
         (r, [key, value]) => r.replace(`{${key}}`, value.toString()),
-        path
+        path,
       )
-    } else {
+    }
+    else {
       return path
     }
   }
@@ -120,41 +125,41 @@ export class RequestService {
    * 开始请求
    * @param adapter
    * @param options
-   * @returns
+   * @returns  Promise
    */
   private startRequest(
     adapter: RequestAdapter,
     options: RequestSendOptions,
-    extraParams?: Record<string, any>
+    extraParams?: Record<string, any>,
   ) {
     return adapter.request({
       baseURL: RequestService.config.gateway,
       pathURL: this.parseRequestPath(
         options.path,
         options.paramsPath,
-        options.service
+        options.service,
       ),
       method: options.method,
       headers: options.headers || {},
       paramsQuery: options.paramsQuery,
       paramsBody: options.paramsBody,
-      extraParams
+      extraParams,
     })
   }
 
   /**
    * 执行拦截器
    * @param response 请求响应对象
-   * @returns
+   * @returns Promise
    */
   private execInterceptors(response: AdapterResponse, hasException = false) {
     const interceptors = RequestService.config?.interceptors
 
     if (
-      !interceptors?.status ||
-      !interceptors?.error ||
-      !interceptors?.success ||
-      !interceptors?.exception
+      !interceptors?.status
+      || !interceptors?.error
+      || !interceptors?.success
+      || !interceptors?.exception
     ) {
       throw new Error('请检查拦截器配置')
     }
@@ -171,7 +176,8 @@ export class RequestService {
     if (status) {
       // 成功状态转换
       return Promise.resolve(interceptors.success.exec(response))
-    } else {
+    }
+    else {
       // 失败状态转换
       return Promise.reject(interceptors.error.exec(response))
     }
@@ -180,12 +186,12 @@ export class RequestService {
   /**
    * 发送请求
    * @param {RequestSendOptions} options 请求选项
-   * @param {RequestPlugin[]} plugins 请求插件
-   * @returns
+   * @param {RequestPlugin[]} requestPlugins 请求插件
+   * @returns Promise
    */
   public async send(
     options: RequestSendOptions,
-    requestPlugins: (RequestPlugin | undefined)[] = []
+    requestPlugins: (RequestPlugin | undefined)[] = [],
   ): Promise<any> {
     if (!RequestService.config) {
       throw new Error('请检查请求配置是否完成')
@@ -203,7 +209,7 @@ export class RequestService {
 
     // 开始进行请求
     const response = await this.startRequest(adapter, options, extraParams)
-      .then((response) => adapter.transformResponse(response))
+      .then(response => adapter.transformResponse(response))
       // 异常请求处理
       .catch((exception) => {
         hasException = true
@@ -213,7 +219,8 @@ export class RequestService {
     // 执行前置插件
     if (!hasException) {
       this.execResponsePlugin(PluginLifecycle.after, plugins, options, response)
-    } else {
+    }
+    else {
       this.execResponsePlugin(PluginLifecycle.catch, plugins, options, response)
     }
 
@@ -225,11 +232,11 @@ export class RequestService {
    * 生成请求路径
    * @param {RequestSendOptions} options 请求选项
    * @param {RequestPlugin[]} plugins 请求插件
-   * @returns
+   * @returns string
    */
   public toURL(
     options: RequestSendOptions,
-    plugins: (RequestPlugin | undefined)[] = []
+    plugins: (RequestPlugin | undefined)[] = [],
   ): string {
     if (!RequestService.config) {
       throw new Error('请检查请求配置是否完成')
@@ -239,7 +246,7 @@ export class RequestService {
       // 执行前置插件
       this.execRequestPlugin(
         plugins.filter(Boolean) as RequestPlugin[],
-        options
+        options,
       )
     }
 
@@ -247,7 +254,7 @@ export class RequestService {
     const pathURL = this.parseRequestPath(
       options.path,
       options.paramsPath,
-      options.service
+      options.service,
     )
     const queryString = qs.stringify(options.paramsQuery, {
       ...{
@@ -255,10 +262,10 @@ export class RequestService {
         skipNulls: true,
         allowDots: true,
         encodeValuesOnly: true,
-        encode: true
+        encode: true,
       },
       ...(RequestService.config.qs || {}),
-      addQueryPrefix: true
+      addQueryPrefix: true,
     })
 
     return `${baseURL}${pathURL}${queryString}`

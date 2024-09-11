@@ -18,13 +18,13 @@ const TYPE_MAPPINGS = new Map<string, string>([
   ['password', 'string'],
   ['string', 'string'],
   ['void', 'void'],
-  ['null', 'null']
+  ['null', 'null'],
 ])
 
 /**
  * 获取对应类型
  */
-export const getMappedType = (type = 'object', format?: string): string => {
+export function getMappedType(type = 'object', format?: string): string {
   if (format === 'binary') {
     return 'binary'
   }

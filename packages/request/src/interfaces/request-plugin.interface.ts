@@ -1,5 +1,5 @@
-import { AdapterResponse } from './request-adapter.interface'
-import { RequestSendOptions } from './request-send.interface'
+import type { AdapterResponse } from './request-adapter.interface'
+import type { RequestSendOptions } from './request-send.interface'
 
 /**
  * 请求插件
@@ -18,7 +18,7 @@ export interface RequestPlugin {
 export enum PluginLifecycle {
   before = 'before',
   after = 'after',
-  catch = 'catch'
+  catch = 'catch',
 }
 
 export type RequestLifecycle = PluginLifecycle.before

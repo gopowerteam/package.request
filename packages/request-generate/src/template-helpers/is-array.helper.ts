@@ -6,8 +6,9 @@ export const isArrayHelper: {
   fn(v1: unknown, options: Handlebars.HelperOptions) {
     if (Array.isArray(v1)) {
       return options.fn(this)
-    } else {
+    }
+    else {
       return options.inverse(this)
     }
-  }
+  },
 }

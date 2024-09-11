@@ -1,7 +1,7 @@
 import type { IStringifyOptions } from 'qs'
-import { RequestAdapter } from './request-adapter.interface'
-import { ResponseInterceptor } from './response-interceptor.interface'
-import { RequestPlugin } from './request-plugin.interface'
+import type { RequestAdapter } from './request-adapter.interface'
+import type { RequestPlugin } from './request-plugin.interface'
+import type { ResponseInterceptor } from './response-interceptor.interface'
 
 export interface RequestSetupConfig {
   gateway: string

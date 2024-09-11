@@ -8,7 +8,7 @@ export enum RequestMethod {
   Delete = 'DELETE',
   Options = 'OPTIONS',
   Head = 'HEAD',
-  Patch = 'PATCH'
+  Patch = 'PATCH',
 }
 
 export interface RequestSendOptions {

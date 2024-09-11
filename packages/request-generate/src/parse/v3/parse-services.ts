@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import type { Service } from '../../entities/service'
 import { parseService } from './parse-service'
+import type { Service } from '../../entities/service'
 
 export function parseServices(document: OpenAPIV3.Document) {
   const services: Service[] = []
@@ -13,7 +13,7 @@ export function parseServices(document: OpenAPIV3.Document) {
           method,
           operationObject as OpenAPIV3.OperationObject,
           document.tags || [],
-          services
+          services,
         )
       })
     }

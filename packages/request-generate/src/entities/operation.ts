@@ -28,7 +28,7 @@ export class Operation {
     this.method = method
     this.path = path
 
-    this.responseType =
-      Generate.options?.exportServices?.responseType || 'promise'
+    this.responseType
+      = Generate.options?.exportServices?.responseType || 'promise'
   }
 }

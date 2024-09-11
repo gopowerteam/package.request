@@ -5,5 +5,5 @@ export default <Options>{
   clean: true,
   format: ['cjs', 'esm'],
   dts: true,
-  external: ['axios']
+  external: ['axios'],
 }

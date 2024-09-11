@@ -1,11 +1,12 @@
 {
   "name": "playground",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "dev":"ts-node ./src/request-generate/index.ts && ts-node ./src/request/index.ts",
+    "dev": "ts-node ./src/request-generate/index.ts && ts-node ./src/request/index.ts",
     "dev:request": "ts-node ./src/request/index.ts",
-    "dev:request-generate": "ts-node ./src/request-generate/index.ts"
+    "dev:request-generate": "tsx ./src/request-generate/index.ts",
+    "lint": "eslint . --fix"
   },
   "dependencies": {
     "@gopowerteam/request": "workspace:*",
@@ -13,6 +14,7 @@
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
+    "tsx": "^4.7.0",
     "typescript": "^4.8.4"
   }
 }

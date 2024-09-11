@@ -1,5 +1,5 @@
-import type { Options } from 'tsup'
 import fs from 'fs-extra'
+import type { Options } from 'tsup'
 
 export default <Options>{
   entry: ['src/index.ts', 'src/vite-plugin/index.ts'],
@@ -15,12 +15,12 @@ export default <Options>{
     'axios',
     'handlebars',
     '@apidevtools/swagger-parser',
-    'vite'
+    'vite',
   ],
   shims: true,
   onSuccess() {
     return fs.copy('./src/templates', './dist/templates', {
-      overwrite: true
+      overwrite: true,
     })
-  }
+  },
 }

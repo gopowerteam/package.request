@@ -9,7 +9,7 @@ import { parseSchemaType } from './parse-schema-type'
 export function parseOperation(
   path: string,
   method: string,
-  operationObject: OpenAPIV2.OperationObject
+  operationObject: OpenAPIV2.OperationObject,
 ) {
   const name = getOperationName(path, method, operationObject)
 
@@ -30,10 +30,10 @@ export function parseOperation(
   operation.imports = Array.from(
     new Set([
       ...(operation.parametersBody?.imports || []),
-      ...(operation.parametersPath.flatMap((p) => p.imports) || []),
-      ...(operation.parametersQuery.flatMap((p) => p.imports) || []),
-      ...(responseSchema?.imports || [])
-    ])
+      ...(operation.parametersPath.flatMap(p => p.imports) || []),
+      ...(operation.parametersQuery.flatMap(p => p.imports) || []),
+      ...(responseSchema?.imports || []),
+    ]),
   )
 
   operation.responseRef = responseSchema?.ref || 'void'
@@ -57,6 +57,6 @@ function parseResponseType(responses: OpenAPIV2.ResponsesObject) {
   return {
     type: 'void',
     ref: 'void',
-    imports: []
+    imports: [],
   }
 }

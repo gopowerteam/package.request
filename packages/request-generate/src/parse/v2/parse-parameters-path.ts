@@ -3,12 +3,12 @@ import { OperationParameter } from '../../entities/operation-parameter'
 import { parseSchemaType } from './parse-schema-type'
 
 export function parseParametersPath(
-  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[]
+  parameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
 ) {
   return parameters.reduce<OperationParameter[]>((r, p) => {
     if (!('$ref' in p) && p.in === 'path') {
       const { type, ref, imports, enums } = parseSchemaType(
-        p as OpenAPIV2.SchemaObject
+        p as OpenAPIV2.SchemaObject,
       )
 
       const parameter = new OperationParameter()

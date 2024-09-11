@@ -6,18 +6,19 @@ import { Generate } from '../generate'
  * @param path
  * @param method
  * @param operationObject
- * @returns
+ * @returns string
  */
 export function getOperationName(
   path: string,
   method: string,
-  operationObject: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject
+  operationObject: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject,
 ): string {
   const resolve = Generate.options?.exportServices?.operationResolve
 
   if (resolve) {
     return resolve({ path, method, object: operationObject })
-  } else {
+  }
+  else {
     return operationObject.operationId || ''
   }
 }

@@ -1,5 +1,5 @@
-import { RequestMethod } from './request-send.interface'
-import { RequestSetupConfig } from './request-setup.interface'
+import type { RequestMethod } from './request-send.interface'
+import type { RequestSetupConfig } from './request-setup.interface'
 
 export interface RequestAdapter {
   /**
@@ -11,19 +11,19 @@ export interface RequestAdapter {
   /**
    * 发送请求
    */
-  request(options: RequestAdapterOptions): Promise<any>
+  request: (options: RequestAdapterOptions) => Promise<any>
 
   /**
    * 转换Response
    * @param any
    */
-  transformResponse(response: any): AdapterResponse
+  transformResponse: (response: any) => AdapterResponse
 
   /**
    * 转换Exception
    * @param any
    */
-  transformException(response: any): AdapterResponse
+  transformException: (response: any) => AdapterResponse
 }
 
 export interface RequestAdapterOptions {

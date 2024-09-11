@@ -5,11 +5,12 @@ export const toUpperHelper: {
   name: 'to-upper',
   fn(v1: string, onlyFirst?: boolean) {
     if (onlyFirst) {
-      return v1.replace(/^\S/, function (s) {
+      return v1.replace(/^\S/, (s) => {
         return s.toUpperCase()
       })
-    } else {
+    }
+    else {
       return v1.toUpperCase()
     }
-  }
+  },
 }

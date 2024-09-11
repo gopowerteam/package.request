@@ -5,11 +5,11 @@ export function getCamelName(value: string) {
   // }
 
   return value
-    .replace(/^[^a-zA-Z]+/g, '')
-    .replace(/[^\w_]+/g, '_')
+    .replace(/^[^a-z]+/gi, '')
+    .replace(/\W+/g, '_')
     .replace(/[^\w-]+/g, '_')
-    .replace(/^\S/, (s) => s.toUpperCase())
-    .replace(/_[a-zA-Z]/g, (s) => s.toUpperCase())
+    .replace(/^\S/, s => s.toUpperCase())
+    .replace(/_[a-z]/gi, s => s.toUpperCase())
     .replace(/_/g, '')
     .trim()
 }

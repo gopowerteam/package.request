@@ -1,16 +1,17 @@
 import {
   setup,
-  RequestSetupConfig,
-  RequestGenerateType
 } from '@gopowerteam/request'
 import { AxiosAdapter } from '@gopowerteam/request/adapters'
+import type {
+  RequestSetupConfig,
+} from '@gopowerteam/request'
+// import { AppService } from '../generated/services/AppService'
 import {
   ErrorInterceptors,
   ExceptionInterceptors,
   StatusInterceptors,
-  SuccessInterceptors
+  SuccessInterceptors,
 } from './response-interceptors'
-import { AppService } from '../generated/services/AppService'
 
 const config: RequestSetupConfig = {
   gateway: 'https://mall-service.gopowerteam.cn',
@@ -20,21 +21,19 @@ const config: RequestSetupConfig = {
     status: new StatusInterceptors(),
     success: new SuccessInterceptors(),
     error: new ErrorInterceptors(),
-    exception: new ExceptionInterceptors()
+    exception: new ExceptionInterceptors(),
   },
-  plugins: []
+  plugins: [],
 }
 
 async function bootstrap() {
   setup(config)
 
-  const appService = new AppService()
+  // const appService = new AppService()
 
-  console.log(appService.appBase([], { type: RequestGenerateType.URL }))
-
-  appService.appBase([]).then((data) => {
-    console.log(data)
-  })
+  // appService.appBase([]).then((data: any) => {
+  //   console.error(data)
+  // })
 }
 
 bootstrap()

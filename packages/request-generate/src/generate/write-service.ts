@@ -1,7 +1,7 @@
-import type { Service } from '../entities/service'
+import Handlebars from 'handlebars'
 import { loadHandlebarTemplate } from '../template'
 import { writeFile } from './write-file'
-import Handlebars from 'handlebars'
+import type { Service } from '../entities/service'
 
 /**
  * 写入Service文件
