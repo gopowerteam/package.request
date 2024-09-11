@@ -49,4 +49,4 @@ jobs:
       - name: Sync Package
         run: |
           curl -X PUT "https://registry-direct.npmmirror.com/-/package/@gopowerteam/request/syncs" &&
-          curl -X PUT "https://registry-direct.npmmirror.com/-/package/@gopowerteam/request-generate/syncs" &&
+          curl -X PUT "https://registry-direct.npmmirror.com/-/package/@gopowerteam/request-generate/syncs"
