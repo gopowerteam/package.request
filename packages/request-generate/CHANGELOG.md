@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.1.26
+
+### Patch Changes
+
+- fixed schema type compute
+
 ## 0.1.25
 
 ### Patch Changes

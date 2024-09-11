@@ -39,7 +39,7 @@ export function parseOperation(
     ]),
   )
 
-  operation.responseRef = responseSchema?.ref || 'void'
+  operation.responseRef = responseSchema?.ref || responseSchema?.type || 'void'
 
   return operation
 }
