@@ -44,7 +44,6 @@
     "eslint": "^9.10.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.2",
-    "pnpm": "^7.27.1",
     "prettier": "latest",
     "rimraf": "^4.1.2",
     "tsup": "^6.6.3",
