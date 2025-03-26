@@ -1,4 +1,4 @@
-import generate from '../src'
+import {generate} from '../src'
 
 describe('测试请求生成逻辑', () => {
   test('测试OpenAPIV3', async () => {

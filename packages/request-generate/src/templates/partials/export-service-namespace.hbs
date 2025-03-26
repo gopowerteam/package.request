@@ -1,3 +1,4 @@
+{{#include-query-params operations}}
 namespace RequestQueryParams {
 {{#each operations}}
   {{#if parametersQuery}}
@@ -9,3 +10,4 @@ namespace RequestQueryParams {
   {{/if}}
 {{/each}}
 }
+{{/include-query-params}}

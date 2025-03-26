@@ -28,6 +28,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "tsup --watch",
     "test": "jest --coverage",
     "build": "tsup",
     "lint": "eslint . --fix"

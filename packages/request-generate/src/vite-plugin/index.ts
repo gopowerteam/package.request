@@ -1,8 +1,10 @@
+import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import Handlebars from 'handlebars'
-import type { Plugin, ResolvedConfig } from 'vite'
+import type { PluginOption, ResolvedConfig } from 'vite'
 import { generateCodeTemplate, generateDeclareTemplate } from './templates'
+
 // 虚拟模块ID
 const MODULE_ID = 'virtual:request'
 // 默认定义文件名
@@ -28,38 +30,54 @@ interface PluginOptions {
   dts: string
 }
 
+let GerneratedCodeStr: string = ''
+
+function genretateDeclareAndCode(options: PluginOptions) {
+  // 生成文件列表
+  const paths = getServicePaths(options)
+  // 生成服务列表
+  const services = getServiceItems(paths)
+  // 生成分组列表
+  const groups = getServiceGroups(services)
+
+  if (services && services.length) {
+    // 生成定义
+    generateDeclare(services, groups, options)
+    // 生成代码
+    generateCode(services, groups)
+  }
+}
+
+function generateRequestCode() {
+  const generateScript = path.resolve(viteConfig.root, 'node_modules', '.bin', 'request-generate')
+  execSync(`${generateScript}`)
+}
+
 /**
  * Request插件
  */
-export default (options: PluginOptions): Plugin => {
+export default (options: PluginOptions): PluginOption => {
   return {
-    name: 'vite-plugin-request',
+    name: 'vite-plugin-vue-request',
     enforce: 'pre',
+    configResolved(config) {
+      viteConfig = config
+    },
     resolveId(id: string) {
       return id === MODULE_ID ? MODULE_ID : undefined
     },
-    configResolved(config) {
-      viteConfig = config
+    async buildStart() {
+      // 生成接口文件
+      // TODO: 执行bin/generate.ts
+      await generateRequestCode()
+      // 生成定义文件以及代码文件
+      await genretateDeclareAndCode(options)
     },
     load(id: string) {
       if (id !== MODULE_ID)
         return
-      // 生成文件列表
-      const paths = getServicePaths(options)
-      // 生成服务列表
-      const services = getServiceItems(paths)
-      // 生成分组列表
-      const groups = getServiceGroups(services)
 
-      if (services && services.length) {
-        // 生成定义
-        generateDeclare(services, groups, options)
-        // 生成代码
-        return generateCode(services, groups)
-      }
-      else {
-        return undefined
-      }
+      return GerneratedCodeStr
     },
   }
 }
@@ -166,7 +184,7 @@ function generateCode(services: ServiceItem[], groups: GroupItem[]) {
   // 生成模板
   const template = Handlebars.compile(generateCodeTemplate)
   // 编译模板内容
-  return template({
+  GerneratedCodeStr = template({
     groups: groups.length ? groups : undefined,
     services,
   })

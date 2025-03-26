@@ -3,6 +3,7 @@ import * as path from 'node:path'
 
 import Handlebars from 'handlebars'
 import { equalHelper } from './template-helpers/equal.helper'
+import { includeQueryParams } from './template-helpers/include-query-params'
 import { isArrayHelper } from './template-helpers/is-array.helper'
 import { toUpperHelper } from './template-helpers/to-upper.helper'
 
@@ -38,6 +39,7 @@ function registerHandlebarHelpers() {
   registerHandlebarHelper(equalHelper)
   registerHandlebarHelper(isArrayHelper)
   registerHandlebarHelper(toUpperHelper)
+  registerHandlebarHelper(includeQueryParams)
 }
 
 function registerHandlebarHelper(helper: {

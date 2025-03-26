@@ -1,15 +1,12 @@
-import generate from '@gopowerteam/request-generate'
+import { download, generate } from '@gopowerteam/request-generate'
+import type { GenerateOptions } from '@gopowerteam/request-generate'
 
-generate({
+const options: GenerateOptions = {
   gateway: 'https://gateway.local.xbt-dev.top',
   openapi: '/v2/api-docs',
-  output: './src/generated',
+  output: './src/generated/http',
   exportModels: true,
   applications: {
-    'wxcp-service': {
-      key: 'xbt-platform-wxcp-service',
-      openapi: '/v2/api-docs',
-    },
     'mall-service': {
       key: 'xbt-platform-mall-service',
       openapi: '/v2/api-docs',
@@ -17,18 +14,6 @@ generate({
     'file-service': {
       key: 'xbt-platform-file-service',
       openapi: '/v2/api-docs',
-    },
-    'material-service': {
-      key: 'xbt-platform-material-service',
-      openapi: '/v2/api-docs',
-    },
-    'sales-customer-service': {
-      key: 'xbt-platform-sales-customer-service',
-      openapi: '/v3/api-docs',
-    },
-    'communication-service': {
-      key: 'xbt-platform-communication-service',
-      openapi: '/v3/api-docs',
     },
   },
   logger: true,
@@ -60,4 +45,11 @@ generate({
       'offset',
     ],
   },
-})
+}
+
+async function startup() {
+  await download(options)
+  await generate(options)
+}
+
+startup()

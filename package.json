@@ -4,14 +4,14 @@
   "private": true,
   "packageManager": "pnpm@9.10.0",
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "build": "turbo run build --filter @gopowerteam/*",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "play": "pnpm dev --filter playground",
+    "play:test": "pnpm dev --filter playground-test",
+    "play:test-vite": "pnpm dev --filter playground-test-vite",
     "clear": "rimraf 'packages/*/{node_modules}' && rimraf node_modules",
     "changeset": "changeset",
     "prettier": "prettier --write .",

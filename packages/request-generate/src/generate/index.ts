@@ -8,6 +8,7 @@ import { registerHandlebarTemplates } from '../template'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
 import { generateServiceOptions } from '../utils/get-services-options'
+import { updateOptionsFromLocalConfig } from './write-config'
 import { writeModels } from './write-models'
 import { writeServices } from './write-services'
 import type { GenerateClient } from '../types/generate-client'
@@ -32,7 +33,9 @@ export class Generate {
     // 注册Handlebars模板
     registerHandlebarTemplates()
     // 生成服务列表
-    const applicationOptions = generateServiceOptions(options)
+    let applicationOptions = generateServiceOptions(options)
+    applicationOptions = updateOptionsFromLocalConfig(applicationOptions)
+
     const applications: { client: GenerateClient, options: GenerateApplicationOptions }[] = []
 
     for (const applicationOption of applicationOptions) {
