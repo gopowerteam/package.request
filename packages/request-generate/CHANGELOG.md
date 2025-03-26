@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.2.0
+
+### Minor Changes
+
+- 更新生成接口方式
+
 ## 0.1.26
 
 ### Patch Changes
