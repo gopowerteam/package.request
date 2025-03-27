@@ -15,13 +15,13 @@ interface ConfigFileItem {
 /**
  * 生成应用配置文件
  */
-export function updateOptionsFromLocalConfig(options: GenerateApplicationOptions[]): GenerateApplicationOptions[] {
+export function updateOptionsFromLocalConfig(options: GenerateApplicationOptions[], output: string): GenerateApplicationOptions[] {
   const config = readLocalConfig()
 
   const toUpdateOptions: Map<string, string> = new Map()
 
   options = options.filter((item) => {
-    const md5 = isFindNewMd5(item.name!, config)
+    const md5 = isNeedUpdate(item.name!, config, output)
 
     if (md5) {
       toUpdateOptions.set(item.name!, md5)
@@ -40,8 +40,9 @@ export function updateOptionsFromLocalConfig(options: GenerateApplicationOptions
 /**
  * 比较文件的MD5值判断文件是否更新
  */
-export function isFindNewMd5(name: string, config: ConfigFileItem[]) {
+export function isNeedUpdate(name: string, config: ConfigFileItem[], output: string): string | void {
   const file = path.resolve('.request', `${name}.json`)
+  const outputDir = path.resolve(output)
 
   if (!fs.existsSync(file)) {
     throw new Error(`未找到相应的配置文件: ${name}.json`)
@@ -51,11 +52,18 @@ export function isFindNewMd5(name: string, config: ConfigFileItem[]) {
   const data = fs.readFileSync(file)
   const md5 = crypto.createHash('md5').update(data.toString()).digest('hex')
 
+  // output目录不存在直接重新生成
+  if (!fs.existsSync(path.join(outputDir, name))) {
+    return md5
+  }
+
   // 查找匹配的配置项
   const configItem = config.find(x => x.name === name)
 
   // 如果文件不存在或者MD5值不一致则表示文件已更新
-  return (!configItem || configItem.md5 !== md5) ? md5 : ''
+  if (!configItem || configItem.md5 !== md5) {
+    return md5
+  }
 }
 
 export function readLocalConfig(): ConfigFileItem[] {

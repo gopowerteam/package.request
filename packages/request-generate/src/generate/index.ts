@@ -34,7 +34,7 @@ export class Generate {
     registerHandlebarTemplates()
     // 生成服务列表
     let applicationOptions = generateServiceOptions(options)
-    applicationOptions = updateOptionsFromLocalConfig(applicationOptions)
+    applicationOptions = updateOptionsFromLocalConfig(applicationOptions, options.output)
 
     const applications: { client: GenerateClient, options: GenerateApplicationOptions }[] = []
 

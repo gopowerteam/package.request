@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.2.1
+
+### Patch Changes
+
+- auto generate when not found output dir
+
 ## 0.2.0
 
 ### Minor Changes
