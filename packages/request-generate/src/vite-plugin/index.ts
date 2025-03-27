@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import process from 'node:process'
 import Handlebars from 'handlebars'
 import type { PluginOption, ResolvedConfig } from 'vite'
 import { generateCodeTemplate, generateDeclareTemplate } from './templates'
@@ -50,7 +51,11 @@ function genretateDeclareAndCode(options: PluginOptions) {
 
 function generateRequestCode() {
   const generateScript = path.resolve(viteConfig.root, 'node_modules', '.bin', 'request-generate')
-  execSync(`${generateScript}`)
+  execSync(`${generateScript}`, { env: {
+    ...process.env,
+    FORCE_COLOR: '1',
+  },
+  })
 }
 
 /**
@@ -178,7 +183,6 @@ function getServiceGroups(services: ServiceItem[]) {
  * 生成代码
  * @param services
  * @param groups
- * @returns string
  */
 function generateCode(services: ServiceItem[], groups: GroupItem[]) {
   // 生成模板

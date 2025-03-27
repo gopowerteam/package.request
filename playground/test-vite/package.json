@@ -1,8 +1,8 @@
 {
   "name": "playground-test-vite",
-  "private": true,
-  "version": "0.0.2",
   "type": "module",
+  "version": "0.0.3",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",

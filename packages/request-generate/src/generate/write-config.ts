@@ -20,6 +20,7 @@ export function updateOptionsFromLocalConfig(options: GenerateApplicationOptions
 
   const toUpdateOptions: Map<string, string> = new Map()
 
+  // 过滤需要更新的配置项
   options = options.filter((item) => {
     const md5 = isNeedUpdate(item.name!, config, output)
 
@@ -30,6 +31,12 @@ export function updateOptionsFromLocalConfig(options: GenerateApplicationOptions
     else {
       return false
     }
+  })
+
+  // 更新配置文件路径
+  options.forEach((item) => {
+    const file = path.resolve('.request', `${item.name}.json`)
+    item.input = file
   })
 
   writeLocalConfig(toUpdateOptions, config)

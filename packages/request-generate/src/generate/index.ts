@@ -52,20 +52,18 @@ export class Generate {
     })
   }
 
-  static async getApiDocument(url: string, retry: number = 0): Promise<UnkownVersionDocument> {
-    if (retry >= 3) {
-      console.error(`请求[${url}]失败,请稍后重试.`)
-      process.exit(0)
-    }
-
+  static async getApiDocument(input: string): Promise<UnkownVersionDocument> {
     try {
       // 获取OPENAPI
-      return (await getOpenApiDocument(
-        url,
-      )) as UnkownVersionDocument
+      const document = await getOpenApiDocument(
+        input,
+      )
+
+      return document as UnkownVersionDocument
     }
     catch {
-      return Generate.getApiDocument(url, retry + 1)
+      console.error(`请求文件[${input}]失败,请稍后重试.`)
+      process.exit(0)
     }
   }
 

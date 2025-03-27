@@ -1,6 +1,6 @@
 {
   "name": "playground-test",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "dev": "ts-node ./src/request-generate/index.ts && ts-node ./src/request/index.ts",
