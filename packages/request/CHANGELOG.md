@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.1.21
+
+### Patch Changes
+
+- 更换query-string相关逻辑为内置函数
+
 ## 0.1.20
 
 ### Patch Changes

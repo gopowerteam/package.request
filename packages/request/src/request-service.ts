@@ -1,7 +1,7 @@
-import qs from 'qs'
 import {
   PluginLifecycle,
 } from './interfaces/request-plugin.interface'
+import { stringify } from './utils/query-string'
 import type {
   AdapterResponse,
   RequestAdapter,
@@ -256,16 +256,14 @@ export class RequestService {
       options.paramsPath,
       options.service,
     )
-    const queryString = qs.stringify(options.paramsQuery, {
-      ...{
-        arrayFormat: 'repeat',
-        skipNulls: true,
-        allowDots: true,
-        encodeValuesOnly: true,
-        encode: true,
-      },
-      ...(RequestService.config.qs || {}),
+    const queryString = stringify(options.paramsQuery || {}, {
+      arrayFormat: 'repeat',
+      skipNulls: true,
+      allowDots: true,
+      encodeValuesOnly: true,
+      encode: true,
       addQueryPrefix: true,
+      ...(RequestService.config.qs || {}),
     })
 
     return `${baseURL}${pathURL}${queryString}`
