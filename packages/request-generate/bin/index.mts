@@ -33,7 +33,7 @@ const configFilePaths = [
  * @param {*} filePath
  * @returns Promise
  */
-async function loadConfigFile(filePath) {
+async function loadConfigFile(filePath: string) {
   if (filePath) {
     configFilePaths.unshift(filePath)
   }
@@ -64,7 +64,7 @@ if (RequestGenerate) {
     .then(() => {
       process.exit(0)
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       console.error(error)
       process.exit(1)
     })

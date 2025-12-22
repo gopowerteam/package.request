@@ -28,7 +28,7 @@ interface GroupItem {
 interface PluginOptions {
   alias: string
   dir: string
-  dts: string
+  dts: string | boolean
 }
 
 let GerneratedCodeStr: string = ''
@@ -42,10 +42,13 @@ function genretateDeclareAndCode(options: PluginOptions) {
   const groups = getServiceGroups(services)
 
   if (services && services.length) {
-    // 生成定义
-    generateDeclare(services, groups, options)
     // 生成代码
     generateCode(services, groups)
+
+    if (options.dts !== false) {
+      // 生成定义
+      generateDeclare(services, groups, options)
+    }
   }
 }
 
@@ -73,7 +76,6 @@ export default (options: PluginOptions): PluginOption => {
     },
     async buildStart() {
       // 生成接口文件
-      // TODO: 执行bin/generate.ts
       await generateRequestCode()
       // 生成定义文件以及代码文件
       await genretateDeclareAndCode(options)
@@ -215,7 +217,7 @@ function generateDeclare(
   })
 
   fs.writeFileSync(
-    path.resolve(viteConfig.root, options.dts ?? DECLARATION_FILE),
+    path.resolve(viteConfig.root, typeof options.dts === 'string' ? options.dts : DECLARATION_FILE),
     content.replace(/\r\n/g, '\n'),
     'utf-8',
   )

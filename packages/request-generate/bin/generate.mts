@@ -32,7 +32,7 @@ const configFilePaths = [
  * 加载配置文件
  * @param {*} filePath
  */
-async function loadConfigFile(filePath) {
+async function loadConfigFile(filePath: string) {
   if (filePath) {
     configFilePaths.unshift(filePath)
   }

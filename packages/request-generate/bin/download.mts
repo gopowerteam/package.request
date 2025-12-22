@@ -32,7 +32,7 @@ const configFilePaths = [
  * 加载配置文件
  * @param {*} filePath
  */
-async function loadConfigFile(filePath) {
+async function loadConfigFile(filePath: string) {
   if (filePath) {
     configFilePaths.unshift(filePath)
   }
@@ -62,7 +62,7 @@ if (RequestGenerate) {
       console.log('接口文件更新完成')
       process.exit(0)
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       console.error(error)
       process.exit(1)
     })

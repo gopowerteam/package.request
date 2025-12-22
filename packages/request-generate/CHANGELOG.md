@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.2.3
+
+### Patch Changes
+
+- 添加 dts 生成开启选项
+
 ## 0.2.2
 
 ### Patch Changes

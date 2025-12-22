@@ -1,5 +1,5 @@
 {{#include-query-params operations}}
-namespace RequestQueryParams {
+export namespace RequestQueryParams {
 {{#each operations}}
   {{#if parametersQuery}}
   export type {{to-upper name true}} = {
