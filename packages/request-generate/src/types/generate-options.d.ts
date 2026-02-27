@@ -36,8 +36,8 @@ export interface GenerateOptions {
   appendService?: boolean
 }
 
-export type ApplicationConfig =
-  | {
+export type ApplicationConfig
+  = | {
     key: string
     openapi: string
   }

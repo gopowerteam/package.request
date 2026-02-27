@@ -1,5 +1,5 @@
-import fs from 'fs-extra'
 import type { Options } from 'tsup'
+import fs from 'fs-extra'
 
 export default <Options>{
   entry: ['src/index.ts', 'src/vite-plugin/index.ts'],

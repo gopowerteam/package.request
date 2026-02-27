@@ -1,5 +1,10 @@
-import process from 'node:process'
 import type { OpenAPIV2, OpenAPIV3 } from 'openapi-types'
+import type { GenerateClient } from '../types/generate-client'
+import type {
+  GenerateApplicationOptions,
+  GenerateOptions,
+} from '../types/generate-options'
+import process from 'node:process'
 import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
@@ -11,11 +16,6 @@ import { generateServiceOptions } from '../utils/get-services-options'
 import { updateOptionsFromLocalConfig } from './write-config'
 import { writeModels } from './write-models'
 import { writeServices } from './write-services'
-import type { GenerateClient } from '../types/generate-client'
-import type {
-  GenerateApplicationOptions,
-  GenerateOptions,
-} from '../types/generate-options'
 
 type UnkownVersionDocument = OpenAPIV3.Document & OpenAPIV2.Document
 

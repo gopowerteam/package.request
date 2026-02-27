@@ -1,9 +1,9 @@
-import path from 'node:path'
 import type {
   ApplicationConfig,
   GenerateApplicationOptions,
   GenerateOptions,
 } from '../types/generate-options'
+import path from 'node:path'
 
 /**
  * 创建单服务配置项

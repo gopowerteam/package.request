@@ -1,5 +1,3 @@
-import axios from 'axios'
-import * as qs from 'qs'
 import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
 import type { RequestSetupConfig } from '../interfaces'
 import type {
@@ -8,6 +6,8 @@ import type {
   RequestAdapter,
   RequestAdapterOptions,
 } from '../interfaces/request-adapter.interface'
+import axios from 'axios'
+import * as qs from 'qs'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance

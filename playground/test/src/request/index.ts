@@ -1,10 +1,10 @@
+import type {
+  RequestSetupConfig,
+} from '@gopowerteam/request'
 import {
   setup,
 } from '@gopowerteam/request'
 import { AxiosAdapter } from '@gopowerteam/request/adapters'
-import type {
-  RequestSetupConfig,
-} from '@gopowerteam/request'
 // import { AppService } from '../generated/services/AppService'
 import {
   ErrorInterceptors,

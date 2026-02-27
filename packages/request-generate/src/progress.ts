@@ -1,5 +1,6 @@
+import type { Ora } from 'ora'
 import chalk from 'chalk'
-import ora, { type Ora } from 'ora'
+import ora from 'ora'
 
 interface Progress {
   spinner: Ora

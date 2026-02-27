@@ -1,10 +1,10 @@
+import type { GenerateClient } from '../types/generate-client'
+import type { GenerateApplicationOptions } from '../types/generate-options'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import rimraf from 'rimraf'
 import { updateProgress } from '../progress'
 import { writeModel } from './write-model'
-import type { GenerateClient } from '../types/generate-client'
-import type { GenerateApplicationOptions } from '../types/generate-options'
 
 /**
  * 写入Model文件

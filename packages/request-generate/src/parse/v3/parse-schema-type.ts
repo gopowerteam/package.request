@@ -1,9 +1,9 @@
 import type { OpenAPIV3 } from 'openapi-types'
+import type { SchemaType } from '../../types/schema-type'
 import { getBuiltInType } from '../../utils/get-built-in-type'
 import { getCamelName } from '../../utils/get-camel-name'
 import { getMappedType } from '../../utils/get-mapped-type'
 import { stripNamespace } from './strip-namespace'
-import type { SchemaType } from '../../types/schema-type'
 
 export function parseSchemaType(
   schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
@@ -69,17 +69,17 @@ export function parseSchemaType(
         type: hasRef ? 'any' : ofSchemaArray.map(s => s.type).join('|'),
         ref: hasRef
           ? ofSchemaArray
-            .map(s => (s.ref && getCamelName(s.ref)) || s.type)
-            .join('|')
+              .map(s => (s.ref && getCamelName(s.ref)) || s.type)
+              .join('|')
           : undefined,
         imports: hasRef
           ? ofSchemaArray.reduce<string[]>(
-            (r, s) => (
+              (r, s) => (
               // eslint-disable-next-line no-sequences
-              s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
-            ),
-            [],
-          )
+                s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
+              ),
+              [],
+            )
           : undefined,
       }
     }

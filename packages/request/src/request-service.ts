@@ -1,7 +1,3 @@
-import {
-  PluginLifecycle,
-} from './interfaces/request-plugin.interface'
-import { stringify } from './utils/query-string'
 import type {
   AdapterResponse,
   RequestAdapter,
@@ -12,6 +8,10 @@ import type {
 } from './interfaces/request-plugin.interface'
 import type { RequestSendOptions } from './interfaces/request-send.interface'
 import type { RequestSetupConfig } from './interfaces/request-setup.interface'
+import {
+  PluginLifecycle,
+} from './interfaces/request-plugin.interface'
+import { stringify } from './utils/query-string'
 
 export class RequestService {
   static config: RequestSetupConfig

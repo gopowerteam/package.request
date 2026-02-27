@@ -84,11 +84,11 @@ request-download --url <swagger-url> --output <file>
 
 ```typescript
 // Use `import type` for type-only imports
-import type { OpenAPIV2, OpenAPIV3 } from "openapi-types";
-import type { GenerateOptions } from "../types/generate-options";
+import type { OpenAPIV2, OpenAPIV3 } from 'openapi-types'
+import type { GenerateOptions } from '../types/generate-options'
 
 // Node.js built-ins with `node:` prefix
-import process from "node:process";
+import process from 'node:process'
 ```
 
 #### Naming Conventions
@@ -102,8 +102,8 @@ import process from "node:process";
 
 ```typescript
 // Use Chinese error messages for user-facing output
-console.error(`请求文件[${input}]失败,请稍后重试.`);
-process.exit(0);
+console.error(`请求文件[${input}]失败,请稍后重试.`)
+process.exit(0)
 ```
 
 ### Architecture Patterns
@@ -142,7 +142,7 @@ Handlebars templates in `src/templates/` with helpers in `src/template-helpers/`
 
 ```typescript
 // Integration with Vite build
-export function requestGeneratePlugin(options: PluginOptions): Plugin;
+export function requestGeneratePlugin(options: PluginOptions): Plugin
 ```
 
 ### Exports

@@ -68,14 +68,14 @@ pnpm --filter @gopowerteam/request lint
 #### Imports
 
 ```typescript
+import type { AxiosError, AxiosInstance } from 'axios'
 // Use `import type` for type-only imports (IMPORTANT)
-import type { RequestAdapter } from "./interfaces/request-adapter.interface";
-import type { AxiosError, AxiosInstance } from "axios";
+import type { RequestAdapter } from './interfaces/request-adapter.interface'
 
 // External imports first, then internal
-import axios from "axios";
-import * as qs from "qs";
-import { stringify } from "./utils/query-string";
+import axios from 'axios'
+import * as qs from 'qs'
+import { stringify } from './utils/query-string'
 ```
 
 #### Naming Conventions
@@ -91,7 +91,7 @@ import { stringify } from "./utils/query-string";
 ```typescript
 // Use Chinese error messages (project convention)
 if (!RequestService.config) {
-  throw new Error("请检查请求配置是否完成");
+  throw new Error('请检查请求配置是否完成')
 }
 ```
 
@@ -103,10 +103,10 @@ Implement `RequestAdapter` interface for custom HTTP clients:
 
 ```typescript
 interface RequestAdapter {
-  injectConfig?: (config: RequestSetupConfig) => void;
-  request: (options: RequestAdapterOptions) => Promise<any>;
-  transformResponse: (response: any) => AdapterResponse;
-  transformException: (response: any) => AdapterResponse;
+  injectConfig?: (config: RequestSetupConfig) => void
+  request: (options: RequestAdapterOptions) => Promise<any>
+  transformResponse: (response: any) => AdapterResponse
+  transformException: (response: any) => AdapterResponse
 }
 ```
 
@@ -116,9 +116,9 @@ Plugins hook into request lifecycle:
 
 ```typescript
 interface RequestPlugin {
-  before?(options: RequestSendOptions, appendParams: Function): Promise<void>;
-  after?(response: AdapterResponse, options: RequestSendOptions): void;
-  catch?(response: AdapterResponse, options: RequestSendOptions): void;
+  before?: (options: RequestSendOptions, appendParams: Function) => Promise<void>
+  after?: (response: AdapterResponse, options: RequestSendOptions) => void
+  catch?: (response: AdapterResponse, options: RequestSendOptions) => void
 }
 ```
 
@@ -126,12 +126,13 @@ interface RequestPlugin {
 
 ```typescript
 export class RequestService {
-  static config: RequestSetupConfig;
-  static instance: RequestService;
+  static config: RequestSetupConfig
+  static instance: RequestService
 
   public static getInstance(): RequestService {
-    if (this.instance) return this.instance;
-    return new RequestService();
+    if (this.instance)
+      return this.instance
+    return new RequestService()
   }
 }
 ```

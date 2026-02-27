@@ -1,5 +1,5 @@
-import { Generate } from '../generate'
 import type { Operation } from './operation'
+import { Generate } from '../generate'
 
 export class Service {
   constructor(name: string) {

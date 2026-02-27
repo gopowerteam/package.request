@@ -1,10 +1,10 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-import { generateServiceOptions } from '../utils/get-services-options'
 import type {
   GenerateApplicationOptions,
   GenerateOptions,
 } from '../types/generate-options'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { generateServiceOptions } from '../utils/get-services-options'
 
 const DefaultDownloadDir = '.request'
 

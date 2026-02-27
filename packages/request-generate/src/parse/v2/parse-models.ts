@@ -1,7 +1,7 @@
 import type { OpenAPIV2 } from 'openapi-types'
+import type { Model } from '../../entities/model'
 import { getCamelName } from '../../utils/get-camel-name'
 import { parseModel } from './parse-model'
-import type { Model } from '../../entities/model'
 
 export function parseModels(document: OpenAPIV2.Document) {
   const models: Model[] = []

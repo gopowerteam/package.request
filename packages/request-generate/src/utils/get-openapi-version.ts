@@ -4,7 +4,7 @@ import { OpenAPIVersion } from '../config/enum.config'
 /**
  * 获取OpenAPI版本
  * @param document
- * @returns
+ * @returns OpenAPI版本
  */
 export function getOpenAPIVersion(
   document: OpenAPIV3.Document & OpenAPIV2.Document,

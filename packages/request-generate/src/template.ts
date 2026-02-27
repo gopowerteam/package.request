@@ -59,7 +59,7 @@ function registerHandlebarPartial(input: string) {
 
 /**
  * 加载模板
- * @returns
+ * @returns 模板内容
  */
 export function loadHandlebarTemplate(input: string) {
   const templatePath = path.resolve(__dirname, 'templates', `${input}.hbs`)

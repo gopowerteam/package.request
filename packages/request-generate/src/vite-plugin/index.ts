@@ -1,9 +1,9 @@
+import type { PluginOption, ResolvedConfig } from 'vite'
 import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import process from 'node:process'
 import Handlebars from 'handlebars'
-import type { PluginOption, ResolvedConfig } from 'vite'
 import { generateCodeTemplate, generateDeclareTemplate } from './templates'
 
 // 虚拟模块ID
@@ -57,8 +57,7 @@ function generateRequestCode() {
   execSync(`${generateScript}`, { env: {
     ...process.env,
     FORCE_COLOR: '1',
-  },
-  })
+  } })
 }
 
 /**

@@ -1,4 +1,5 @@
-import { type QueryStringifyOptions, stringify } from '../src/utils/query-string'
+import type { QueryStringifyOptions } from '../src/utils/query-string'
+import { stringify } from '../src/utils/query-string'
 
 describe('query-string', () => {
   describe('stringify', () => {

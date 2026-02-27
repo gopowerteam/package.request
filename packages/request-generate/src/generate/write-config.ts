@@ -1,7 +1,7 @@
+import type { GenerateApplicationOptions } from '../types/generate-options'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
-import type { GenerateApplicationOptions } from '../types/generate-options'
 
 const ConfigFileName = '.config.json'
 const ConfigFilePath = path.resolve('.request', ConfigFileName)

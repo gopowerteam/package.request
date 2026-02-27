@@ -1,11 +1,11 @@
+import type { GenerateClient } from '../types/generate-client'
+import type { GenerateApplicationOptions } from '../types/generate-options'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import rimraf from 'rimraf'
 import { Generate } from '.'
 import { updateProgress } from '../progress'
 import { writeService } from './write-service'
-import type { GenerateClient } from '../types/generate-client'
-import type { GenerateApplicationOptions } from '../types/generate-options'
 
 export function writeServices(
   client: GenerateClient,

@@ -1,5 +1,5 @@
-import { Generate } from '../generate'
 import type { OperationParameter } from './operation-parameter'
+import { Generate } from '../generate'
 
 export class Operation {
   // Operation名称

@@ -1,5 +1,5 @@
-import { download, generate } from '@gopowerteam/request-generate'
 import type { GenerateOptions } from '@gopowerteam/request-generate'
+import { download, generate } from '@gopowerteam/request-generate'
 
 const options: GenerateOptions = {
   gateway: 'https://gateway.local.xbt-dev.top',
@@ -30,7 +30,9 @@ const options: GenerateOptions = {
     },
     operationResolve({ object }) {
       return object
-        .operationId!.replace(/_*\d*$/g, '').replace(/Using(GET|POST|PUT|PATCH|DELETE)_*\d*$/g, '')
+        .operationId!
+        .replace(/_*\d*$/g, '')
+        .replace(/Using(GET|POST|PUT|PATCH|DELETE)_*\d*$/g, '')
     },
     responseType: 'promise',
     excludeQueryParams: [

@@ -8,8 +8,7 @@ import { getCamelName } from './get-camel-name'
  * @param method
  * @param operationObject
  * @param tags
- * @param options
- * @returns
+ * @returns 服务名称
  */
 export function getServiceName(
   path: string,

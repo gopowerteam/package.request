@@ -1,9 +1,9 @@
 import type { OpenAPIV2 } from 'openapi-types'
+import type { SchemaType } from '../../types/schema-type'
 import { getBuiltInType } from '../../utils/get-built-in-type'
 import { getCamelName } from '../../utils/get-camel-name'
 import { getMappedType } from '../../utils/get-mapped-type'
 import { stripNamespace } from './strip-namespace'
-import type { SchemaType } from '../../types/schema-type'
 
 export function parseSchemaType(
   schema: OpenAPIV2.ReferenceObject | OpenAPIV2.SchemaObject,

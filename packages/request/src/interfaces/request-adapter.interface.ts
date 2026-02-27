@@ -15,13 +15,13 @@ export interface RequestAdapter {
 
   /**
    * 转换Response
-   * @param any
+   * @param response
    */
   transformResponse: (response: any) => AdapterResponse
 
   /**
    * 转换Exception
-   * @param any
+   * @param response
    */
   transformException: (response: any) => AdapterResponse
 }
