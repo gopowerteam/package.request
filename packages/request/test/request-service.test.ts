@@ -1,4 +1,5 @@
 import type { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
+import { vi } from 'vitest'
 import { AxiosAdapter } from '../src/adapters'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'
@@ -11,7 +12,7 @@ import {
 } from './response-interceptors'
 
 const config: RequestSetupConfig = {
-  gateway: 'https://mall-service.gopowerteam.cn',
+  gateway: 'https://gateway.local.xbt.sx.cn',
   adapter: new AxiosAdapter(),
   interceptors: {
     status: new StatusInterceptors(),
@@ -31,7 +32,7 @@ describe('测试RequestService', () => {
     // 请求数据
     const data = await request.send(
       {
-        path: '/api/admin/app/app-base',
+        path: '/dso-org-service/api/appModule/all',
         method: 'GET',
       },
       [],
@@ -43,8 +44,8 @@ describe('测试RequestService', () => {
 
   it('测试异常请求', async () => {
     // 替换异常方法
-    const errorHandle = jest.fn()
-    const exceptionHandle = jest.fn()
+    const errorHandle = vi.fn()
+    const exceptionHandle = vi.fn()
     config.interceptors.exception.exec = exceptionHandle
 
     // 配置RequestService
@@ -55,7 +56,7 @@ describe('测试RequestService', () => {
     await request
       .send(
         {
-          path: '/api/admin/app/app---',
+          path: '/dso-org-service/api/appModule/all---',
           method: 'GET',
         },
         [],
@@ -68,8 +69,8 @@ describe('测试RequestService', () => {
 
   it('测试插件正常生命周期', async () => {
     // 配置RequestService
-    const beforeHook = jest.fn()
-    const afterHook = jest.fn()
+    const beforeHook = vi.fn()
+    const afterHook = vi.fn()
 
     setup(config)
     // 请求实例
@@ -83,7 +84,7 @@ describe('测试RequestService', () => {
     // 请求数据
     await request.send(
       {
-        path: '/api/admin/app/app-base',
+        path: '/dso-org-service/api/appModule/all',
         method: 'GET',
         paramsQuery: {
           a: [1, 2, 3, 4, 5],
@@ -99,7 +100,7 @@ describe('测试RequestService', () => {
 
   it('测试插件异常生命周期', async () => {
     // 配置RequestService
-    const catchHook = jest.fn()
+    const catchHook = vi.fn()
 
     setup(config)
     // 请求实例
@@ -113,7 +114,7 @@ describe('测试RequestService', () => {
     await request
       .send(
         {
-          path: '/api/admin/app/app-base',
+          path: '/dso-org-service/api/appModule/all',
           method: 'POST',
         },
         [plugin],

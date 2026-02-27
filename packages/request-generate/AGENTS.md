@@ -33,7 +33,7 @@ CLI tool for generating TypeScript service code from OpenAPI/Swagger specificati
 | `src/template-helpers/` | Handlebars helper functions                    |
 | `src/templates/`        | Handlebars template files (copied to dist)     |
 | `src/config/`           | Configuration enums                            |
-| `test/`                 | Jest test files                                |
+| `test/`                 | Vitest test files                              |
 
 ## For AI Agents
 
@@ -55,11 +55,14 @@ pnpm --filter @gopowerteam/request-generate dev
 # Run all tests
 pnpm --filter @gopowerteam/request-generate test
 
+# Run tests in watch mode
+pnpm --filter @gopowerteam/request-generate test:watch
+
 # Run single test file (from this directory)
-pnpm jest test/path/to/file.spec.ts
+pnpm vitest run test/path/to/file.spec.ts
 
 # Run tests matching pattern
-pnpm jest --testNamePattern="test name"
+pnpm vitest run -t "test name"
 ```
 
 ### Lint Commands
@@ -173,8 +176,8 @@ Output: ESM + CJS with d.ts declarations
 ### Dev Dependencies
 
 - **vite** - For plugin testing
-- **jest** + **ts-jest** - Testing
+- **vitest** - Testing
 - **tsup** - Bundler
-- **typescript** - v4.9.5
+- **typescript** - v5.9.3
 
 <!-- MANUAL: Custom project notes can be added below -->

@@ -2,7 +2,7 @@ import type { GenerateOptions } from '@gopowerteam/request-generate'
 import { download, generate } from '@gopowerteam/request-generate'
 
 const options: GenerateOptions = {
-  gateway: 'https://gateway.local.xbt-dev.top',
+  gateway: 'https://gateway.local.xbt.sx.cn',
   openapi: '/v2/api-docs',
   output: './src/generated/http',
   exportModels: true,

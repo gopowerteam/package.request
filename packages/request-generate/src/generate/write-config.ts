@@ -52,7 +52,7 @@ export function isNeedUpdate(name: string, config: ConfigFileItem[], output: str
   const outputDir = path.resolve(output)
 
   if (!fs.existsSync(file)) {
-    throw new Error(`未找到相应的配置文件: ${name}.json`)
+    throw new Error(`未找到相应的配置文件: ${file}`)
   }
 
   // 读取文件的MD5值

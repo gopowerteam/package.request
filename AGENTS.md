@@ -17,7 +17,7 @@ A TypeScript monorepo containing HTTP request utilities and OpenAPI code generat
 | `.editorconfig`        | Editor formatting settings (2-space indent, LF) |
 | `.lintstagedrc.js`     | Lint-staged configuration for pre-commit hooks  |
 | `commitlint.config.js` | Commit message linting rules                    |
-| `.cz-config.js`        | Commitizen interactive commit configuration     |
+| `vitest.config.ts`     | Vitest test configuration                        |
 
 ## Subdirectories
 
@@ -59,17 +59,24 @@ pnpm --filter @gopowerteam/request lint
 ### Test Commands
 
 ```bash
-# Run all tests in request package
+# Run all tests
+pnpm vitest run
+
+# Run tests in watch mode
+pnpm vitest
+
+# Run tests for specific package
 pnpm --filter @gopowerteam/request test
+pnpm --filter @gopowerteam/request-generate test
 
 # Run single test file
-cd packages/request && pnpm jest test/path/to/file.spec.ts
+pnpm vitest run packages/request/test/path/to/file.test.ts
 
 # Run tests matching pattern
-cd packages/request && pnpm jest --testNamePattern="test name"
+pnpm vitest run -t "test name"
 
 # Run tests with coverage
-cd packages/request && pnpm jest --coverage
+pnpm vitest run --coverage
 ```
 
 ### Package-specific Commands
@@ -186,7 +193,7 @@ Use `pnpm commit` for interactive commit creation.
 
 ### Testing Requirements
 
-- Tests use Jest with ts-jest preset
+- Tests use Vitest
 - Test environment: Node.js
 - Place test files in `test/` directory adjacent to `src/`
 - Run tests before committing changes
@@ -244,7 +251,7 @@ Husky runs lint-staged on commit:
 ### Dev Tools
 
 - **@antfu/eslint-config** - ESLint preset
-- **Jest** + **ts-jest** - Testing framework
+- **Vitest** - Testing framework
 - **Husky** + **lint-staged** - Git hooks
 
 <!-- MANUAL: Custom project notes can be added below -->

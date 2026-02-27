@@ -13,8 +13,8 @@
     "@gopowerteam/request-generate": "workspace:*"
   },
   "devDependencies": {
-    "ts-node": "^10.9.1",
-    "tsx": "^4.7.0",
-    "typescript": "^4.8.4"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

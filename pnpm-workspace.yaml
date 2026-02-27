@@ -1,12 +1,13 @@
 packages:
-  - "playground/*"
-  - "packages/*"
-
-registry: https://registry.npmmirror.com
-
-publicHoistPattern:
-  - "@vue/runtime-core"
-  - exceljs
+  - playground/*
+  - packages/*
 
 onlyBuiltDependencies:
   - esbuild
+  - unrs-resolver
+
+publicHoistPattern:
+  - '@vue/runtime-core'
+  - exceljs
+
+registry: https://registry.npmmirror.com

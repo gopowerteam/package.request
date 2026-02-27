@@ -1,7 +1,7 @@
 import { defineConfig } from '@gopowerteam/request-generate'
 
 export default defineConfig({
-  gateway: 'https://gateway.local.xbt-dev.top',
+  gateway: 'https://gateway.local.xbt.sx.cn',
   openapi: '/v3/api-docs',
   output: './src/http',
   exportModels: true,

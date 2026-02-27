@@ -25,7 +25,7 @@ Core HTTP request library implementing the adapter pattern for flexible HTTP cli
 | `src/interfaces/` | TypeScript interface definitions          |
 | `src/adapters/`   | HTTP client adapter implementations       |
 | `src/utils/`      | Utility functions (query-string handling) |
-| `test/`           | Jest test files                           |
+| `test/`           | Vitest test files                           |
 
 ## For AI Agents
 
@@ -47,14 +47,17 @@ pnpm --filter @gopowerteam/request dev
 # Run all tests
 pnpm --filter @gopowerteam/request test
 
+# Run tests in watch mode
+pnpm --filter @gopowerteam/request test:watch
+
 # Run single test file (from this directory)
-pnpm jest test/path/to/file.spec.ts
+pnpm vitest run test/path/to/file.test.ts
 
 # Run tests matching pattern
-pnpm jest --testNamePattern="test name"
+pnpm vitest run -t "test name"
 
 # Run tests with coverage
-pnpm jest --coverage
+pnpm --filter @gopowerteam/request test:coverage
 ```
 
 ### Lint Commands
@@ -153,8 +156,8 @@ Entry points defined in `tsup.config.ts`:
 
 ### Dev Dependencies
 
-- **jest** + **ts-jest** - Testing
+- **vitest** - Testing
 - **tsup** - Bundler (ESM + CJS)
-- **typescript** - v4.9.5
+- **typescript** - v5.9.3
 
 <!-- MANUAL: Custom project notes can be added below -->

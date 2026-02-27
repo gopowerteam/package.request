@@ -60,6 +60,6 @@ export function generateServiceOptions(
     )
   }
   else {
-    return [createOptions(options)]
+    return [createOptions(options, 'default')]
   }
 }

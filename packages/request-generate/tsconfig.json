@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "types": ["vitest/globals"],
     "strict": true,
     "strictPropertyInitialization": false,
     "alwaysStrict": true,
