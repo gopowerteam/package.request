@@ -9,30 +9,30 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./adapters": {
-      "types": "./dist/adapters/index.d.ts",
-      "import": "./dist/adapters/index.js",
+      "types": "./dist/adapters/index.d.mts",
+      "import": "./dist/adapters/index.mjs",
       "require": "./dist/adapters/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "README.md",
     "adapters.d.ts",
     "dist"
   ],
   "scripts": {
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "build": "tsup",
+    "build": "tsdown",
     "lint": "eslint . --fix"
   },
   "dependencies": {
@@ -42,7 +42,7 @@
   "devDependencies": {
     "@types/node": "24",
     "@types/qs": "^6.14.0",
-    "tsup": "^8.5.1",
+    "tsdown": "0.20.3",
     "typescript": "^5.9.3",
     "vitest": "^3.0.0"
   },

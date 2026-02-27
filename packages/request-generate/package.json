@@ -9,19 +9,19 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./vite-plugin": {
-      "types": "./dist/vite-plugin/index.d.ts",
+      "types": "./dist/vite-plugin/index.d.mts",
       "import": "./dist/vite-plugin/index.mjs",
-      "require": "./dist/vite-plugin/index.js"
+      "require": "./dist/vite-plugin/index.cjs"
     }
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "bin": {
     "request-download": "bin/download.mts",
     "request-generate": "bin/generate.mts"
@@ -33,8 +33,8 @@
     "vite-plugin.d.ts"
   ],
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "tsdown --watch",
+    "build": "tsdown",
     "lint": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -60,9 +60,8 @@
     "@types/node": "24",
     "@types/qs": "^6.14.0",
     "@types/rimraf": "^3.0.2",
-    "fs-extra": "^11.3.3",
     "openapi-types": "^12.1.3",
-    "tsup": "^8.5.1",
+    "tsdown": "0.21.0-beta.2",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^3.0.0"
