@@ -1,7 +1,7 @@
 {
   "name": "@gopowerteam/request-generate",
-  "type": "commonjs",
-  "version": "0.3.2",
+  "type": "module",
+  "version": "0.3.3",
   "private": false,
   "keywords": [
     "gopowerteam",
@@ -10,17 +10,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs"
     },
     "./vite-plugin": {
       "types": "./dist/vite-plugin/index.d.mts",
-      "import": "./dist/vite-plugin/index.mjs",
-      "require": "./dist/vite-plugin/index.cjs"
+      "import": "./dist/vite-plugin/index.mjs"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "bin": {
     "request-download": "bin/download.mts",

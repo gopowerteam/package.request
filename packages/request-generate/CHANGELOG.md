@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.3.3
+
+### Patch Changes
+
+- update to esm
+
 ## 0.3.2
 
 ### Patch Changes

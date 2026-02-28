@@ -1,5 +1,6 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import Handlebars from 'handlebars'
 import { equalHelper } from './template-helpers/equal.helper'
@@ -7,10 +8,10 @@ import { includeQueryParams } from './template-helpers/include-query-params'
 import { isArrayHelper } from './template-helpers/is-array.helper'
 import { toUpperHelper } from './template-helpers/to-upper.helper'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 export function registerHandlebarTemplates() {
-  // 注册Partials
   registerHandlebarPartials()
-  // 注册Helpers
   registerHandlebarHelpers()
 }
 
@@ -49,18 +50,11 @@ function registerHandlebarHelper(helper: {
   Handlebars.registerHelper(helper.name, helper.fn)
 }
 
-/**
- * 注册Handlebar模板
- */
 function registerHandlebarPartial(input: string) {
   const template = loadHandlebarTemplate(`partials/${input}`)
   Handlebars.registerPartial(input, template)
 }
 
-/**
- * 加载模板
- * @returns 模板内容
- */
 export function loadHandlebarTemplate(input: string) {
   const templatePath = path.resolve(__dirname, 'templates', `${input}.hbs`)
   return fs.readFileSync(templatePath, 'utf-8')
