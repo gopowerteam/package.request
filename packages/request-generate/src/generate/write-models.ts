@@ -2,7 +2,6 @@ import type { GenerateClient } from '../types/generate-client'
 import type { GenerateApplicationOptions } from '../types/generate-options'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import rimraf from 'rimraf'
 import { updateProgress } from '../progress'
 import { writeModel } from './write-model'
 
@@ -24,7 +23,7 @@ export function writeModels(
 
   // 清空历史文件
   if (fs.existsSync(output)) {
-    rimraf.sync(output)
+    fs.rmSync(output, { recursive: true, force: true })
   }
 
   // 创建目标文件夹
