@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.3.0
+
+### Minor Changes
+
+- 升级依赖
+
 ## 0.2.3
 
 ### Patch Changes
