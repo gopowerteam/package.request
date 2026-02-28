@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.2.1
+
+### Patch Changes
+
+- update tsdown config
+
 ## 0.2.0
 
 ### Minor Changes
