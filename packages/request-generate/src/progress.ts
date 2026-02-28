@@ -1,98 +1,102 @@
 import type { Ora } from 'ora'
 import chalk from 'chalk'
 import ora from 'ora'
+import { table } from 'table'
 
-interface Progress {
-  spinner: Ora
-  model: {
-    total: number
-    value: number
-  }
-  service: {
-    total: number
-    value: number
+interface GenerationResult {
+  name: string
+  models: number
+  services: number
+}
+
+const results: GenerationResult[] = []
+let spinner: Ora | null = null
+
+export function startSpinner() {
+  spinner = ora('生成中...').start()
+}
+
+export function stopSpinner() {
+  if (spinner) {
+    spinner.stop()
+    spinner = null
   }
 }
 
-const progressMaps = new Map<string, Progress>()
+export function collectResult(name: string, models: number, services: number) {
+  results.push({ name, models, services })
+}
 
-export function createProgress(
-  name: string,
-) {
-  const spinner = ora(
-    formatProgressText(name),
-  ).start()
+export function outputSummary() {
+  const header = [
+    chalk.cyan('Service'),
+    chalk.cyan('Models'),
+    chalk.cyan('Services'),
+    chalk.cyan('Status'),
+  ]
 
-  progressMaps.set(name, {
-    spinner,
-    model: {
-      total: 0,
-      value: 0,
+  const border = {
+    topBody: '─',
+    topJoin: '┬',
+    topLeft: '┌',
+    topRight: '┐',
+    bottomBody: '─',
+    bottomJoin: '┴',
+    bottomLeft: '└',
+    bottomRight: '┘',
+    bodyLeft: '│',
+    bodyRight: '│',
+    bodyJoin: '│',
+    joinBody: '─',
+    joinLeft: '├',
+    joinRight: '┤',
+    joinJoin: '┼',
+  }
+
+  const config = {
+    border,
+    columns: [
+      { alignment: 'left' as const },
+      { alignment: 'right' as const },
+      { alignment: 'right' as const },
+      { alignment: 'center' as const },
+    ],
+    drawHorizontalLine: (lineIndex: number, rowCount: number) => {
+      return lineIndex === 0 || lineIndex === 1 || lineIndex === rowCount - 1 || lineIndex === rowCount
     },
-    service: {
-      total: 0,
-      value: 0,
-    },
-  })
-}
-
-export function startProgress(name: string, options: { models: number, services: number }) {
-  const progress = progressMaps.get(name)
-
-  if (progress) {
-    progress.model = {
-      total: options.models,
-      value: 0,
-    }
-
-    progress.service = {
-      total: options.services,
-      value: 0,
-    }
-
-    updateProgressText(name, progress)
   }
-}
 
-function formatProgressText(name: string, progress?: Progress) {
-  const toStateText = (text: string) => `${chalk.green(text)}`
-  const toNameText = (text: string) => `${chalk.cyan(text).padEnd(20, ' ')}`
-  const toModelText = (text: string) => `${chalk.greenBright('Model')}:${chalk.gray(text).padEnd(10, ' ')}`
-  const toServiceText = (text: string) => `${chalk.greenBright('Service')}:${chalk.gray(text).padEnd(10, ' ')}`
-  const isFinish = progress?.model.value === progress?.model.total && progress?.service.value === progress?.service.total
-
-  if (progress) {
-    const stateText = toStateText(isFinish ? '生成完成' : '生成中')
-    const nameText = toNameText(name)
-    const modelText = toModelText(`${progress.model.value} / ${progress.model.total}`)
-    const serviceText = toServiceText(`${progress.service.value} / ${progress.service.total}`)
-    return `${stateText} | ${nameText} | ${modelText} | ${serviceText}`
-  }
-  else {
-    const stateText = toStateText('开始请求')
-    const nameText = toNameText(name)
-    return `${stateText} | ${nameText}`
-  }
-}
-
-function updateProgressText(name: string, progress: Progress) {
-  const isFinish = progress?.model.value === progress?.model.total && progress?.service.value === progress?.service.total
-
-  if (isFinish) {
-    progress.spinner.succeed(formatProgressText(name, progress))
-  }
-  else {
-    progress.spinner.text = formatProgressText(name, progress)
-  }
-}
-
-export function updateProgress(name: string, type: 'model' | 'service') {
-  const progress = progressMaps.get(name)
-
-  if (!progress) {
+  if (results.length === 0) {
+    const emptyRow = [chalk.gray('(none)'), '0', '0', chalk.gray('-')]
+    const tableData = [header, emptyRow]
+    // eslint-disable-next-line no-console
+    console.log(table(tableData, config))
     return
   }
 
-  progress[type].value++
-  updateProgressText(name, progress)
+  const rows = results.map(r => [
+    r.name,
+    r.models.toString(),
+    r.services.toString(),
+    chalk.green('✓'),
+  ])
+
+  const totalModels = results.reduce((sum, r) => sum + r.models, 0)
+  const totalServices = results.reduce((sum, r) => sum + r.services, 0)
+
+  const summaryRow = [
+    chalk.bold('Total'),
+    chalk.bold(totalModels.toString()),
+    chalk.bold(totalServices.toString()),
+    chalk.bold.green(`${results.length} services`),
+  ]
+
+  const tableData = [header, ...rows, summaryRow]
+
+  // eslint-disable-next-line no-console
+  console.log(table(tableData, config))
+}
+
+export function clearResults() {
+  results.length = 0
 }

@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.3.4
+
+### Patch Changes
+
+- update display result
+
 ## 0.3.3
 
 ### Patch Changes

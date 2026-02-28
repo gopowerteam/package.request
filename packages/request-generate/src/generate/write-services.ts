@@ -3,7 +3,6 @@ import type { GenerateApplicationOptions } from '../types/generate-options'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Generate } from '.'
-import { updateProgress } from '../progress'
 import { writeService } from './write-service'
 
 export function writeServices(
@@ -33,6 +32,5 @@ export function writeServices(
       = Generate.options.appendService === false ? '' : options.application
 
     writeService(service, path.join(output, filename))
-    updateProgress(options.name || 'default', 'service')
   })
 }

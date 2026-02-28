@@ -61,8 +61,6 @@ if (RequestGenerate) {
 
   try {
     await RequestGenerate.generate(config)
-    // eslint-disable-next-line no-console
-    console.log('接口文件生成完成')
     process.exit(0)
   }
   catch (error) {

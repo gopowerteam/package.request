@@ -2,9 +2,9 @@ import { defineConfig } from '@gopowerteam/request-generate'
 
 export default defineConfig({
   gateway: 'https://gateway.local.xbt.sx.cn',
-  openapi: '/v3/api-docs',
-  output: './src/http',
+  openapi: '/v2/api-docs',
   exportModels: true,
+  output: './src/http',
   applications: {
     'file-service': {
       key: 'xbt-platform-file-service',

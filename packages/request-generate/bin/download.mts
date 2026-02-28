@@ -58,8 +58,6 @@ if (RequestGenerate) {
 
   RequestGenerate.download(config)
     .then(() => {
-      // eslint-disable-next-line no-console
-      console.log('接口文件更新完成')
       process.exit(0)
     })
     .catch((error: Error) => {

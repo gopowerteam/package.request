@@ -8,7 +8,7 @@ import process from 'node:process'
 import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
-import { createProgress, startProgress } from '../progress'
+import { collectResult, outputSummary, startSpinner, stopSpinner } from '../progress'
 import { registerHandlebarTemplates } from '../template'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
@@ -28,6 +28,7 @@ export class Generate {
    * @returns Promise<void>
    */
   static async startup(options: GenerateOptions) {
+    startSpinner()
     // 保存配置
     Generate.options = options
     // 注册Handlebars模板
@@ -46,10 +47,17 @@ export class Generate {
       })
     }
 
-    applications.forEach((application) => {
-      createProgress(application.options.name || 'default')
+    for (const application of applications) {
+      collectResult(
+        application.options.name || 'default',
+        application.client.models.length,
+        application.client.services.length,
+      )
       Generate.writeClient(application.client, application.options)
-    })
+    }
+
+    stopSpinner()
+    outputSummary()
   }
 
   static async getApiDocument(input: string): Promise<UnkownVersionDocument> {
@@ -108,10 +116,6 @@ export class Generate {
     client: GenerateClient,
     options: GenerateApplicationOptions,
   ) {
-    startProgress(options.name || 'default', {
-      models: client.models.length,
-      services: client.services.length,
-    })
     // 写入model
     writeModels(client, options)
     // 写入Service
