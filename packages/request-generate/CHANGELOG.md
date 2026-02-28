@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.3.2
+
+### Patch Changes
+
+- fixed tsdown copy config
+
 ## 0.3.1
 
 ### Patch Changes

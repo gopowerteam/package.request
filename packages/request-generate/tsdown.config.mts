@@ -16,6 +16,9 @@ export default defineConfig({
       'vite',
     ],
   },
-  shims: true,
-  copy: { from: 'src/templates', to: 'dist/templates' },
+  copy: {
+    from: 'src/templates',
+    to: 'dist/',
+    flatten: false,
+  },
 })
