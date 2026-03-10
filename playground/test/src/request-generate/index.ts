@@ -2,36 +2,40 @@ import type { GenerateOptions } from '@gopowerteam/request-generate'
 import { download, generate } from '@gopowerteam/request-generate'
 
 const options: GenerateOptions = {
-  gateway: 'https://gateway.local.xbt.sx.cn',
-  openapi: '/v2/api-docs',
+  gateway: 'https://gateway.bdso.xbt.sx.cn',
+  openapi: '/v3/api-docs',
   output: './src/generated/http',
   exportModels: true,
   applications: {
-    'mall-service': {
-      key: 'xbt-platform-mall-service',
-      openapi: '/v2/api-docs',
+    'dso-service': {
+      key: 'org-service',
+      openapi: '/v3/api-docs',
     },
     'file-service': {
-      key: 'xbt-platform-file-service',
-      openapi: '/v2/api-docs',
+      key: 'file-service',
+      openapi: '/v3/api-docs',
     },
   },
   logger: true,
   exportServices: {
     serviceResolve({ object, tags }) {
-      const tag = tags.find(tag => tag.name === object.tags?.[0])
+      const tagName = object.tags?.[0]
 
-      if (tag && tag.description) {
-        return tag.description.replace(/\s/g, '').replace(/Controller$/g, '')
+      if (!tagName) {
+        return 'default'
+      }
+
+      if (/[\u4E00-\u9FA5]+/.test(tagName)) {
+        const tag = tags.find(tag => tag.name === tagName)
+        return tag && tag.description ? tag.description.replace(/\s/g, '').replace(/Controller$/g, '') : 'default'
       }
       else {
-        return 'default'
+        return tagName
       }
     },
     operationResolve({ object }) {
-      return object
-        .operationId!
-        .replace(/_*\d*$/g, '')
+      return object.operationId!
+        .replace(/_\d+$/g, '')
         .replace(/Using(GET|POST|PUT|PATCH|DELETE)_*\d*$/g, '')
     },
     responseType: 'promise',

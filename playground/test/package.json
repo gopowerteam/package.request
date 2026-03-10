@@ -1,10 +1,11 @@
 {
   "name": "playground-test",
+  "type": "module",
   "version": "0.0.11",
   "private": true,
   "scripts": {
-    "dev": "ts-node ./src/request-generate/index.ts && ts-node ./src/request/index.ts",
-    "dev:request": "ts-node ./src/request/index.ts",
+    "dev": "tsx ./src/request-generate/index.ts && tsx ./src/request/index.ts",
+    "dev:request": "tsx ./src/request/index.ts",
     "dev:request-generate": "tsx ./src/request-generate/index.ts",
     "lint": "eslint . --fix"
   },
