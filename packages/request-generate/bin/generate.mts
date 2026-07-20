@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 
-import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { program } from 'commander'
+import { loadConfigFile } from './_load-config.mts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,49 +22,13 @@ const params = program
   .parse(process.argv)
   .opts()
 
-const configFilePaths = [
-  'request.config.ts',
-  'request-generate.config.cjs',
-  'request-generate.config.js',
-]
+const { default: config } = await loadConfigFile(params.config)
 
-/**
- * 加载配置文件
- * @param {*} filePath
- */
-async function loadConfigFile(filePath: string) {
-  if (filePath) {
-    configFilePaths.unshift(filePath)
-  }
-
-  const configFilePath = configFilePaths.find(file =>
-    fs.existsSync(path.resolve(process.cwd(), file)),
-  )
-
-  if (!configFilePath) {
-    throw new Error('Not Find Config File.')
-  }
-
-  if (configFilePath.endsWith('js')) {
-    return import(`file://${path.resolve(process.cwd(), configFilePath)}`)
-  }
-  else if (configFilePath.endsWith('ts')) {
-    return import(`file://${path.resolve(process.cwd(), configFilePath)}`)
-  }
-  else {
-    throw new Error('无法找到RequestGenerate配置文件')
-  }
+try {
+  await RequestGenerate.generate(config)
+  process.exit(0)
 }
-
-if (RequestGenerate) {
-  const { default: config } = await loadConfigFile(params.config)
-
-  try {
-    await RequestGenerate.generate(config)
-    process.exit(0)
-  }
-  catch (error) {
-    console.error(error)
-    process.exit(1)
-  }
+catch (error) {
+  console.error(error)
+  process.exit(1)
 }

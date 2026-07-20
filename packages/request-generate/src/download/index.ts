@@ -17,7 +17,7 @@ export class Download {
 
     // 创建.request目录
     if (!fs.existsSync(DefaultDownloadDir)) {
-      fs.mkdirSync(DefaultDownloadDir)
+      fs.mkdirSync(DefaultDownloadDir, { recursive: true })
     }
 
     // 下载所有OpenAPI文件
@@ -28,6 +28,13 @@ export class Download {
 
   static async downloadOpenAPIFile(option: GenerateApplicationOptions) {
     const response = await fetch(option.input)
+
+    if (!response.ok) {
+      throw new Error(
+        `下载失败: ${option.input} 返回状态码 ${response.status} ${response.statusText}`,
+      )
+    }
+
     const data = await response.json()
     const filePath = path.join('.request', `${option.name}.json`)
 

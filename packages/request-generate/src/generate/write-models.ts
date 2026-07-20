@@ -1,7 +1,7 @@
 import type { GenerateClient } from '../types/generate-client'
 import type { GenerateApplicationOptions } from '../types/generate-options'
-import * as fs from 'node:fs'
-import * as path from 'node:path'
+import path from 'node:path'
+import { safeClearGeneratedDir, writeGeneratedMarker } from './safe-clear'
 import { writeModel } from './write-model'
 
 /**
@@ -20,17 +20,15 @@ export function writeModels(
   // 输出路径
   const output = path.join(options.output, 'models')
 
-  // 清空历史文件
-  if (fs.existsSync(output)) {
-    fs.rmSync(output, { recursive: true, force: true })
-  }
-
-  // 创建目标文件夹
-  fs.mkdirSync(output, { recursive: true })
+  // 安全清空历史文件(仅当目录由本工具生成时才会清空)
+  const markerPath = safeClearGeneratedDir(output)
 
   // 写入Models
   client.models.forEach((model) => {
     const filename = `${model.name}.ts`
     writeModel(model, path.join(output, filename))
   })
+
+  // 写入标记文件,标识目录由本工具生成
+  writeGeneratedMarker(markerPath)
 }

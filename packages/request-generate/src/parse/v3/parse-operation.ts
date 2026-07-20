@@ -1,10 +1,12 @@
 import type { OpenAPIV3 } from 'openapi-types'
+import type { ParseContext } from './resolve-content'
 import { Operation } from '../../entities/operation'
 import { getOperationName } from '../../utils/get-operation-name'
 import { parseParametersBody } from './parse-parameters-body'
 import { parseParametersPath } from './parse-parameters-path'
 import { parseParametersQuery } from './parse-parameters-query'
 import { parseSchemaType } from './parse-schema-type'
+import { resolveFromContent } from './resolve-content'
 
 export function parseOperation(
   path: string,
@@ -18,8 +20,17 @@ export function parseOperation(
   // Operation注释
   operation.description = operationObject.summary
 
+  const context: ParseContext = {
+    path,
+    method,
+    operationId: operationObject.operationId,
+  }
+
   if (operationObject.requestBody) {
-    operation.parametersBody = parseParametersBody(operationObject.requestBody)
+    operation.parametersBody = parseParametersBody(
+      operationObject.requestBody,
+      context,
+    )
   }
 
   if (operationObject.parameters) {
@@ -28,7 +39,7 @@ export function parseOperation(
   }
 
   // 解析返回类型
-  const responseSchema = parseResponseType(operationObject.responses)
+  const responseSchema = parseResponseType(operationObject.responses, context)
 
   operation.imports = Array.from(
     new Set([
@@ -44,36 +55,36 @@ export function parseOperation(
   return operation
 }
 
-function parseResponseType(responses: OpenAPIV3.ResponsesObject) {
+function parseResponseType(
+  responses: OpenAPIV3.ResponsesObject,
+  context: ParseContext,
+) {
   const SUCCESS_STATUS_CODE = '200'
   const response = responses?.[SUCCESS_STATUS_CODE]
 
-  const medias = ['*/*', 'application/json']
-
-  // 引用直接类型转换
-  if (response && '$ref' in response) {
-    return parseSchemaType(responses)
+  // 无 200 响应 → void
+  if (!response) {
+    return {
+      type: 'void',
+      ref: 'void',
+      imports: [],
+    }
   }
 
-  if (
-    response
-    && 'content' in response
-    && medias.some(media => !!response?.content?.[media]?.schema)
-  ) {
-    // 查找media类型
-    const mediaType = medias.find(
-      media => !!response?.content?.[media]?.schema,
-    )
-
-    // 获取media schema
-    const schema = response?.content?.[mediaType!]?.schema
-
-    return parseSchemaType(schema!)
+  // $ref 响应(与 V2 行为对齐,存在已知限制 — 完整修复需 swagger-parser.dereference)
+  if ('$ref' in response) {
+    return parseSchemaType(response)
   }
 
-  return {
-    type: 'void',
-    ref: 'void',
-    imports: [],
+  // 无 content(如 204 No Content)→ void
+  if (!response.content || Object.keys(response.content).length === 0) {
+    return {
+      type: 'void',
+      ref: 'void',
+      imports: [],
+    }
   }
+
+  // 共享解析器:支持 application/json 家族、multipart、binary、text 等
+  return resolveFromContent(response.content, context, 'Response')
 }

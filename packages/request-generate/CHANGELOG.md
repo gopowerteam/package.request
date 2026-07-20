@@ -1,5 +1,42 @@
 # @gopowerteam/request-generate
 
+## 0.3.5
+
+### Patch Changes
+
+- 修复已知问题
+
+## 0.4.0
+
+### Minor Changes
+
+- ✨ V3 RequestBody 与 Response 支持 `multipart/form-data`、`application/octet-stream`、`application/pdf`、`text/csv` 等多 media 类型,自动映射为 `FormData` / `Blob` / `URLSearchParams` / `string`
+- ✨ V3 RequestBody/Response 识别 JSON 家族(`application/json; charset=utf-8`、`application/problem+json`、`application/vnd.*+json`),不再漏匹配
+- ✨ 错误信息含 path/method/operationId 上下文,便于定位失败的 operation
+- ✨ V3 PathItemObject 的非方法字段(`parameters`/`summary`/`description`/`servers`)不再被误识别为 operation
+- ✨ 目录删除安全守卫:输出目录需含 `.generated` 标记文件才会被清空,防止误删用户已存在的同名目录
+- ✨ CLI 支持 `.cjs`/`.mjs` 配置文件(原仅识别 `.js`/`.ts`)
+
+### Patch Changes
+
+- 🛠 V3 `parseOperation` 修复 `responses` → `response` 拼写错误(原导致 response `$ref` 时抛错)
+- 🛠 V3 `components.schemas` 缺失时不再崩溃
+- 🛠 V3 `schema.items` 缺失时不再抛 cryptic TypeError
+- 🛠 schema 解析错误信息包含 schema 内容片段(JSON 截断 200 字符)
+- 🛠 `getApiDocument` 改为 throw(原 `process.exit(0)` 误报成功,误导 CI/CD)
+- 🛠 `generateClient` switch 增加默认分支,未知版本不再静默返回 undefined
+- 🛠 Download 模块校验 `response.ok`,HTTP 错误状态不再被 `.json()` 吞掉
+- 🛠 `getOpenApiDocument` 校验空输入
+- 🛠 Vite 插件 alias 未配置时给出明确错误(原 `as any` 导致 cryptic TypeError)
+- 🛠 MD5 改为基于 Buffer(原 `.toString()` 对非 UTF-8 内容会失真)
+- 🛠 `writeServices` 不再修改原始 service entity(改为浅克隆写入)
+- 🛠 修复 `OpenAPIV3.ContentObject` 类型引用错误(openapi-types 未导出此类型)
+- 🛠 移除损坏的 `bin/index.mts`(调用不存在的 default 导出,且未在 package.json bin 中注册)
+- 🛠 tsconfig 修正 include:增加 `test/**/*.test.ts`,移除不存在的 `src/types/global.d.ts`
+- 🛠 `vite-plugin.d.ts` 路径补 `.mts` 后缀(原 `index.d` 不存在)
+- 🛠 包级 `vitest.config.ts`(修复 `pnpm --filter ... test` 找不到测试文件的问题)
+- 🧪 删除依赖内网网关的 `generate.spec.ts`,新增 fixture-based 单元测试覆盖 parser/write/download
+
 ## 0.3.4
 
 ### Patch Changes

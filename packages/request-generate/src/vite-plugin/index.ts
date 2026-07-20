@@ -113,17 +113,25 @@ function getServicePaths(options: PluginOptions) {
     })
   }
 
-  // 替换路径别名
-  const { replacement } = viteConfig.resolve.alias.find(
+  // 查找别名配置,缺失时给出明确错误
+  const aliasMatch = viteConfig.resolve.alias.find(
     alias => alias.find === options.alias,
-  ) as any
+  )
+
+  if (!aliasMatch) {
+    throw new Error(
+      `Vite alias "${options.alias}" 未在配置中找到,请在 vite.config 中配置 resolve.alias`,
+    )
+  }
+
+  const replacement = aliasMatch.replacement.replace(/\\/g, '/')
 
   if (fs.existsSync(path.resolve(options.dir))) {
     walk(path.resolve(options.dir))
   }
 
   return paths.map(filepath =>
-    filepath.replace(replacement.replace(/\\/g, '/'), options.alias),
+    filepath.replace(replacement, options.alias),
   )
 }
 

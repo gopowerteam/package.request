@@ -1,8 +1,9 @@
+import type { Service } from '../entities/service'
 import type { GenerateClient } from '../types/generate-client'
 import type { GenerateApplicationOptions } from '../types/generate-options'
-import * as fs from 'node:fs'
-import * as path from 'node:path'
+import path from 'node:path'
 import { Generate } from '.'
+import { safeClearGeneratedDir, writeGeneratedMarker } from './safe-clear'
 import { writeService } from './write-service'
 
 export function writeServices(
@@ -16,21 +17,22 @@ export function writeServices(
   // 输出路径
   const output = path.join(options.output, 'services')
 
-  // 清空历史文件
-  if (fs.existsSync(output)) {
-    fs.rmSync(output, { recursive: true, force: true })
-  }
-
-  // 创建目标文件夹
-  fs.mkdirSync(output, { recursive: true })
+  // 安全清空历史文件(仅当目录由本工具生成时才会清空)
+  const markerPath = safeClearGeneratedDir(output)
 
   // 写入Services
   client.services.forEach((service) => {
     const filename = `${service.name}Service.ts`
-    // 设置应用名称
-    service.application
-      = Generate.options.appendService === false ? '' : options.application
+    // 构造写入上下文,不修改原始 entity
+    const serviceWithContext: Service = {
+      ...service,
+      application:
+        Generate.options.appendService === false ? '' : options.application,
+    }
 
-    writeService(service, path.join(output, filename))
+    writeService(serviceWithContext, path.join(output, filename))
   })
+
+  // 写入标记文件,标识目录由本工具生成
+  writeGeneratedMarker(markerPath)
 }

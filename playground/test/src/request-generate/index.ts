@@ -2,17 +2,21 @@ import type { GenerateOptions } from '@gopowerteam/request-generate'
 import { download, generate } from '@gopowerteam/request-generate'
 
 const options: GenerateOptions = {
-  gateway: 'https://gateway.bdso.xbt.sx.cn',
+  gateway: 'https://gateway.local.xbt.sx.cn',
   openapi: '/v3/api-docs',
   output: './src/generated/http',
   exportModels: true,
   applications: {
     'dso-service': {
-      key: 'org-service',
+      key: 'dso-org-service',
       openapi: '/v3/api-docs',
     },
     'file-service': {
-      key: 'file-service',
+      key: 'xbt-platform-file-service',
+      openapi: '/v2/api-docs',
+    },
+    'sca-service': {
+      key: 'xbt-platform-sca',
       openapi: '/v3/api-docs',
     },
   },

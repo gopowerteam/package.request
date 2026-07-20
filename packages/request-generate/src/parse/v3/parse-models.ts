@@ -7,7 +7,7 @@ import { parseModel } from './parse-model'
 export function parseModels(document: OpenAPIV3.Document) {
   const models: Model[] = []
 
-  if (document.components) {
+  if (document.components?.schemas) {
     for (const definitionName in document.components.schemas) {
       const { schemas } = document.components
       // 遍历自身对象

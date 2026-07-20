@@ -21,7 +21,7 @@ export interface GenerateOptions {
       method: string
       object: OpenAPIV2.OperationObject | OpenAPIV3.OperationObject
       tags: OpenAPIV2.TagObject[]
-    }) => string
+    }) => string | string[]
     operationResolve?: (options: {
       path: string
       method: string

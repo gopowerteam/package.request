@@ -4,7 +4,6 @@ import type {
   GenerateApplicationOptions,
   GenerateOptions,
 } from '../types/generate-options'
-import process from 'node:process'
 import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
@@ -17,7 +16,7 @@ import { updateOptionsFromLocalConfig } from './write-config'
 import { writeModels } from './write-models'
 import { writeServices } from './write-services'
 
-type UnkownVersionDocument = OpenAPIV3.Document & OpenAPIV2.Document
+type UnknownVersionDocument = OpenAPIV3.Document & OpenAPIV2.Document
 
 export class Generate {
   public static options: GenerateOptions
@@ -60,18 +59,17 @@ export class Generate {
     outputSummary()
   }
 
-  static async getApiDocument(input: string): Promise<UnkownVersionDocument> {
+  static async getApiDocument(input: string): Promise<UnknownVersionDocument> {
     try {
       // 获取OPENAPI
       const document = await getOpenApiDocument(
         input,
       )
 
-      return document as UnkownVersionDocument
+      return document as UnknownVersionDocument
     }
-    catch {
-      console.error(`请求文件[${input}]失败,请稍后重试.`)
-      process.exit(0)
+    catch (error) {
+      throw new Error(`请求文件[${input}]失败,请稍后重试.`, { cause: error })
     }
   }
 
@@ -96,7 +94,7 @@ export class Generate {
    * @returns GenerateClient
    */
   static generateClient(
-    document: UnkownVersionDocument,
+    document: UnknownVersionDocument,
     version: OpenAPIVersion,
   ): GenerateClient {
     switch (version) {
@@ -104,6 +102,8 @@ export class Generate {
         return parseV2(document)
       case OpenAPIVersion.V3:
         return parseV3(document)
+      default:
+        throw new Error(`不支持的OpenAPI版本: ${String(version)}`)
     }
   }
 

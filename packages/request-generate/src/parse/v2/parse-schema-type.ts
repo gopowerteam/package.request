@@ -77,5 +77,5 @@ export function parseSchemaType(
 
   // TODO: 多类型处理
 
-  throw new Error('无法解析相应的schema')
+  throw new Error(`无法解析相应的schema: ${JSON.stringify(schema).slice(0, 200)}`)
 }

@@ -1,0 +1,119 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Minimal V3 API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/users": {
+      "summary": "Users path summary",
+      "description": "描述应被跳过,不应生成 Service",
+      "parameters": [
+        {
+          "name": "X-Common",
+          "in": "header",
+          "required": false,
+          "schema": { "type": "string" }
+        }
+      ],
+      "get": {
+        "operationId": "listUsers",
+        "tags": ["user"],
+        "summary": "List users",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createUser",
+        "tags": ["user"],
+        "summary": "Create user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/User" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/UserResponse" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "getUser",
+        "tags": ["user"],
+        "summary": "Get user by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "description": "User id" },
+          "name": { "type": "string" },
+          "age": { "type": "integer" },
+          "roles": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "MapStringObject": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "responses": {
+      "UserResponse": {
+        "description": "User response wrapper",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/User" }
+          }
+        }
+      }
+    }
+  }
+}

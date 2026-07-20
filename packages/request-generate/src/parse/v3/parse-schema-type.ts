@@ -36,7 +36,11 @@ export function parseSchemaType(
   }
 
   // ArrayReferenceObject类型
-  if (schema.type === 'array' && '$ref' in schema.items) {
+  if (
+    schema.type === 'array'
+    && schema.items
+    && '$ref' in schema.items
+  ) {
     // 获取引用类型
     const ref = getCamelName(stripNamespace(schema.items.$ref))
     const type = getBuiltInType(ref)
@@ -49,7 +53,11 @@ export function parseSchemaType(
   }
 
   // ArraySchemaObject类型
-  if (schema.type === 'array' && !('$ref' in schema.items)) {
+  if (
+    schema.type === 'array'
+    && schema.items
+    && !('$ref' in schema.items)
+  ) {
     return {
       type: `${getMappedType(schema.items.type)}[]`,
       ref: undefined,
@@ -85,5 +93,5 @@ export function parseSchemaType(
     }
   }
 
-  throw new Error('无法解析相应的schema')
+  throw new Error(`无法解析相应的schema: ${JSON.stringify(schema).slice(0, 200)}`)
 }

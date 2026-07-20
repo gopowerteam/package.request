@@ -4,12 +4,18 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ConfigFileName = '.config.json'
-const ConfigFilePath = path.resolve('.request', ConfigFileName)
 
 interface ConfigFileItem {
   name: string
   md5: string
   updatedAt: string
+}
+
+/**
+ * 配置文件路径(延迟解析,允许运行时切换 cwd,便于测试)
+ */
+function getConfigFilePath(): string {
+  return path.resolve('.request', ConfigFileName)
 }
 
 /**
@@ -57,7 +63,7 @@ export function isNeedUpdate(name: string, config: ConfigFileItem[], output: str
 
   // 读取文件的MD5值
   const data = fs.readFileSync(file)
-  const md5 = crypto.createHash('md5').update(data.toString()).digest('hex')
+  const md5 = crypto.createHash('md5').update(data).digest('hex')
 
   // output目录不存在直接重新生成
   if (!fs.existsSync(path.join(outputDir, name))) {
@@ -74,12 +80,14 @@ export function isNeedUpdate(name: string, config: ConfigFileItem[], output: str
 }
 
 export function readLocalConfig(): ConfigFileItem[] {
-  if (!fs.existsSync(ConfigFilePath)) {
+  const configFilePath = getConfigFilePath()
+
+  if (!fs.existsSync(configFilePath)) {
     return []
   }
 
   // 读取本地配置文件
-  const data = fs.readFileSync(ConfigFilePath, 'utf-8')
+  const data = fs.readFileSync(configFilePath, 'utf-8')
   return JSON.parse(data) as ConfigFileItem[]
 }
 
@@ -100,5 +108,5 @@ export function writeLocalConfig(toUpdateOptions: Map<string, string>, config: C
     }
   })
 
-  fs.writeFileSync(ConfigFilePath, JSON.stringify(config, null, 2))
+  fs.writeFileSync(getConfigFilePath(), JSON.stringify(config, null, 2))
 }
