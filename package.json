@@ -22,12 +22,12 @@
     "cs:version": "changeset version",
     "cs:tag": "changeset tag",
     "prerelease": "pnpm build",
-    "release": "changeset publish",
+    "release": "changeset publish --provenance",
     "prepare": "husky",
     "commit": "git-cz",
     "preinstall": "npx only-allow pnpm",
     "cs": "changeset && changeset version",
-    "publish-packages": "turbo run build && changeset version && changeset publish"
+    "publish-packages": "turbo run build && changeset version && changeset publish --provenance"
   },
   "workspaces": [
     "playground/*",

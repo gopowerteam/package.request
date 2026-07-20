@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.3.6
+
+### Patch Changes
+
+- 修复已知问题
+
 ## 0.3.5
 
 ### Patch Changes
