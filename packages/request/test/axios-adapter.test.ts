@@ -155,3 +155,123 @@ describe('axiosAdapter - Axios HTTP 客户端适配器', () => {
     })
   })
 })
+
+describe('axiosAdapter - Content-Type 注入(按运行时 body 类型)', () => {
+  // 取最近一次 axiosInstance.request 调用的参数
+  const lastRequestCall = (): any => {
+    const cachedInstance = (AxiosAdapter as any).axiosInstance
+    return cachedInstance.request.mock.calls.at(-1)[0]
+  }
+
+  const setupAdapter = (): AxiosAdapter => {
+    const a = new AxiosAdapter()
+    a.injectConfig({ gateway: 'https://api.test' } as any)
+    return a
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // 重置静态缓存的 axiosInstance,确保每个用例独立触发 create + headers 流程
+    ;(AxiosAdapter as any).axiosInstance = undefined
+  })
+
+  it('formData body 应设置 Content-Type: false(让浏览器补 boundary)', async () => {
+    const adapter = setupAdapter()
+    const fd = new FormData()
+    fd.append('file', new Blob(['x']), 't.txt')
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/upload',
+      method: 'POST',
+      headers: {},
+      paramsBody: fd,
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBe(false)
+  })
+
+  it('uRLSearchParams body 应设置 Content-Type: false', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/form',
+      method: 'POST',
+      headers: {},
+      paramsBody: new URLSearchParams('a=1'),
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBe(false)
+  })
+
+  it('blob body 应设置 Content-Type: application/octet-stream(A 端兜底)', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/upload',
+      method: 'POST',
+      headers: {},
+      paramsBody: new Blob(['x']),
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBe('application/octet-stream')
+  })
+
+  it('普通对象 body 不应注入 Content-Type(走 axios 实例默认的 application/json)', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/users',
+      method: 'POST',
+      headers: {},
+      paramsBody: { name: 'foo' },
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBeUndefined()
+  })
+
+  it('无 body GET 不应注入 Content-Type', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/users',
+      method: 'GET',
+      headers: {},
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBeUndefined()
+  })
+
+  it('调用方显式设置 Content-Type 时不应被覆盖', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/upload',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/pdf' },
+      paramsBody: new Blob(['x']),
+    })
+
+    expect(lastRequestCall().headers['Content-Type']).toBe('application/pdf')
+  })
+
+  it('大小写不敏感识别调用方已设的 content-type', async () => {
+    const adapter = setupAdapter()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/upload',
+      method: 'POST',
+      headers: { 'content-type': 'text/xml' },
+      paramsBody: new Blob(['x']),
+    })
+
+    expect(lastRequestCall().headers['content-type']).toBe('text/xml')
+    expect(lastRequestCall().headers['Content-Type']).toBeUndefined()
+  })
+})

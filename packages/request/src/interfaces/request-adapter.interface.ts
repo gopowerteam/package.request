@@ -29,7 +29,7 @@ export interface RequestAdapter {
 export interface RequestAdapterOptions {
   baseURL: string
   pathURL: string
-  headers: Record<string, string>
+  headers: Record<string, string | boolean>
   method: RequestMethod | string
   paramsQuery?: Record<string, any>
   paramsBody?: any

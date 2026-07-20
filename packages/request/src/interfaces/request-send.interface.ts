@@ -15,7 +15,7 @@ export interface RequestSendOptions {
   service?: string
   path: string
   method: RequestMethod | string
-  headers?: Record<string, string>
+  headers?: Record<string, string | boolean>
   paramsPath?: Record<string, string | number>
   paramsQuery?: Record<string, any>
   paramsBody?: any

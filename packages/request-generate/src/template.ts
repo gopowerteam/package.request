@@ -6,6 +6,8 @@ import Handlebars from 'handlebars'
 import { equalHelper } from './template-helpers/equal.helper'
 import { includeQueryParams } from './template-helpers/include-query-params'
 import { isArrayHelper } from './template-helpers/is-array.helper'
+import { isJsonMediaHelper } from './template-helpers/is-json-media.helper'
+import { isMultipartHelper } from './template-helpers/is-multipart.helper'
 import { toUpperHelper } from './template-helpers/to-upper.helper'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -41,6 +43,8 @@ function registerHandlebarHelpers() {
   registerHandlebarHelper(isArrayHelper)
   registerHandlebarHelper(toUpperHelper)
   registerHandlebarHelper(includeQueryParams)
+  registerHandlebarHelper(isJsonMediaHelper)
+  registerHandlebarHelper(isMultipartHelper)
 }
 
 function registerHandlebarHelper(helper: {

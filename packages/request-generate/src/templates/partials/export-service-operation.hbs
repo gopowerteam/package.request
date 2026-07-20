@@ -35,6 +35,13 @@ public {{{name}}}(
     paramsQuery: requestQuery,
     {{/if}}
     {{#if parametersBody}}
+    {{#if parametersBody.mediaType}}
+    {{#unless (is-json-media parametersBody.mediaType)}}
+    {{#unless (is-multipart parametersBody.mediaType)}}
+    headers: { 'Content-Type': '{{parametersBody.mediaType}}' },
+    {{/unless}}
+    {{/unless}}
+    {{/if}}
     paramsBody: requestBody,
     {{/if}}
   }

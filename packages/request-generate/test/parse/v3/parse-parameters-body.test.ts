@@ -19,6 +19,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       )
       expect(param.ref).toBe('User')
       expect(param.imports).toContain('User')
+      expect(param.mediaType).toBeUndefined()
     })
 
     it('application/json; charset=utf-8 应被识别为 JSON 家族', () => {
@@ -34,6 +35,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('string')
+      expect(param.mediaType).toBeUndefined()
     })
 
     it('application/problem+json 应被识别为 JSON 家族', () => {
@@ -49,6 +51,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       )
       expect(param.ref).toBe('Error')
       expect(param.imports).toContain('Error')
+      expect(param.mediaType).toBeUndefined()
     })
 
     it('*/* media 应按 JSON 解析 schema', () => {
@@ -61,6 +64,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.ref).toBe('Anything')
+      expect(param.mediaType).toBeUndefined()
     })
   })
 
@@ -83,6 +87,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       expect(param.type).toBe('FormData')
       expect(param.ref).toBe('FormData')
       expect(param.imports).toEqual([])
+      expect(param.mediaType).toBe('multipart/form-data')
     })
 
     it('application/octet-stream 无 schema 时应映射为 Blob', () => {
@@ -94,6 +99,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       )
       expect(param.type).toBe('Blob')
       expect(param.ref).toBe('Blob')
+      expect(param.mediaType).toBe('application/octet-stream')
     })
 
     it('application/octet-stream 有 schema 时也应映射为 Blob', () => {
@@ -108,6 +114,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('Blob')
+      expect(param.mediaType).toBe('application/octet-stream')
     })
 
     it('application/x-www-form-urlencoded 应映射为 URLSearchParams', () => {
@@ -120,6 +127,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('URLSearchParams')
+      expect(param.mediaType).toBe('application/x-www-form-urlencoded')
     })
 
     it('text/plain 应映射为 string', () => {
@@ -130,6 +138,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('string')
+      expect(param.mediaType).toBe('text/plain')
     })
 
     it('image/png 应映射为 Blob', () => {
@@ -140,6 +149,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('Blob')
+      expect(param.mediaType).toBe('image/png')
     })
   })
 
@@ -155,6 +165,8 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.ref).toBe('Payload')
+      // JSON 家族命中 → mediaType 不写入,模板走 axios 实例默认
+      expect(param.mediaType).toBeUndefined()
     })
 
     it('未知 media 有 schema 时应回退解析 schema', () => {
@@ -169,6 +181,8 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.ref).toBe('Custom')
+      // 未知 media 兜底走 schema → 不注入 headers(JSON 默认)
+      expect(param.mediaType).toBeUndefined()
     })
 
     it('未知 media 无 schema 时应回退为 any', () => {
@@ -179,6 +193,7 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
         ctx,
       )
       expect(param.type).toBe('any')
+      expect(param.mediaType).toBeUndefined()
     })
   })
 
@@ -190,6 +205,8 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       )
       expect(param.ref).toBe('UserBody')
       expect(param.imports).toContain('UserBody')
+      // $ref 不经过 media-type 分类 → 无 mediaType(JSON 默认)
+      expect(param.mediaType).toBeUndefined()
     })
   })
 

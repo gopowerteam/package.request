@@ -19,9 +19,16 @@ export interface ParseContext {
 }
 
 /**
+ * 扩展 SchemaType,附加选中的 media-type 字符串
+ * - mediaType 仅在选中"已知非 JSON 家族"媒体时写入(multipart/binary/urlencoded/text)
+ * - JSON 家族 / 未知 media 兜底 → mediaType 为 undefined
+ */
+export type ResolvedSchema = SchemaType & { mediaType?: string }
+
+/**
  * 按优先级解析 content map(RequestBody 与 Response 共用):
  *   1. JSON 家族(含通配符) 且有 schema  → parseSchemaType
- *   2. 已知非 JSON media(multipart/binary/urlencoded/text)→ 整体类型映射
+ *   2. 已知非 JSON media(multipart/binary/urlencoded/text)→ 整体类型映射 + mediaType
  *   3. 未知 media 且有 schema              → parseSchemaType 兜底
  *   4. 无任何 schema                       → 整体类型映射(基于第一个 media)
  *
@@ -33,14 +40,14 @@ export function resolveFromContent(
   content: ContentObject,
   context: ParseContext,
   label: string,
-): SchemaType {
+): ResolvedSchema {
   const entries = Object.entries(content)
 
   if (entries.length === 0) {
     throw new ParseMediaError(context, label, `${label}.content 为空对象`)
   }
 
-  // 1. JSON 家族 + 通配符 优先,且需有 schema
+  // 1. JSON 家族 + 通配符 优先,且需有 schema → 不写 mediaType(走 axios 实例默认)
   const jsonEntry = entries.find(
     ([mt, m]) => classifyMediaType(mt) === 'json' && m?.schema,
   )
@@ -48,23 +55,23 @@ export function resolveFromContent(
     return parseSchemaType(jsonEntry[1]!.schema!)
   }
 
-  // 2. 已知非 JSON media(multipart/binary/urlencoded/text)→ 整体类型映射
+  // 2. 已知非 JSON media(multipart/binary/urlencoded/text)→ 整体类型映射 + 附带 mediaType
   const typedEntry = entries.find(([mt]) => {
     const kind = classifyMediaType(mt)
     return kind !== 'json' && kind !== 'unknown'
   })
   if (typedEntry) {
-    const kind = classifyMediaType(typedEntry[0])
-    return { ...MEDIA_TYPE_TS_MAPPING[kind] }
+    const [mediaType, kind] = [typedEntry[0], classifyMediaType(typedEntry[0])]
+    return { ...MEDIA_TYPE_TS_MAPPING[kind], mediaType }
   }
 
-  // 3. 未知 media 且有 schema → 兜底用 schema
+  // 3. 未知 media 且有 schema → 兜底用 schema(不写 mediaType)
   const unknownWithSchema = entries.find(([, m]) => m?.schema)
   if (unknownWithSchema) {
     return parseSchemaType(unknownWithSchema[1]!.schema!)
   }
 
-  // 4. 实在没 schema,按第一个 media 的类别兜底
+  // 4. 实在没 schema,按第一个 media 的类别兜底(不写 mediaType)
   const [fallbackMediaType] = entries[0]
   const fallbackKind = classifyMediaType(fallbackMediaType)
   return { ...MEDIA_TYPE_TS_MAPPING[fallbackKind] }

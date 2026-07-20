@@ -14,7 +14,7 @@ export function parseParametersBody(
   requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
   context: ParseContext,
 ): OperationParameter {
-  const { type, ref, imports } = parseBodyType(requestBody, context)
+  const { type, ref, imports, mediaType } = parseBodyType(requestBody, context)
 
   const parameter = new OperationParameter()
 
@@ -23,6 +23,7 @@ export function parseParametersBody(
   parameter.type = type
   parameter.ref = ref
   parameter.imports = imports || []
+  parameter.mediaType = mediaType
 
   return parameter
 }

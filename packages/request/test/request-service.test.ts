@@ -32,7 +32,7 @@ describe('测试RequestService', () => {
     // 请求数据
     const data = await request.send(
       {
-        path: '/dso-org-service/api/appModule/all',
+        path: '/dso-org-service/api/system/setting/all',
         method: 'GET',
       },
       [],
@@ -84,7 +84,7 @@ describe('测试RequestService', () => {
     // 请求数据
     await request.send(
       {
-        path: '/dso-org-service/api/appModule/all',
+        path: '/dso-org-service/api/system/setting/all',
         method: 'GET',
         paramsQuery: {
           a: [1, 2, 3, 4, 5],

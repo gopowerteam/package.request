@@ -8,6 +8,12 @@ import type {
 } from '../interfaces/request-adapter.interface'
 import axios from 'axios'
 import * as qs from 'qs'
+import {
+  hasContentTypeHeader,
+  isBlob,
+  isFormData,
+  isURLSearchParams,
+} from '../utils/content-type'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance
@@ -69,12 +75,42 @@ export class AxiosAdapter implements RequestAdapter {
     return axiosInstance.request({
       method,
       baseURL,
-      headers,
+      headers: this.applyContentTypeHeader(headers, paramsBody),
       params: paramsQuery,
       data: paramsBody,
       url: pathURL,
       ...extraParams,
     })
+  }
+
+  /**
+   * 按运行时 body 类型推断 Content-Type
+   * - 调用方显式设置 → 不覆盖(守卫 1)
+   * - FormData / URLSearchParams → false(让 axios/浏览器自动补 boundary / charset)
+   * - Blob → application/octet-stream(A 端兜底,B 端若已注入精确类型会走守卫 1)
+   * - 其他(对象/数组/字符串/undefined)→ 不写头,沿用 axios 实例默认的 application/json
+   */
+  private applyContentTypeHeader(
+    headers: Record<string, string | boolean>,
+    paramsBody: unknown,
+  ): Record<string, string | boolean> {
+    const result: Record<string, string | boolean> = { ...headers }
+
+    // 守卫 1:调用方显式设置了 Content-Type(大小写不敏感)→ 完全尊重
+    if (hasContentTypeHeader(result)) {
+      return result
+    }
+
+    // 仅对明确的非 JSON 运行时类型介入
+    if (isFormData(paramsBody) || isURLSearchParams(paramsBody)) {
+      result['Content-Type'] = false
+    }
+    else if (isBlob(paramsBody)) {
+      result['Content-Type'] = 'application/octet-stream'
+    }
+
+    // 其他情况不写头 → axios 实例默认 application/json 自动生效
+    return result
   }
 
   /**
