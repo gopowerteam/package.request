@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vue-tsc -b && request-download && vite build",
     "preview": "vite preview",
     "request:download": "request-download",
     "request:generate": "request-generate"

@@ -223,8 +223,20 @@ function generateDeclare(
     MODULE_ID,
   })
 
+  // 目标声明文件路径
+  const declarationFilePath = path.resolve(
+    viteConfig.root,
+    typeof options.dts === 'string' ? options.dts : DECLARATION_FILE,
+  )
+
+  // 确保目标目录存在
+  const declarationFileDir = path.dirname(declarationFilePath)
+  if (!fs.existsSync(declarationFileDir)) {
+    fs.mkdirSync(declarationFileDir, { recursive: true })
+  }
+
   fs.writeFileSync(
-    path.resolve(viteConfig.root, typeof options.dts === 'string' ? options.dts : DECLARATION_FILE),
+    declarationFilePath,
     content.replace(/\r\n/g, '\n'),
     'utf-8',
   )
