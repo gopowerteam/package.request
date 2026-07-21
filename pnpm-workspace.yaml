@@ -1,3 +1,4 @@
+minimumReleaseAge: 0
 publicHoistPattern:
   - '@vue/runtime-core'
   - exceljs
