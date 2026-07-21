@@ -1,8 +1,8 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import type { ParseContext, ResolvedSchema } from './resolve-content'
+import type { ParseContext, ResolvedSchema } from './parse-content'
 import { OperationParameter } from '../../entities/operation-parameter'
+import { ParseMediaError, resolveFromContent } from './parse-content'
 import { parseSchemaType } from './parse-schema-type'
-import { ParseMediaError, resolveFromContent } from './resolve-content'
 
 /**
  * 兼容别名:与 ParseContext 等价

@@ -1,12 +1,12 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import type { ParseContext } from './resolve-content'
+import type { ParseContext } from './parse-content'
 import { Operation } from '../../entities/operation'
 import { getOperationName } from '../../utils/get-operation-name'
+import { resolveFromContent } from './parse-content'
 import { parseParametersBody } from './parse-parameters-body'
 import { parseParametersPath } from './parse-parameters-path'
 import { parseParametersQuery } from './parse-parameters-query'
 import { parseSchemaType } from './parse-schema-type'
-import { resolveFromContent } from './resolve-content'
 
 export function parseOperation(
   path: string,
