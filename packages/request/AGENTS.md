@@ -142,7 +142,7 @@ export class RequestService {
 
 ### Exports
 
-Entry points defined in `tsup.config.ts`:
+Entry points defined in `tsdown.config.ts`:
 
 - `src/index.ts` → Main export
 - `src/adapters/index.ts` → Adapters export
@@ -157,7 +157,7 @@ Entry points defined in `tsup.config.ts`:
 ### Dev Dependencies
 
 - **vitest** - Testing
-- **tsup** - Bundler (ESM + CJS)
+- **tsdown** - Bundler (ESM + CJS)
 - **typescript** - v5.9.3
 
 <!-- MANUAL: Custom project notes can be added below -->

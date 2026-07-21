@@ -180,7 +180,7 @@ function getServiceGroups(services: ServiceItem[]) {
 
     group.services.push(s)
 
-    if (!r.find(g => g === group)) {
+    if (!r.includes(group)) {
       r.push(group)
     }
 

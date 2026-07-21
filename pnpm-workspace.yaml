@@ -1,3 +1,10 @@
+publicHoistPattern:
+  - '@vue/runtime-core'
+  - exceljs
+
+shellEmulator: true
+trustPolicy: no-downgrade
+
 packages:
   - playground/*
   - packages/*
@@ -6,8 +13,7 @@ onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
 
-publicHoistPattern:
-  - '@vue/runtime-core'
-  - exceljs
-
 registry: https://registry.npmmirror.com
+
+allowBuilds:
+  esbuild: true

@@ -150,7 +150,7 @@ export function requestGeneratePlugin(options: PluginOptions): Plugin
 
 ### Exports
 
-Entry points (tsup.config.ts):
+Entry points (tsdown.config.mts):
 
 - `src/index.ts` → Main library
 - `src/vite-plugin/index.ts` → Vite plugin
@@ -177,7 +177,7 @@ Output: ESM + CJS with d.ts declarations
 
 - **vite** - For plugin testing
 - **vitest** - Testing
-- **tsup** - Bundler
+- **tsdown** - Bundler
 - **typescript** - v5.9.3
 
 <!-- MANUAL: Custom project notes can be added below -->

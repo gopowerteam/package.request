@@ -9,8 +9,8 @@ services from OpenAPI/Swagger specs).
 
 ## Toolchain (verify before assuming)
 
-- **pnpm 10.24.0** — enforced via `preinstall: only-allow pnpm`. Do NOT use npm/yarn.
-- **Node ≥ 18** (`engines`); CI and `playground/test-vite` target **Node 24**.
+- **pnpm 11.15.1** — enforced via `preinstall: only-allow pnpm`. Do NOT use npm/yarn.
+- **Node ≥ 22.12** (`engines`, driven by commitlint 21 requirement); CI and `playground/test-vite` target **Node 24**.
 - **TypeScript ^5.9.3**, target `ESNext`, `moduleResolution: bundler`, `strict: true`,
   `noUnusedLocals` / `noUnusedParameters` / `noImplicitReturns` on.
 - **Bundler is `tsdown`** (NOT `tsup` — the old docs were wrong). Each package has its own

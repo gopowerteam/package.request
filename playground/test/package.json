@@ -1,7 +1,7 @@
 {
   "name": "playground-test",
   "type": "module",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "private": true,
   "scripts": {
     "dev": "tsx ./src/request-generate/index.ts && tsx ./src/request/index.ts",
@@ -14,8 +14,8 @@
     "@gopowerteam/request-generate": "workspace:*"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "ts-node": "10.9.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
   }
 }
