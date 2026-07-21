@@ -1,6 +1,5 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import type { SchemaType } from '../../types/schema-type'
-import type { ParseContext } from './resolve-content'
+import type { ParseContext, ResolvedSchema } from './resolve-content'
 import { OperationParameter } from '../../entities/operation-parameter'
 import { parseSchemaType } from './parse-schema-type'
 import { ParseMediaError, resolveFromContent } from './resolve-content'
@@ -31,7 +30,7 @@ export function parseParametersBody(
 function parseBodyType(
   requestBody: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
   context: ParseContext,
-): SchemaType {
+): ResolvedSchema {
   // 引用直接类型转换
   if ('$ref' in requestBody) {
     return parseSchemaType(requestBody)
