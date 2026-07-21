@@ -1,5 +1,86 @@
 # @gopowerteam/request-generate
 
+## 0.4.0
+
+### Minor Changes
+
+- e0dcec5: 支持 multipart/binary/urlencoded/text 等 media 类型的 Content-Type 自动注入。
+
+  ## @gopowerteam/request
+
+  - AxiosAdapter 新增按运行时 body 类型推断 Content-Type 的逻辑
+    - FormData / URLSearchParams → 设置 `Content-Type: false`,让浏览器/axios 自动补 boundary 与 charset
+    - Blob → 兜底 `application/octet-stream`(B 端注入精确类型时不介入)
+    - 调用方显式设置 Content-Type 时绝对优先(大小写不敏感守卫)
+    - 其他类型(对象/数组/字符串/undefined)不写头,沿用 axios 实例默认的 `application/json`
+  - 新增 `src/utils/content-type.ts` 工具模块
+  - `RequestSendOptions.headers` / `RequestAdapterOptions.headers` 类型扩展为 `Record<string, string | boolean>`,以承载 axios `false` 哨兵语义(向后兼容)
+
+  ## @gopowerteam/request-generate
+
+  - V3 parser 在选中"已知非 JSON media"时把 media-type 字符串透传到 `OperationParameter.mediaType`
+  - 模板 `export-service-operation.hbs` 对非 JSON 且非 multipart 的 body 自动注入 `headers: { 'Content-Type': '<media>' }`
+  - multipart/form-data 显式跳过静态头注入(boundary 必须由运行时计算)
+  - 新增 `is-json-media` / `is-multipart` 两个 Handlebars helper
+  - JSON 家族 / `$ref` body / 未知 media → 不注入 headers,走 axios 实例默认的 application/json
+
+- 完善整体逻辑性
+- ea489d3: V2 parser 全面对齐 V3 实现,补齐 media-type 与组合类型支持。
+
+  ## V2 parse-schema-type - 组合类型支持(原 P0)
+
+  - 补齐 allOf/anyOf/oneOf 分支(与 V3 实现对齐),原本直接抛 "无法解析相应的 schema" 错误
+  - 新分支位置在 object 兜底之前,避免 `{ type: 'object', allOf: [...] }` 静默丢失 allOf
+
+  ## V2 media-type 支持(原 P1)
+
+  - Phase 1.1:将 `media-type.ts` 提取到共享位置 `src/utils/get-media-type.ts`,V2 与 V3 共用 `classifyMediaType` 与 `MEDIA_TYPE_TS_MAPPING`
+  - Phase 1.2:V2 `parseParametersBody` 支持 consumes 参数
+    - 非\_JSON consumes(multipart/binary/urlencoded/text)→ 整体类型映射 + mediaType 注入
+    - JSON 家族 consumes → 走 schema 派生,不写 mediaType(走 axios 实例默认)
+    - 多 consumes 共存时 JSON 优先(与 V3 行为一致)
+    - `operation.consumes` 优先于 `document.consumes`
+  - Phase 1.3:V2 formData 参数聚合
+    - formData 参数 + `multipart/form-data` consumes → 聚合为单一 FormData body
+    - formData 参数 + 无 consumes / 非 multipart consumes → 静默丢弃(向后兼容)
+
+  ## 行为契约
+
+  | V2 输入                               | 旧行为                 | 新行为                                  |
+  | ------------------------------------- | ---------------------- | --------------------------------------- |
+  | allOf/anyOf/oneOf schema              | 抛错                   | 按 V3 规则解析为 `any` 或 `\|` 联合类型 |
+  | body + `['application/pdf']` consumes | schema 派生(如 string) | Blob + mediaType                        |
+  | body + JSON 家族 consumes             | schema 派生            | 不变(JSON 守卫)                         |
+  | formData + multipart consumes         | formData 被丢弃        | 聚合为 FormData body                    |
+  | formData + 无 consumes                | 丢弃                   | 静默丢弃(决策一致)                      |
+
+- 7f6b006: V2 parser 测试覆盖补全 + 响应类型推导对齐 V3 + 死代码清理。
+
+  ## 响应类型推导对齐 V3(P3 核心)
+
+  - 修复 V2 `parse-operation.ts:45` 的 responseRef 兜底链:
+    - 旧:`responseSchema?.ref || 'void'`(inline schema 响应全部丢类型 → 错误的 `Promise<void>`)
+    - 新:`responseSchema?.ref || responseSchema?.type || 'void'`(与 V3 对齐)
+  - 影响:inline schema 响应(string/integer/boolean/object/array of primitives 等)现在正确派生为对应类型
+  - `$ref` 响应、parseResponseType void 兜底路径均无变化
+
+  ## V2 测试覆盖补全(P2)
+
+  新增 5 个测试文件共 ~44 用例:
+
+  - `parse-parameters-path.test.ts`(6 用例)
+  - `parse-parameters-query.test.ts`(13 用例,含 excludeQueryParams 与点号名转义)
+  - `parse-field.test.ts`(8 用例,含 $ref/enum/array)
+  - `parse-model.test.ts`(7 用例,含自引用过滤关键不变量)
+  - `parse-response.test.ts`(13 用例,对齐 V3 的 parse-response.test.ts)
+
+  V2 测试总数:36 → ~80,基本对齐 V3 的 ~60 用例(部分场景因 V2 简单不需要)。
+
+  ## 死代码清理
+
+  - `parse-parameters-query.ts`:删除 line 40-51 的历史实验代码注释块(零行为影响)
+  - `parse-schema-type.ts`:删除 object 兜底分支(P0 引入 allOf 分支后已不可达,数学证明 + 回归测试保护)
+
 ## 0.3.6
 
 ### Patch Changes

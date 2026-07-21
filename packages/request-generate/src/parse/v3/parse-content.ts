@@ -26,6 +26,28 @@ export interface ParseContext {
 export type ResolvedSchema = SchemaType & { mediaType?: string }
 
 /**
+ * 错误信息标签:标识当前解析的是请求体还是响应
+ */
+export type MediaLabel = 'RequestBody' | 'Response'
+
+/**
+ * Media 解析错误(含 path/method/operationId 上下文)
+ */
+export class ParseMediaError extends Error {
+  constructor(
+    { path, method, operationId }: ParseContext,
+    label: MediaLabel,
+    detail: string,
+  ) {
+    const opLabel = operationId ? ` "${operationId}"` : ''
+    super(
+      `[V3 ${label} 解析失败] ${method.toUpperCase()} ${path}${opLabel}: ${detail}`,
+    )
+    this.name = 'ParseMediaError'
+  }
+}
+
+/**
  * 按优先级解析 content map(RequestBody 与 Response 共用):
  *   1. JSON 家族(含通配符) 且有 schema  → parseSchemaType
  *   2. 已知非 JSON media(multipart/binary/urlencoded/text)→ 整体类型映射 + mediaType
@@ -39,7 +61,7 @@ export type ResolvedSchema = SchemaType & { mediaType?: string }
 export function resolveFromContent(
   content: ContentObject,
   context: ParseContext,
-  label: string,
+  label: MediaLabel,
 ): ResolvedSchema {
   const entries = Object.entries(content)
 
@@ -61,7 +83,8 @@ export function resolveFromContent(
     return kind !== 'json' && kind !== 'unknown'
   })
   if (typedEntry) {
-    const [mediaType, kind] = [typedEntry[0], classifyMediaType(typedEntry[0])]
+    const [mediaType] = typedEntry
+    const kind = classifyMediaType(mediaType)
     return { ...MEDIA_TYPE_TS_MAPPING[kind], mediaType }
   }
 
@@ -75,21 +98,4 @@ export function resolveFromContent(
   const [fallbackMediaType] = entries[0]
   const fallbackKind = classifyMediaType(fallbackMediaType)
   return { ...MEDIA_TYPE_TS_MAPPING[fallbackKind] }
-}
-
-/**
- * Media 解析错误(含 path/method/operationId 上下文)
- */
-export class ParseMediaError extends Error {
-  constructor(
-    { path, method, operationId }: ParseContext,
-    label: string,
-    detail: string,
-  ) {
-    const opLabel = operationId ? ` "${operationId}"` : ''
-    super(
-      `[V3 ${label} 解析失败] ${method.toUpperCase()} ${path}${opLabel}: ${detail}`,
-    )
-    this.name = 'ParseMediaError'
-  }
 }
