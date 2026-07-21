@@ -1,4 +1,4 @@
-import { classifyMediaType } from '../parse/v3/media-type'
+import { classifyMediaType } from '../utils/get-media-type'
 
 /**
  * Handlebars helper:判定 media-type 字符串是否为 multipart/form-data 家族

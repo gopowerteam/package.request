@@ -10,6 +10,7 @@ export function parseOperation(
   path: string,
   method: string,
   operationObject: OpenAPIV2.OperationObject,
+  documentConsumes: string[] = [],
 ) {
   const name = getOperationName(path, method, operationObject)
 
@@ -19,7 +20,12 @@ export function parseOperation(
   operation.description = operationObject.summary || operation.description
 
   if (operationObject.parameters) {
-    operation.parametersBody = parseParametersBody(operationObject.parameters)
+    // operation.consumes 优先于 document.consumes
+    const effectiveConsumes = operationObject.consumes || documentConsumes
+    operation.parametersBody = parseParametersBody(
+      operationObject.parameters,
+      effectiveConsumes,
+    )
     operation.parametersPath = parseParametersPath(operationObject.parameters)
     operation.parametersQuery = parseParametersQuery(operationObject.parameters)
   }

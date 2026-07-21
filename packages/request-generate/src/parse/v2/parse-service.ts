@@ -9,6 +9,7 @@ export function parseService(
   operationObject: OpenAPIV2.OperationObject,
   tags: OpenAPIV2.TagObject[],
   services: Service[],
+  documentConsumes: string[] = [],
 ) {
   const toNames = (name: string | string[]) =>
     Array.isArray(name) ? name : [name]
@@ -23,7 +24,7 @@ export function parseService(
   )
 
   // 生成Operation
-  const operation = parseOperation(path, method, operationObject)
+  const operation = parseOperation(path, method, operationObject, documentConsumes)
 
   // 生成Service
   names.forEach((name) => {

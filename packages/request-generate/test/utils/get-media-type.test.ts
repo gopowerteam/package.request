@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   classifyMediaType,
   MEDIA_TYPE_TS_MAPPING,
-} from '../../../src/parse/v3/media-type'
+} from '../../src/utils/get-media-type'
 
 describe('classifyMediaType - media 类型分类', () => {
   describe('jSON 家族', () => {

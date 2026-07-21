@@ -5,6 +5,7 @@ import { parseService } from './parse-service'
 
 export function parseServices(document: OpenAPIV2.Document) {
   const services: Service[] = []
+  const documentConsumes = document.consumes || []
 
   Object.entries(document.paths).forEach(([path, pathObject]) => {
     if (pathObject) {
@@ -20,6 +21,7 @@ export function parseServices(document: OpenAPIV2.Document) {
           operationObject as OpenAPIV2.OperationObject,
           document.tags || [],
           services,
+          documentConsumes,
         )
       })
     }

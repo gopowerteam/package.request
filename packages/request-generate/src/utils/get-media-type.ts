@@ -1,4 +1,4 @@
-import type { SchemaType } from '../../types/schema-type'
+import type { SchemaType } from '../types/schema-type'
 
 export type MediaTypeKind
   = | 'json'

@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from 'openapi-types'
 import type { SchemaType } from '../../types/schema-type'
-import { classifyMediaType, MEDIA_TYPE_TS_MAPPING } from './media-type'
+import { classifyMediaType, MEDIA_TYPE_TS_MAPPING } from '../../utils/get-media-type'
 import { parseSchemaType } from './parse-schema-type'
 
 /**

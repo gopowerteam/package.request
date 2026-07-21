@@ -68,14 +68,44 @@ export function parseSchemaType(
     }
   }
 
+  // AllOf|AnyOf|OneOf 类型(与 V3 实现对齐)
+  // 注意:必须插在 object 兜底分支之前,否则 { type: 'object', allOf: [...] } 会被静默丢弃 allOf
+  if (!('$ref' in schema) && (schema.allOf || schema.anyOf || schema.oneOf)) {
+    const ofSchema = schema.allOf || schema.anyOf || schema.oneOf
+
+    const ofSchemaArray = ofSchema?.map(s =>
+      parseSchemaType(s as OpenAPIV2.ReferenceObject | OpenAPIV2.SchemaObject),
+    )
+
+    if (ofSchemaArray) {
+      const hasRef = ofSchemaArray.some(s => s.ref)
+
+      return {
+        type: hasRef ? 'any' : ofSchemaArray.map(s => s.type).join('|'),
+        ref: hasRef
+          ? ofSchemaArray
+              .map(s => (s.ref && getCamelName(s.ref)) || s.type)
+              .join('|')
+          : undefined,
+        imports: hasRef
+          ? ofSchemaArray.reduce<string[]>(
+              (r, s) => (
+              // eslint-disable-next-line no-sequences
+                s.ref && !r.includes(s.ref) && r.push(getCamelName(s.ref)), r
+              ),
+              [],
+            )
+          : undefined,
+      }
+    }
+  }
+
   if (!('$ref' in schema) && schema.type === 'object') {
     return {
       type: getMappedType(schema.type),
       ref: 'any',
     }
   }
-
-  // TODO: 多类型处理
 
   throw new Error(`无法解析相应的schema: ${JSON.stringify(schema).slice(0, 200)}`)
 }
