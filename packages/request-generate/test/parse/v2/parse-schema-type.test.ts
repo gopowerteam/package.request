@@ -91,4 +91,25 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
       expect(result.ref).toBe('Mixin')
     })
   })
+
+  describe('object 类型解析(由 NonArray 分支处理,不经 object 兜底)', () => {
+    it('{ type: "object" } 无 properties 应通过 NonArray 分支返回 type=any', () => {
+      // 关键回归:确认 object 兜底分支是死代码(决策 1-X)
+      // 删除 object 兜底后此用例仍应通过,因为 NonArray 已处理
+      const result = parseSchemaType({ type: 'object' })
+      expect(result.type).toBe('any')
+      // ref 为 undefined:V2 parse-operation.ts 用 ref || 'void' 兜底
+      expect(result.ref).toBeUndefined()
+    })
+
+    it('{ type: "object", properties: {...} } 应同样走 NonArray(不依赖 properties)', () => {
+      // NonArray 不检查 properties,只要 type 是 string 且无 allOf/anyOf/oneOf 就命中
+      const result = parseSchemaType({
+        type: 'object',
+        properties: { id: { type: 'string' } },
+      })
+      expect(result.type).toBe('any')
+      expect(result.ref).toBeUndefined()
+    })
+  })
 })

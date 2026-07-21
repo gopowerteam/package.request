@@ -100,12 +100,11 @@ export function parseSchemaType(
     }
   }
 
-  if (!('$ref' in schema) && schema.type === 'object') {
-    return {
-      type: getMappedType(schema.type),
-      ref: 'any',
-    }
-  }
+  // 注:V2 历史上的 `schema.type === 'object'` 兜底分支已被删除。
+  // 原因:NonArray 分支(上方)的守卫不拒绝 type='object',已先行处理所有
+  // { type: 'object' } 与 { type: 'object', properties: ... } 场景。
+  // 加上 P0 引入的 allOf 分支后,object 兜底分支已无可达路径,确认为死代码。
+  // 见 test/parse/v2/parse-schema-type.test.ts 的回归测试。
 
   throw new Error(`无法解析相应的schema: ${JSON.stringify(schema).slice(0, 200)}`)
 }
