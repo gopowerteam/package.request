@@ -17,8 +17,8 @@ export function writeServices(
   // 输出路径
   const output = path.join(options.output, 'services')
 
-  // 安全清空历史文件(仅当目录由本工具生成时才会清空)
-  const markerPath = safeClearGeneratedDir(output)
+  // 安全清空历史文件(仅当目录由本工具生成时才会清空,forceClear 可跳过标记检查)
+  const markerPath = safeClearGeneratedDir(output, options.forceClear ?? false)
 
   // 写入Services
   client.services.forEach((service) => {

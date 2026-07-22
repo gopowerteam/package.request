@@ -1,7 +1,7 @@
 {
   "name": "playground-test",
   "type": "module",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": true,
   "scripts": {
     "dev": "tsx ./src/request-generate/index.ts && tsx ./src/request/index.ts",

@@ -19,10 +19,16 @@ const params = program
   .name('@gopowerteam/request-generate')
   .usage('[options]')
   .option('--config <value>', '指定配置文件位置')
+  .option('--force', '强制清空输出目录(跳过 .generated 标记检查)')
   .parse(process.argv)
   .opts()
 
 const { default: config } = await loadConfigFile(params.config)
+
+// CLI --force 覆盖配置中的 forceClear
+if (params.force) {
+  config.forceClear = true
+}
 
 try {
   await RequestGenerate.generate(config)

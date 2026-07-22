@@ -14,6 +14,8 @@ export interface GenerateOptions {
   exportModels: boolean
   // 开启日志输出
   logger?: boolean
+  // 强制清空输出目录(跳过 .generated 标记检查,用于旧项目迁移)
+  forceClear?: boolean
   // 输出Model路径
   exportServices?: {
     serviceResolve?: (options: {
@@ -48,7 +50,7 @@ export type ApplicationConfig
  */
 export type GenerateApplicationOptions = Pick<
   GenerateOptions,
-  'exportModels' | 'output'
+  'exportModels' | 'output' | 'forceClear'
 > & {
   // 服务名称
   name?: string
