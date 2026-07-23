@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.4.3
+
+### Patch Changes
+
+- 修复 forceClear
+
 ## 0.4.2
 
 ### Patch Changes

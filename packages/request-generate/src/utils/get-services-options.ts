@@ -43,6 +43,7 @@ function createOptions(
     input: `${options.gateway}/${service}/${openapi}`.replace(/\/{2,3}/g, '/'),
     output: name ? path.join(options.output, name) : options.output,
     exportModels: options.exportModels,
+    forceClear: options.forceClear,
   }
 }
 
