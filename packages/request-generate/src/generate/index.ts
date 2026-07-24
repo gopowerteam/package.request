@@ -7,7 +7,7 @@ import type {
 import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
-import { collectResult, outputSummary, startSpinner, stopSpinner } from '../progress'
+import { clearResults, collectResult, outputSummary, startSpinner, stopSpinner } from '../progress'
 import { registerHandlebarTemplates } from '../template'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
@@ -27,6 +27,7 @@ export class Generate {
    * @returns Promise<void>
    */
   static async startup(options: GenerateOptions) {
+    clearResults()
     startSpinner()
     // 保存配置
     Generate.options = options

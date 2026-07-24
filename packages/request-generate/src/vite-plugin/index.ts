@@ -1,18 +1,27 @@
 import type { PluginOption, ResolvedConfig } from 'vite'
-import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import process from 'node:process'
 import Handlebars from 'handlebars'
+import { Generate } from '../generate'
+import { loadConfigFile } from '../load-config'
 import { generateCodeTemplate, generateDeclareTemplate } from './templates'
 
 // 虚拟模块ID
 const MODULE_ID = 'virtual:request'
 // 默认定义文件名
 const DECLARATION_FILE = 'request.d.ts'
+// 生成产物的目录约定(相对 alias)
+const HTTP_DIR_SEGMENT = 'http'
+const DEFAULT_SERVICE_DIR = 'services'
 
-// vite配置项
-let viteConfig: ResolvedConfig
+export interface PluginOptions {
+  alias: string
+  /** 扫描 *Service.ts 的目录;未指定时回退到 request.config.ts 的 output */
+  dir?: string
+  dts: string | boolean
+  /** 显式指定 request-generate 配置文件路径;未指定时自动发现 */
+  configFile?: string
+}
 
 interface ServiceItem {
   name: string
@@ -25,75 +34,101 @@ interface GroupItem {
   services: ServiceItem[]
 }
 
-interface PluginOptions {
-  alias: string
-  dir: string
-  dts: string | boolean
-}
-
-let GerneratedCodeStr: string = ''
-
-function genretateDeclareAndCode(options: PluginOptions) {
-  // 生成文件列表
-  const paths = getServicePaths(options)
-  // 生成服务列表
-  const services = getServiceItems(paths)
-  // 生成分组列表
-  const groups = getServiceGroups(services)
-
-  if (services && services.length) {
-    // 生成代码
-    generateCode(services, groups)
-
-    if (options.dts !== false) {
-      // 生成定义
-      generateDeclare(services, groups, options)
-    }
-  }
-}
-
-function generateRequestCode() {
-  const generateScript = path.resolve(viteConfig.root, 'node_modules', '.bin', 'request-generate')
-  execSync(`${generateScript}`, { env: {
-    ...process.env,
-    FORCE_COLOR: '1',
-  } })
-}
-
 /**
- * Request插件
+ * Request 插件
+ *
+ * 进程内调用 Generate.startup 生成接口文件,无需子进程;随后扫描产物并装配虚拟模块。
  */
-export default (options: PluginOptions): PluginOption => {
+export default function requestGeneratePlugin(options: PluginOptions): PluginOption {
+  // 将状态收敛到插件闭包内,避免多实例/多测试共享全局
+  let viteConfig: ResolvedConfig | undefined
+  let generatedCode = ''
+
   return {
-    name: 'vite-plugin-vue-request',
+    name: 'request-generate',
     enforce: 'pre',
     configResolved(config) {
       viteConfig = config
     },
+    async buildStart() {
+      if (!viteConfig) {
+        throw new Error('Vite 配置尚未解析完成,无法执行 request-generate 插件')
+      }
+
+      // 1. 加载 request-generate 配置(进程内,支持 .ts)
+      const { default: generateOptions } = await loadConfigFile(
+        options.configFile,
+        viteConfig.root,
+      )
+
+      // 2. 进程内生成接口文件(替代子进程调用)
+      try {
+        await Generate.startup(generateOptions)
+      }
+      catch (error) {
+        throw new Error('request-generate 接口生成失败', { cause: error })
+      }
+
+      // 3. 扫描产物并生成虚拟模块代码 / 类型声明
+      const scanDir = options.dir ?? generateOptions.output
+      if (!scanDir) {
+        throw new Error(
+          '未指定扫描目录,请在插件选项 dir 或 request.config.ts 的 output 中配置',
+        )
+      }
+
+      const paths = getServicePaths(
+        { ...options, dir: scanDir },
+        viteConfig,
+      )
+      const services = getServiceItems(paths)
+      const groups = getServiceGroups(services)
+
+      if (services.length > 0) {
+        generatedCode = renderCode(services, groups)
+
+        if (options.dts !== false) {
+          generateDeclare(services, groups, options, viteConfig)
+        }
+      }
+    },
     resolveId(id: string) {
       return id === MODULE_ID ? MODULE_ID : undefined
-    },
-    async buildStart() {
-      // 生成接口文件
-      await generateRequestCode()
-      // 生成定义文件以及代码文件
-      await genretateDeclareAndCode(options)
     },
     load(id: string) {
       if (id !== MODULE_ID)
         return
 
-      return GerneratedCodeStr
+      if (!generatedCode) {
+        throw new Error(
+          `未在 "${options.dir ?? ''}" 下找到任何 Service 文件,请先运行 request-generate 生成接口`,
+        )
+      }
+
+      return generatedCode
     },
   }
 }
 
 /**
+ * 将 kebab-case 字符串转为 PascalCase
+ */
+function toPascalCase(str = ''): string {
+  return str
+    .replace(/-(\w)/g, (_, $1: string) => $1.toUpperCase())
+    .replace(/^\S/, s => s.toUpperCase())
+}
+
+/**
  * 生成服务路径
- * @param options PluginOptions
+ * @param options PluginOptions(需包含 dir)
+ * @param config Vite 已解析配置
  * @returns string[]
  */
-function getServicePaths(options: PluginOptions) {
+function getServicePaths(
+  options: PluginOptions & { dir: string },
+  config: ResolvedConfig,
+) {
   const paths: string[] = []
 
   // 遍历目录
@@ -107,14 +142,13 @@ function getServicePaths(options: PluginOptions) {
         paths.push(fullpath)
       }
       else if (stat.isDirectory()) {
-        const subdir = path.join(dir, file)
-        walk(subdir)
+        walk(path.join(dir, file))
       }
     })
   }
 
   // 查找别名配置,缺失时给出明确错误
-  const aliasMatch = viteConfig.resolve.alias.find(
+  const aliasMatch = config.resolve.alias.find(
     alias => alias.find === options.alias,
   )
 
@@ -125,14 +159,13 @@ function getServicePaths(options: PluginOptions) {
   }
 
   const replacement = aliasMatch.replacement.replace(/\\/g, '/')
+  const targetDir = path.resolve(config.root, options.dir)
 
-  if (fs.existsSync(path.resolve(options.dir))) {
-    walk(path.resolve(options.dir))
+  if (fs.existsSync(targetDir)) {
+    walk(targetDir)
   }
 
-  return paths.map(filepath =>
-    filepath.replace(replacement, options.alias),
-  )
+  return paths.map(filepath => filepath.replace(replacement, options.alias))
 }
 
 /**
@@ -141,25 +174,36 @@ function getServicePaths(options: PluginOptions) {
  * @returns ServiceItem[]
  */
 function getServiceItems(paths: string[]): ServiceItem[] {
-  const toCaseString = (str = '') =>
-    str
-      .replace(/-(\w)/g, (_, $1: string) => $1.toUpperCase())
-      .replace(/^\S/, s => s.toUpperCase())
-
   return paths.map((filePath) => {
-    const [name]
-      = /[^\\]+(?=\.ts$)/.exec(toCaseString(path.basename(filePath))) || []
-
-    const [group]
-      // eslint-disable-next-line regexp/no-super-linear-backtracking
-      = /(?<=^.\/http\/)(.*?)(?=\/.*?Service\.ts$)/.exec(filePath) || []
+    const name = toPascalCase(path.basename(filePath, '.ts'))
 
     return {
-      name: toCaseString(name),
-      group: group !== 'services' ? toCaseString(group) : undefined,
+      name,
+      group: getServiceGroup(filePath),
       path: filePath.replace(/\.ts$/g, ''),
     }
   })
+}
+
+/**
+ * 从服务路径中提取分组名
+ *
+ * 约定: <alias>/http/<group?>/.../<Name>Service.ts
+ * group 为 http 下的第一级目录;若为 services(默认目录)则视为无分组。
+ */
+function getServiceGroup(filePath: string): string | undefined {
+  const segments = filePath.split('/')
+  const httpIndex = segments.indexOf(HTTP_DIR_SEGMENT)
+
+  if (httpIndex === -1 || httpIndex + 1 >= segments.length)
+    return undefined
+
+  const group = segments[httpIndex + 1]
+
+  if (group === DEFAULT_SERVICE_DIR)
+    return undefined
+
+  return toPascalCase(group)
 }
 
 /**
@@ -167,56 +211,54 @@ function getServiceItems(paths: string[]): ServiceItem[] {
  * @param services
  * @returns GroupItem[]
  */
-function getServiceGroups(services: ServiceItem[]) {
-  return services.reduce<GroupItem[]>((r, s) => {
-    if (!s.group) {
-      return r
+function getServiceGroups(services: ServiceItem[]): GroupItem[] {
+  const map = new Map<string, GroupItem>()
+
+  for (const service of services) {
+    if (!service.group)
+      continue
+
+    let group = map.get(service.group)
+
+    if (!group) {
+      group = { name: service.group, services: [] }
+      map.set(service.group, group)
     }
 
-    const group = r.find(x => x.name === s.group) || {
-      name: s.group,
-      services: [],
-    }
+    group.services.push(service)
+  }
 
-    group.services.push(s)
-
-    if (!r.includes(group)) {
-      r.push(group)
-    }
-
-    return r
-  }, [])
+  return [...map.values()]
 }
 
 /**
- * 生成代码
+ * 渲染虚拟模块代码
  * @param services
  * @param groups
  */
-function generateCode(services: ServiceItem[], groups: GroupItem[]) {
-  // 生成模板
+function renderCode(services: ServiceItem[], groups: GroupItem[]): string {
   const template = Handlebars.compile(generateCodeTemplate)
-  // 编译模板内容
-  GerneratedCodeStr = template({
+
+  return template({
     groups: groups.length ? groups : undefined,
     services,
   })
 }
 
 /**
- * 生成代码
+ * 生成类型声明文件
  * @param services
  * @param groups
  * @param options
+ * @param config
  */
 function generateDeclare(
   services: ServiceItem[],
   groups: GroupItem[],
   options: PluginOptions,
+  config: ResolvedConfig,
 ) {
-  // 生成模板
   const template = Handlebars.compile(generateDeclareTemplate)
-  // 编译模板内容
   const content = template({
     groups: groups.length ? groups : undefined,
     services,
@@ -225,7 +267,7 @@ function generateDeclare(
 
   // 目标声明文件路径
   const declarationFilePath = path.resolve(
-    viteConfig.root,
+    config.root,
     typeof options.dts === 'string' ? options.dts : DECLARATION_FILE,
   )
 

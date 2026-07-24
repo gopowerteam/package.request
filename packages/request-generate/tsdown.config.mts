@@ -13,6 +13,7 @@ export default defineConfig({
       'axios',
       'handlebars',
       '@apidevtools/swagger-parser',
+      'tsx',
       'vite',
     ],
   },

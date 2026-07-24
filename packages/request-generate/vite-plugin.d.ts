@@ -1,1 +1,1 @@
-export { default } from './dist/vite-plugin/index.d.mts'
+export { default } from './dist/vite-plugin/index.mjs'

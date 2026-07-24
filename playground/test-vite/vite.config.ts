@@ -10,7 +10,7 @@ export default defineConfig({
       alias: '@',
       dir: 'src/http',
       dts: 'src/types/generated/request.d.ts',
-    }) as any,
+    }),
   ],
   resolve: {
     alias: {

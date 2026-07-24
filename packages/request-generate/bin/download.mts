@@ -4,7 +4,6 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { program } from 'commander'
-import { loadConfigFile } from './_load-config.mts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,7 +21,7 @@ const params = program
   .parse(process.argv)
   .opts()
 
-const { default: config } = await loadConfigFile(params.config)
+const { default: config } = await RequestGenerate.loadConfigFile(params.config)
 
 RequestGenerate.download(config)
   .then(() => {
