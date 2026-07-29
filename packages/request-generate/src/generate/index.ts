@@ -7,7 +7,7 @@ import type {
 import { OpenAPIVersion } from '../config/enum.config'
 import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
-import { clearResults, collectResult, outputSummary, startSpinner, stopSpinner } from '../progress'
+import { clearResults, collectResult, outputSummary, printPhaseBanner, startSpinner, stopSpinner } from '../progress'
 import { registerHandlebarTemplates } from '../template'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
@@ -28,9 +28,14 @@ export class Generate {
    */
   static async startup(options: GenerateOptions) {
     clearResults()
-    startSpinner()
     // 保存配置
     Generate.options = options
+    const enabled = options.logger !== false
+
+    if (enabled) {
+      printPhaseBanner('开始生成接口代码：')
+      startSpinner('生成中...')
+    }
     // 注册Handlebars模板
     registerHandlebarTemplates()
     // 生成服务列表
@@ -56,8 +61,10 @@ export class Generate {
       Generate.writeClient(application.client, application.options)
     }
 
-    stopSpinner()
-    outputSummary()
+    if (enabled) {
+      stopSpinner()
+      outputSummary()
+    }
   }
 
   static async getApiDocument(input: string): Promise<UnknownVersionDocument> {

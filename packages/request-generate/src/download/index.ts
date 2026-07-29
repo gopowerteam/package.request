@@ -2,8 +2,17 @@ import type {
   GenerateApplicationOptions,
   GenerateOptions,
 } from '../types/generate-options'
+import { Buffer } from 'node:buffer'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import {
+  clearDownloadResults,
+  collectDownloadResult,
+  outputDownloadSummary,
+  printPhaseBanner,
+  startSpinner,
+  stopSpinner,
+} from '../progress'
 import { generateServiceOptions } from '../utils/get-services-options'
 
 const DefaultDownloadDir = '.request'
@@ -12,6 +21,8 @@ export class Download {
   public static options: GenerateOptions
 
   static async startup(options: GenerateOptions) {
+    const enabled = options.logger !== false
+
     // 生成服务列表
     const applicationOptions = generateServiceOptions(options)
 
@@ -20,13 +31,51 @@ export class Download {
       fs.mkdirSync(DefaultDownloadDir, { recursive: true })
     }
 
-    // 下载所有OpenAPI文件
-    await Promise.all(
-      applicationOptions.map(options => Download.downloadOpenAPIFile(options)),
+    if (enabled) {
+      clearDownloadResults()
+      printPhaseBanner('开始下载接口文件：')
+      startSpinner('下载中...')
+    }
+
+    // 下载所有OpenAPI文件(全部尝试,失败项在表格中标注)
+    const downloadStart = Date.now()
+    const settled = await Promise.allSettled(
+      applicationOptions.map(option => Download.downloadOpenAPIFile(option)),
     )
+    const totalDuration = Date.now() - downloadStart
+
+    // 收集结果
+    const failures: unknown[] = []
+    applicationOptions.forEach((option, index) => {
+      const result = settled[index]
+      const name = option.name ?? 'default'
+
+      if (result.status === 'fulfilled') {
+        if (enabled) {
+          collectDownloadResult(name, result.value.size, result.value.duration)
+        }
+      }
+      else {
+        failures.push(result.reason)
+        if (enabled) {
+          collectDownloadResult(name, null, null)
+        }
+      }
+    })
+
+    if (enabled) {
+      stopSpinner()
+      outputDownloadSummary(totalDuration)
+    }
+
+    // 存在失败则抛出第一个错误,中断后续生成阶段(&& 链)
+    if (failures.length > 0) {
+      throw failures[0]
+    }
   }
 
-  static async downloadOpenAPIFile(option: GenerateApplicationOptions) {
+  static async downloadOpenAPIFile(option: GenerateApplicationOptions): Promise<{ size: number, duration: number }> {
+    const start = Date.now()
     const response = await fetch(option.input)
 
     if (!response.ok) {
@@ -37,9 +86,10 @@ export class Download {
 
     const data = await response.json()
     const filePath = path.join('.request', `${option.name}.json`)
+    const content = JSON.stringify(data, null, 2)
 
     // 写入文件
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-    return data
+    fs.writeFileSync(filePath, content)
+    return { size: Buffer.byteLength(content), duration: Date.now() - start }
   }
 }

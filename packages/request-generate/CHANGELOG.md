@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.4.5
+
+### Patch Changes
+
+- 优化日志信息
+
 ## 0.4.4
 
 ### Patch Changes
