@@ -274,4 +274,19 @@ describe('axiosAdapter - Content-Type 注入(按运行时 body 类型)', () => {
     expect(lastRequestCall().headers['content-type']).toBe('text/xml')
     expect(lastRequestCall().headers['Content-Type']).toBeUndefined()
   })
+
+  it('应将 signal 传入 axios 请求配置', async () => {
+    const adapter = setupAdapter()
+    const controller = new AbortController()
+
+    await adapter.request({
+      baseURL: '',
+      pathURL: '/users',
+      method: 'GET',
+      headers: {},
+      signal: controller.signal,
+    })
+
+    expect(lastRequestCall().signal).toBe(controller.signal)
+  })
 })

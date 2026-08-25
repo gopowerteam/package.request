@@ -69,6 +69,7 @@ export class AxiosAdapter implements RequestAdapter {
     paramsQuery,
     paramsBody,
     extraParams = {},
+    signal,
   }: RequestAdapterOptions) {
     const axiosInstance = this.getAxiosInstance()
 
@@ -79,6 +80,7 @@ export class AxiosAdapter implements RequestAdapter {
       params: paramsQuery,
       data: paramsBody,
       url: pathURL,
+      signal,
       ...extraParams,
     })
   }
