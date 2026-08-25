@@ -1,5 +1,6 @@
 import type { RequestAdapterOptions } from '../src/interfaces/request-adapter.interface'
 import type { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
+import { AbortService } from '../src/plugins/abort-service'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'
 
@@ -61,5 +62,77 @@ describe('signal 透传', () => {
     })
 
     expect(adapter.lastOptions?.signal).toBeUndefined()
+  })
+})
+
+describe('abortService 作用域插件', () => {
+  it('before() 应为请求注入 signal', async () => {
+    const abortService = new AbortService()
+    const options: any = { path: '/x', method: 'GET' }
+
+    await abortService.before(options, () => {})
+
+    expect(options.signal).toBeInstanceOf(AbortSignal)
+    expect(abortService.size).toBe(1)
+  })
+
+  it('after() 应回收已完成请求的 controller', async () => {
+    const abortService = new AbortService()
+    const options: any = {}
+    await abortService.before(options, () => {})
+
+    abortService.after({} as any, options)
+
+    expect(abortService.size).toBe(0)
+  })
+
+  it('catch() 应回收失败请求的 controller', async () => {
+    const abortService = new AbortService()
+    const options: any = {}
+    await abortService.before(options, () => {})
+
+    abortService.catch({} as any, options)
+
+    expect(abortService.size).toBe(0)
+  })
+
+  it('abort() 应终止所有 in-flight 请求并清空', async () => {
+    const abortService = new AbortService()
+    const optionsA: any = {}
+    const optionsB: any = {}
+    await abortService.before(optionsA, () => {})
+    await abortService.before(optionsB, () => {})
+
+    abortService.abort()
+
+    expect(optionsA.signal.aborted).toBe(true)
+    expect(optionsB.signal.aborted).toBe(true)
+    expect(abortService.size).toBe(0)
+  })
+
+  it('已回收的请求不受后续 abort() 影响', async () => {
+    const abortService = new AbortService()
+    const finished: any = {}
+    const inflight: any = {}
+    await abortService.before(finished, () => {})
+    await abortService.before(inflight, () => {})
+    abortService.after({} as any, finished)
+
+    abortService.abort()
+
+    expect(finished.signal.aborted).toBe(false)
+    expect(inflight.signal.aborted).toBe(true)
+  })
+
+  it('连续请求生成独立 controller 互不影响', async () => {
+    const abortService = new AbortService()
+    const first: any = {}
+    const second: any = {}
+    await abortService.before(first, () => {})
+    await abortService.before(second, () => {})
+
+    abortService.abort()
+
+    expect(first.signal).not.toBe(second.signal)
   })
 })
