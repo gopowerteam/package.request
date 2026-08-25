@@ -22,6 +22,11 @@
       "types": "./dist/adapters/index.d.mts",
       "import": "./dist/adapters/index.mjs",
       "require": "./dist/adapters/index.cjs"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.mts",
+      "import": "./dist/plugins/index.mjs",
+      "require": "./dist/plugins/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
