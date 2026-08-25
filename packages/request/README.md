@@ -105,6 +105,7 @@ bootstrap()
 | `paramsPath` | `Record<string, string \| number>` | 路径参数,替换 `path` 中的 `{key}` |
 | `paramsQuery` | `Record<string, any>` | 查询参数,经 `qs` 序列化 |
 | `paramsBody` | `any` | 请求体 |
+| `signal` | `AbortSignal` | 终止请求的信号,配合 `AbortController` 使用 |
 
 ### GET 查询参数
 
@@ -225,6 +226,155 @@ await request.send(
 ```
 
 > 全局插件与请求级插件都会执行;`before` 先执行全局、再执行请求级,`after` / `catch` 同理。
+
+## 请求取消
+
+### 手动传入 signal
+
+`RequestSendOptions` 支持 Web 标准的 `AbortSignal`,配合 `AbortController` 终止请求:
+
+```ts
+const controller = new AbortController()
+
+request.send({
+  path: '/user-service/api/users',
+  method: RequestMethod.Get,
+  signal: controller.signal,
+})
+
+controller.abort()
+```
+
+被取消的请求会走异常流程,`AdapterResponse` 上的 `canceled` 标记为 `true`,
+可在 exception / error 拦截器中静默处理:
+
+```ts
+class ExceptionInterceptor implements ResponseInterceptor {
+  exec(res: AdapterResponse) {
+    if (res.canceled) {
+      return res // 手动取消,静默处理
+    }
+    // 真实异常正常提示...
+    return res
+  }
+}
+```
+
+调用方也可以在 `catch` 中自行区分:
+
+```ts
+request.send({ path: '/users', method: RequestMethod.Get, signal: controller.signal })
+  .catch((res: AdapterResponse) => {
+    if (res.canceled) return
+    // 处理真实错误
+  })
+```
+
+### AbortService 内置插件
+
+从子路径 `@gopowerteam/request/plugins` 导入。每个实例是一个取消作用域,
+`abort()` 终止该实例发起的所有进行中请求;请求结束后自动回收,可放心复用:
+
+```ts
+import { AbortService } from '@gopowerteam/request/plugins'
+
+const requestAbort = new AbortService()
+
+request.send(
+  { path: '/users', method: RequestMethod.Get },
+  [requestAbort],
+)
+
+// 需要时终止该作用域内全部进行中请求
+requestAbort.abort()
+```
+
+配合 `request-generate` 生成的服务使用(利用每个生成方法都暴露的 `requestPlugins` 参数):
+
+```ts
+const [meituan, order] = useRequest(
+  ({ MeituanService }) => MeituanService,
+  ({ OrderService }) => OrderService,
+)
+
+const requestAbort = new AbortService()
+
+meituan.AccountService.getBalance(accountId, [requestAbort])
+order.OrderService.listByAccount({ accountId }, [requestAbort])
+
+// 组件卸载时终止本组件全部请求
+onBeforeUnmount(() => requestAbort.abort())
+```
+
+搜索防抖场景:每次发新请求前 `abort()` 旧请求,再用同一实例发起新请求即可:
+
+```ts
+const searchAbort = new AbortService()
+
+async function search(keyword: string) {
+  searchAbort.abort() // 终止上一次进行中的请求
+
+  try {
+    results.value = await SearchService.query({ keyword }, [searchAbort])
+  }
+  catch (res: any) {
+    if (!res.canceled) console.error(res.data) // 取消静默,真实错误才提示
+  }
+}
+```
+
+> 注意:`toURL()` 也会触发插件 `before` 但没有响应生命周期,URL 生成场景无需传入 AbortService。
+
+### 自定义适配器支持 signal
+
+核心层只透传 `signal`,取消的识别与终止由各适配器自行实现。小程序等运行时可按下述模式桥接(微信 `RequestTask.abort()` 为例):
+
+```ts
+class WxRequestAdapter implements RequestAdapter {
+  request(options: RequestAdapterOptions) {
+    return new Promise((resolve, reject) => {
+      const task = wx.request({
+        url: options.baseURL + options.pathURL,
+        method: options.method,
+        data: options.paramsBody,
+        success: resolve,
+        fail: reject,
+      })
+
+      if (!options.signal) {
+        return
+      }
+
+      const onAbort = () => task.abort()
+
+      // 注意处理已终止的 signal(立即触发)与 once 解绑
+      if (options.signal.aborted) {
+        onAbort()
+      }
+      else {
+        options.signal.addEventListener('abort', onAbort, { once: true })
+      }
+    })
+  }
+
+  transformResponse(response: any) {
+    return response
+  }
+
+  transformException(error: any): AdapterResponse {
+    return {
+      data: {},
+      status: 400,
+      statusText: '',
+      headers: {},
+      canceled: (error.errMsg || '').includes('abort'),
+    }
+  }
+}
+```
+
+> 运行时前提:`AbortService` 依赖 `AbortController`(浏览器 / Node 18+ / 较新微信基础库均内置)。
+> 不使用 `signal` 的自定义适配器不受任何影响。
 
 ## 响应拦截器
 
@@ -361,6 +511,12 @@ class FetchAdapter implements RequestAdapter {
 | 导出 | 类型 | 说明 |
 | --- | --- | --- |
 | `AxiosAdapter` | 类 | 基于 axios 的内置适配器 |
+
+### 插件入口 `@gopowerteam/request/plugins`
+
+| 导出 | 类型 | 说明 |
+| --- | --- | --- |
+| `AbortService` | 类 | 作用域级请求终止插件,`abort()` 终止该实例全部进行中请求 |
 
 ## 相关生态
 
