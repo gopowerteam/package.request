@@ -1,5 +1,13 @@
 # playground-test-vite
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies
+  - @gopowerteam/request@0.3.2
+  - @gopowerteam/request-generate@0.4.5
+
 ## 0.0.19
 
 ### Patch Changes

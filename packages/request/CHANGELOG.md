@@ -1,5 +1,11 @@
 # @gopowerteam/request
 
+## 0.3.2
+
+### Patch Changes
+
+- 添加 abort 支持
+
 ## 0.3.1
 
 ### Patch Changes
