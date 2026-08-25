@@ -1,5 +1,6 @@
 import type { RequestAdapterOptions } from '../src/interfaces/request-adapter.interface'
 import type { RequestSetupConfig } from '../src/interfaces/request-setup.interface'
+import { AxiosAdapter } from '../src/adapters'
 import { AbortService } from '../src/plugins/abort-service'
 import { RequestService } from '../src/request-service'
 import { setup } from '../src/request-setup'
@@ -134,5 +135,60 @@ describe('abortService 作用域插件', () => {
     abortService.abort()
 
     expect(first.signal).not.toBe(second.signal)
+  })
+})
+
+describe('取消请求端到端(离线)', () => {
+  function createOfflineSetup() {
+    const exceptionResponses: any[] = []
+    const config: RequestSetupConfig = {
+      gateway: 'http://127.0.0.1:9',
+      adapter: new AxiosAdapter(),
+      interceptors: {
+        status: { exec: () => true },
+        success: { exec: r => r },
+        error: { exec: r => r },
+        exception: { exec: (r) => {
+          exceptionResponses.push(r)
+          return r
+        } },
+      },
+      plugins: [],
+    }
+    setup(config)
+    return { exceptionResponses }
+  }
+
+  it('预终止 signal 应走异常流程并携带 canceled 标记', async () => {
+    const { exceptionResponses } = createOfflineSetup()
+
+    const controller = new AbortController()
+    controller.abort()
+
+    const rejection = await RequestService.getInstance()
+      .send({ path: '/offline', method: 'GET', signal: controller.signal })
+      .then(() => null)
+      .catch(r => r)
+
+    expect(rejection).not.toBeNull()
+    expect(exceptionResponses[0]?.canceled).toBe(true)
+  })
+
+  it('abortService 注入的请求 abort 后应携带 canceled 标记', async () => {
+    const { exceptionResponses } = createOfflineSetup()
+
+    const abortService = new AbortService()
+    const promise = RequestService.getInstance()
+      .send({ path: '/offline', method: 'GET' }, [abortService])
+      .then(() => null)
+      .catch(r => r)
+
+    abortService.abort()
+
+    const rejection = await promise
+
+    expect(rejection).not.toBeNull()
+    expect(exceptionResponses[0]?.canceled).toBe(true)
+    expect(abortService.size).toBe(0)
   })
 })
