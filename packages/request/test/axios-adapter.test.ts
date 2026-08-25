@@ -8,6 +8,8 @@ vi.mock('axios', () => ({
     create: vi.fn(() => ({
       request: vi.fn(),
     })),
+    // 对齐真实 axios 的取消判定逻辑(__CANCEL__ 标记)
+    isCancel: (value: any) => !!value?.__CANCEL__,
   },
 }))
 
@@ -152,6 +154,36 @@ describe('axiosAdapter - Axios HTTP 客户端适配器', () => {
 
       expect(result.status).toBe(500)
       expect(result.data).toEqual({ error: 'Internal Server Error' })
+    })
+
+    it('取消异常应返回 canceled: true 的响应', () => {
+      // 模拟 axios 的 CanceledError(携带 __CANCEL__ 标记)
+      const cancelError = Object.assign(new Error('canceled'), {
+        __CANCEL__: true,
+        code: 'ERR_CANCELED',
+        name: 'CanceledError',
+      }) as any
+
+      const result = adapter.transformException(cancelError)
+
+      expect(result.canceled).toBe(true)
+      expect(result.status).toBe(400)
+    })
+
+    it('非取消异常不应标记 canceled', () => {
+      const normalError = {
+        response: {
+          data: { msg: 'err' },
+          status: 500,
+          statusText: 'Server Error',
+          headers: {},
+        },
+      } as any
+
+      const result = adapter.transformException(normalError)
+
+      expect(result.canceled).toBeFalsy()
+      expect(result.status).toBe(500)
     })
   })
 })

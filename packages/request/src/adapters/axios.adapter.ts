@@ -134,11 +134,18 @@ export class AxiosAdapter implements RequestAdapter {
    * @returns AdapterResponse
    */
   public transformException(exception: AxiosError): AdapterResponse {
-    return {
+    const response: AdapterResponse = {
       data: exception.response?.data || {},
       statusText: exception.response?.statusText || '',
       status: exception.response?.status || 400,
       headers: (exception.response?.headers as AdapterResponseHeaders) || {},
     }
+
+    // 取消的请求标记 canceled,调用方可据此静默处理
+    if (axios.isCancel(exception)) {
+      response.canceled = true
+    }
+
+    return response
   }
 }
