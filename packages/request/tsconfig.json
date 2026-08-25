@@ -6,7 +6,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "node"],
     "strict": true,
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,

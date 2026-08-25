@@ -34,6 +34,7 @@ export interface RequestAdapterOptions {
   paramsQuery?: Record<string, any>
   paramsBody?: any
   extraParams?: any
+  signal?: AbortSignal
 }
 
 export interface AdapterResponse {
@@ -41,6 +42,7 @@ export interface AdapterResponse {
   status: number
   statusText: string
   headers: AdapterResponseHeaders
+  canceled?: boolean
 }
 
 export type AdapterResponseHeaders = Record<

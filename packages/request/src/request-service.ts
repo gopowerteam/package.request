@@ -144,6 +144,7 @@ export class RequestService {
       paramsQuery: options.paramsQuery,
       paramsBody: options.paramsBody,
       extraParams,
+      signal: options.signal,
     })
   }
 
