@@ -1,5 +1,11 @@
 # @gopowerteam/request-generate
 
+## 0.4.6
+
+### Patch Changes
+
+- 添加配置文件指纹 md5
+
 ## 0.4.5
 
 ### Patch Changes

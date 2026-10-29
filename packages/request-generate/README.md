@@ -462,6 +462,21 @@ request-download [--config <path>]
 
 > 任意一个候选文件存在即停止查找;全部不存在时抛错。仅支持上述四种扩展名。
 
+## 增量缓存
+
+`request-generate` 通过账本文件 `.request/.config.json` 实现增量生成,每个应用记录两维指纹,任一变化即重新生成该应用:
+
+| 字段 | 感知的变化 | 说明 |
+| --- | --- | --- |
+| `md5` | 后端接口变更 | OpenAPI 文档快照(`.request/{name}.json`)的内容 MD5 |
+| `configMd5` | 生成规则变更 | 覆盖 `exportServices`(`responseType` / `excludeQueryParams` / 自定义命名函数)、`appendService`、`exportModels`、每应用 `application` 以及本包版本号 |
+
+两者均未变化且输出目录已存在时跳过生成;修改 `request.config.ts`(即使后端接口未变)也会自动重新生成。
+
+账本采用"先生成、后提交"策略:仅在全部应用解析与写入成功后才更新,生成中途失败时保持旧账本,下次运行重新生成,避免陈旧产物。账本文件损坏时自动视为空(全量重生成,不中断)。
+
+> 提示:monorepo 内本地开发时,模板 / 生成逻辑的改动不受版本指纹覆盖。需要强制全量重新生成时,删除 `.request/.config.json` 或对应输出目录即可。
+
 ## API 导出
 
 ### 主入口 `@gopowerteam/request-generate`

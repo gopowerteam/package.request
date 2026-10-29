@@ -1,5 +1,12 @@
 # playground-test
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies
+  - @gopowerteam/request-generate@0.4.6
+
 ## 0.0.20
 
 ### Patch Changes

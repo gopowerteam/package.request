@@ -12,7 +12,7 @@ import { registerHandlebarTemplates } from '../template'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
 import { generateServiceOptions } from '../utils/get-services-options'
-import { updateOptionsFromLocalConfig } from './write-config'
+import { commitGenerationConfig, planGeneration } from './write-config'
 import { writeModels } from './write-models'
 import { writeServices } from './write-services'
 
@@ -38,13 +38,12 @@ export class Generate {
     }
     // 注册Handlebars模板
     registerHandlebarTemplates()
-    // 生成服务列表
-    let applicationOptions = generateServiceOptions(options)
-    applicationOptions = updateOptionsFromLocalConfig(applicationOptions, options.output)
+    // 生成服务列表并按账本规划增量(仅规划,账本在全部生成成功后提交)
+    const { entries, pending } = planGeneration(generateServiceOptions(options), options)
 
     const applications: { client: GenerateClient, options: GenerateApplicationOptions }[] = []
 
-    for (const applicationOption of applicationOptions) {
+    for (const applicationOption of pending) {
       const client = await Generate.generateApplicationClient(applicationOption)
       applications.push({
         client,
@@ -60,6 +59,9 @@ export class Generate {
       )
       Generate.writeClient(application.client, application.options)
     }
+
+    // 解析与写入全部成功后才提交账本;中途失败保持旧账本,下次运行重新生成
+    commitGenerationConfig(entries)
 
     if (enabled) {
       stopSpinner()
