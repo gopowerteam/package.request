@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.4.6",
   "private": false,
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gopowerteam/package.request.git",
