@@ -78,8 +78,9 @@ Notes:
   and requires its deps' `dist/` dts built first (`dependsOn: ["^build"]`).
 - The root `vitest.config.ts` only discovers `packages/*/test/**/*.{test,spec}.ts`.
   Playground files are **not** picked up by `pnpm test`.
-- `packages/request/test/request-service.test.ts` has 2 integration cases that hit the real
-  gateway (`gateway.local.xbt.sx.cn`) and fail without network access — pre-existing, not code bugs.
+- `packages/request` tests are fully offline (mock adapter pattern from `test/request-service.test.ts`;
+  real-gateway integration cases are not exercised in CI). Root coverage is scoped to
+  `packages/*/src/**` with global 70% thresholds (baseline: request ~85%, generate ~98%).
 
 ## Tests
 
