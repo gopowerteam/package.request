@@ -19,7 +19,10 @@ export class AbortService implements RequestPlugin {
   /**
    * 为请求注入 signal
    */
-  public async before(options: RequestSendOptions): Promise<void> {
+  public async before(
+    options: RequestSendOptions,
+    _appendParams?: (params: Record<string, any>) => void,
+  ): Promise<void> {
     const controller = new AbortController()
     this.controllers.add(controller)
     options.signal = controller.signal

@@ -1,1 +1,1 @@
-export * from './dist/adapters/index.d'
+export type * from './dist/adapters/index.d.mts'

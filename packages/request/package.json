@@ -35,6 +35,7 @@
   "files": [
     "README.md",
     "adapters.d.ts",
+    "plugins.d.ts",
     "dist"
   ],
   "scripts": {
@@ -42,6 +43,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
     "build": "tsdown",
     "lint": "eslint . --fix"
   },

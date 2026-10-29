@@ -1,4 +1,4 @@
-import type { AdapterResponse, ResponseInterceptor } from '@gopowerteam/request/src'
+import type { AdapterResponse, ResponseInterceptor } from '@gopowerteam/request'
 
 export class StatusInterceptors implements ResponseInterceptor {
   exec() {
