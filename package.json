@@ -10,7 +10,7 @@
     "build": "turbo run build --filter '@gopowerteam/*'",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
+    "typecheck": "pnpm -r --filter '@gopowerteam/*' exec tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

@@ -74,8 +74,9 @@ pnpm --filter @gopowerteam/request-generate test
 
 Notes:
 - `turbo.json` disables build cache (`"cache": false`). Rebuilds always run from scratch.
-- Root `typecheck` script exists (`turbo run typecheck`); each package runs `tsc --noEmit`
-  and requires its deps' `dist/` dts built first (`dependsOn: ["^build"]`).
+- Root `typecheck` = `pnpm -r --filter '@gopowerteam/*' exec tsc --noEmit` (topological
+  order, run AFTER `pnpm build`). Deliberately NOT turbo: turbo's `typecheck` + `^build`
+  raced with tsdown `clean:true` wiping `request/dist` mid-typecheck (flaky CI TS2307).
 - The root `vitest.config.ts` only discovers `packages/*/test/**/*.{test,spec}.ts`.
   Playground files are **not** picked up by `pnpm test`.
 - `packages/request` tests are fully offline (mock adapter pattern from `test/request-service.test.ts`;
