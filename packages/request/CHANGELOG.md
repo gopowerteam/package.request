@@ -1,5 +1,13 @@
 # @gopowerteam/request
 
+## 0.3.3
+
+### Patch Changes
+
+- d4ce1b7: 发布包补充 engines 字段声明 Node 版本要求
+- 547bf1a: 修复 adapters.d.ts 兼容 shim（原路径无法被 TypeScript 解析），并新增 plugins.d.ts 补齐 ./plugins 出口的 node10 解析支持
+- 更新版本
+
 ## 0.3.2
 
 ### Patch Changes

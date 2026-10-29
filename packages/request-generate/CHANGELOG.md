@@ -1,5 +1,12 @@
 # @gopowerteam/request-generate
 
+## 0.4.7
+
+### Patch Changes
+
+- d4ce1b7: 发布包补充 engines 字段声明 Node 版本要求
+- 更新版本
+
 ## 0.4.6
 
 ### Patch Changes
