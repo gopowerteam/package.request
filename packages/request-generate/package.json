@@ -40,7 +40,8 @@
     "lint": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
