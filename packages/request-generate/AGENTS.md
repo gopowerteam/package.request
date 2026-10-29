@@ -155,7 +155,7 @@ Entry points (tsdown.config.mts):
 - `src/index.ts` → Main library
 - `src/vite-plugin/index.ts` → Vite plugin
 
-Output: ESM + CJS with d.ts declarations
+Output: ESM only (`platform: node`, `target: node16`) with `.d.mts`/`.d.cts` declarations
 
 ## Dependencies
 

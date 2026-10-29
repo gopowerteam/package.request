@@ -1,72 +1,33 @@
-# Turborepo starter
+# package.request
 
-This is an official pnpm starter turborepo.
+TypeScript monorepo（Turborepo + pnpm workspaces），发布两个 npm 包：
 
-## What's inside?
+| 包 | 说明 |
+| --- | --- |
+| [`@gopowerteam/request`](./packages/request) | 基于 adapter 模式的 HTTP 客户端，内置 axios、插件中间件、请求中止（AbortService） |
+| [`@gopowerteam/request-generate`](./packages/request-generate) | 从 OpenAPI/Swagger 文档生成类型安全 service 代码的 CLI + Vite 插件 |
 
-This turborepo uses [pnpm](https://pnpm.io) as a package manager. It includes the following packages/apps:
+各包的详细用法见其 README 与 `AGENTS.md`。
 
-### Apps and Packages
+## 开发
 
-- `docs`: a [Next.js](https://nextjs.org) app
-- `web`: another [Next.js](https://nextjs.org) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm run build
+```bash
+pnpm install          # 安装依赖（仅允许 pnpm）
+pnpm build            # 构建两个发布包（turbo，不过滤 playground）
+pnpm test             # 运行全部测试（vitest）
+pnpm lint             # ESLint
+pnpm typecheck        # tsc --noEmit（依赖 build 产物）
+pnpm play:test        # playground/test：先跑 codegen 再跑请求脚本（tsx）
+pnpm play:test-vite   # playground/test-vite 开发服务器（Vue 3 + Vite）
+pnpm commit           # 交互式提交（中文约定式提交）
 ```
 
-### Develop
+要求：Node ≥ 22.12，pnpm 11.x。
 
-To develop all apps and packages, run the following command:
+## 发布流程
 
-```
-cd my-turborepo
-pnpm run dev
-```
+1. `pnpm cs` 添加 changeset 并更新版本号
+2. 推送到 `master` 后，`publish.yml` 由 changesets/action 自动构建并 `changeset publish --provenance`
+3. 发布完成后自动触发 npmmirror 同步
 
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-pnpm dlx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
-
-```
-pnpm dlx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Pipelines](https://turborepo.org/docs/core-concepts/pipelines)
-- [Caching](https://turborepo.org/docs/core-concepts/caching)
-- [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching)
-- [Scoped Tasks](https://turborepo.org/docs/core-concepts/scopes)
-- [Configuration Options](https://turborepo.org/docs/reference/configuration)
-- [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
+详见各包 README 与 `AGENTS.md`（含架构、命令与约定说明）。

@@ -146,6 +146,7 @@ Entry points defined in `tsdown.config.ts`:
 
 - `src/index.ts` → Main export
 - `src/adapters/index.ts` → Adapters export
+- `src/plugins/index.ts` → Plugins export (`AbortService`)
 
 ## Dependencies
 
