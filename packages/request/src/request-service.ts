@@ -22,11 +22,11 @@ export class RequestService {
    * 获取服务请求单例
    */
   public static getInstance(): RequestService {
-    if (this.instance) {
-      return this.instance
+    if (!this.instance) {
+      this.instance = new RequestService()
     }
 
-    return new RequestService()
+    return this.instance
   }
 
   /**

@@ -1,16 +1,21 @@
 import type { RequestSendOptions } from '../src/interfaces'
-import type { RequestService } from '../src/request-service'
 import { firstValueFrom } from 'rxjs'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { GenerateRequestService } from '../src/generate-request-service'
 import { RequestGenerateType } from '../src/interfaces'
 import { ObservableGenerateRequestService } from '../src/observable/generate-request-service'
+import { RequestService } from '../src/request-service'
 
 const sendOptions: RequestSendOptions = { service: 'demo', path: '/users', method: 'get' } as any
 
-// 注意:getInstance() 未缓存实例(每次返回新对象),因此必须先构造 service,
-// 再对其内部实际持有的 request 实例打桩
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+// getInstance() 已缓存单例:先重置单例再构造 service,
+// 保证每个用例拿到干净的 request 实例,避免用例间相互影响
 function createService<T extends new () => any>(Ctor: T) {
+  ;(RequestService as any).instance = undefined
   const service = new Ctor()
   const request = (service as any).request as RequestService
   return { service, request }

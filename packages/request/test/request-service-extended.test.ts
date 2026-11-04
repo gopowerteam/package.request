@@ -224,4 +224,13 @@ describe('requestService - 单例模式', () => {
     expect(RequestService.config).toBeDefined()
     expect(RequestService.config.gateway).toBe('https://api.example.com')
   })
+
+  it('getInstance() 应返回缓存的同一实例', () => {
+    ;(RequestService as any).instance = undefined
+
+    const first = RequestService.getInstance()
+    const second = RequestService.getInstance()
+
+    expect(first).toBe(second)
+  })
 })
