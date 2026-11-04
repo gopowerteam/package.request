@@ -149,6 +149,47 @@ describe('requestService - toURL 方法测试', () => {
 
       expect(url).toContain('/users/123')
     })
+
+    it('应替换路径中重复出现的同一占位符', () => {
+      const url = request.toURL({
+        path: '/users/{id}/messages/{id}',
+        method: 'GET',
+        paramsPath: {
+          id: '123',
+        },
+      })
+
+      expect(url).toContain('/users/123/messages/123')
+      expect(url).not.toContain('{id}')
+    })
+
+    it('应编码路径参数中的特殊字符', () => {
+      const url = request.toURL({
+        path: '/search/{keyword}',
+        method: 'GET',
+        paramsPath: {
+          keyword: 'a&b/c?d#e f',
+        },
+      })
+
+      expect(url).toContain('/search/a%26b%2Fc%3Fd%23e%20f')
+    })
+
+    it('应跳过 null 和 undefined 路径参数且不抛错', () => {
+      const options = {
+        path: '/users/{id}',
+        method: 'GET',
+        paramsPath: {
+          id: null as any,
+        },
+      }
+
+      expect(() => request.toURL(options)).not.toThrow()
+
+      // 占位符保留原样
+      const url = request.toURL(options)
+      expect(url).toContain('/users/{id}')
+    })
   })
 
   describe('服务参数处理', () => {

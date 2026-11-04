@@ -103,6 +103,10 @@ export class RequestService {
 
   /**
    * 转换请求路径
+   *
+   * 路径参数值必须传原始未编码值:内部统一做 encodeURIComponent,
+   * 传入已编码值会被二次编码(如 a%20b → a%2520b)。
+   * 值为 null/undefined 时跳过替换,占位符保留原样。
    */
   private parseRequestPath(
     path: string,
@@ -115,7 +119,15 @@ export class RequestService {
 
     if (paramsPath) {
       return Object.entries(paramsPath).reduce<string>(
-        (r, [key, value]) => r.replace(`{${key}}`, value.toString()),
+        (r, [key, value]) => {
+          // 值缺失时跳过,避免抛出 TypeError
+          if (value === null || value === undefined) {
+            return r
+          }
+
+          // 全量替换(占位符可能出现多次)并编码特殊字符(& / ? # 空格等)
+          return r.replaceAll(`{${key}}`, encodeURIComponent(value))
+        },
         path,
       )
     }
