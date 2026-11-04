@@ -1,38 +1,7 @@
-export class {{{name}}}Service {
-  // 请求实例
-  private request = RequestService.getInstance();
+export class {{{name}}}Service extends {{getGenerateServiceClassName responseType}} {
   private service = '{{{application}}}'
-
-  private generateRequest(
-    requestSendOptions: RequestSendOptions,
-    requestPlugins: (RequestPlugin | undefined)[] = [],
-    requestGenerateOptions?: RequestGenerateOptions
-  ){
-    switch(true){
-      case requestGenerateOptions?.type === RequestGenerateType.URL:
-        // 生成URL
-        return this.request.toURL(
-          requestSendOptions,
-          requestPlugins
-        );
-      default: {
-        // 请求数据
-        const result =  this.request.send(
-          requestSendOptions,
-          requestPlugins
-        );
-
-        {{#equal responseType 'observable'}}
-        return from(result)
-        {{else}}
-        return result
-        {{/equal}}
-      }
-    }
-  }
 
   {{#each operations}}
   {{>export-service-operation}}
   {{/each}}
 }
-

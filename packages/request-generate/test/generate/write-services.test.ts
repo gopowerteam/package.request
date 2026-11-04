@@ -93,3 +93,62 @@ describe('writeServices - 不修改原始 entity', () => {
     }
   })
 })
+
+describe('writeServices - 生成内容继承基类(模板护栏)', () => {
+  beforeEach(() => {
+    registerHandlebarTemplates()
+  })
+
+  it.each([
+    ['promise 模式', 'promise', 'GenerateRequestService', '@gopowerteam/request'],
+    ['observable 模式', 'observable', 'ObservableGenerateRequestService', '@gopowerteam/request/observable'],
+  ] as const)('%s 应 extends 正确基类且 import 路径正确', async (_label, responseType, className, importPath) => {
+    const { default: fs } = await import('node:fs')
+    const { default: path } = await import('node:path')
+    const os = await import('node:os')
+
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-tpl-'))
+    const cwd = process.cwd()
+    process.chdir(tmpDir)
+
+    try {
+      Generate.options = {
+        gateway: '',
+        openapi: '',
+        output: tmpDir,
+        exportModels: false,
+        exportServices: { responseType },
+      }
+
+      const operation = new Operation('getUser', 'get', '/users/{id}')
+      operation.responseRef = 'User'
+
+      const service = new Service('User')
+      service.application = 'mall'
+      service.operations.push(operation)
+
+      writeServices(
+        { services: [service], models: [] },
+        { output: tmpDir, application: 'mall', exportModels: false, input: '' },
+      )
+
+      const content = fs.readFileSync(path.join(tmpDir, 'services', 'UserService.ts'), 'utf-8')
+
+      // 类应继承基类,import 路径随模式切换
+      expect(content).toContain(`extends ${className}`)
+      expect(content).toContain(`} from '${importPath}'`)
+      expect(content).toContain(`import { ${className}, RequestGenerateType`)
+
+      // 公共分发逻辑不应再出现在产物中(已上移 request 包基类)
+      expect(content).not.toContain('switch(true)')
+      expect(content).not.toContain('private request = RequestService.getInstance()')
+
+      // 方法调用方式保持不变
+      expect(content).toContain('this.generateRequest(')
+    }
+    finally {
+      process.chdir(cwd)
+      fs.rmSync(tmpDir, { recursive: true, force: true })
+    }
+  })
+})

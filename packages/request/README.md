@@ -15,6 +15,7 @@
 - **路径参数与查询参数** —— 内置 `{id}` 模板替换与 `qs` 序列化(数组、嵌套、空值过滤)
 - **智能 Content-Type** —— `AxiosAdapter` 按运行时 body 自动推断(FormData / Blob / URLSearchParams 等),显式设置绝对优先
 - **双模块格式** —— 同时产出 ESM + CJS + `.d.ts`,Node 与打包工具无缝消费
+- **代码生成基类** —— 内置 `GenerateRequestService`(promise)与 `ObservableGenerateRequestService`(`@gopowerteam/request/observable`,可选依赖 rxjs),供 `@gopowerteam/request-generate` 生成的 Service 类继承,公共分发逻辑只维护一份
 - **全量 TypeScript** —— 所有接口与选项均带类型,`strict` 模式友好的
 
 ## 安装

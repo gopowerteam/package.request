@@ -166,8 +166,14 @@ Output: ESM only (`platform: node`, `target: node16`) with `.d.mts`/`.d.cts` dec
 - **commander** - CLI framework
 - **chalk** - Terminal colors
 - **ora** - Progress spinners
-- **rxjs** - Reactive utilities
-- **qs** - Query string handling
+- **qs** - REMOVED (dead dependency, 2026-11)
+- **table** - Download summary table
+- **tsx** - Programmatic TS config loading (load-config.ts)
+
+### Peer
+
+- **rxjs** (>=7, optional) - Runtime dep of GENERATED code in Observable 模式(responseType: 'observable');promise 模式无需安装
+- **vite** - Optional, for the plugin
 
 ### Internal
 

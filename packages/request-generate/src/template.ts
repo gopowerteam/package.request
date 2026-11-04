@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 import Handlebars from 'handlebars'
 import { equalHelper } from './template-helpers/equal.helper'
+import { getGenerateServiceClassName } from './template-helpers/get-generate-service-class-name.helper'
+import { getGenerateServiceImportPath } from './template-helpers/get-generate-service-import-path.helper'
 import { includeQueryParams } from './template-helpers/include-query-params'
 import { isArrayHelper } from './template-helpers/is-array.helper'
 import { isJsonMediaHelper } from './template-helpers/is-json-media.helper'
@@ -40,6 +42,8 @@ function registerHandlebarPartials() {
 
 function registerHandlebarHelpers() {
   registerHandlebarHelper(equalHelper)
+  registerHandlebarHelper(getGenerateServiceClassName)
+  registerHandlebarHelper(getGenerateServiceImportPath)
   registerHandlebarHelper(isArrayHelper)
   registerHandlebarHelper(toUpperHelper)
   registerHandlebarHelper(includeQueryParams)

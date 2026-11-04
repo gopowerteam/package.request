@@ -147,6 +147,7 @@ Entry points defined in `tsdown.config.ts`:
 - `src/index.ts` → Main export
 - `src/adapters/index.ts` → Adapters export
 - `src/plugins/index.ts` → Plugins export (`AbortService`)
+- `src/observable/generate-request-service.ts` → Observable 模式生成基类 (`ObservableGenerateRequestService`, 子路径 `./observable`, 唯一携带 rxjs 依赖的入口)
 
 ## Dependencies
 
@@ -154,6 +155,10 @@ Entry points defined in `tsdown.config.ts`:
 
 - **axios** - HTTP client
 - **qs** - Query string parsing
+
+### Peer (optional)
+
+- **rxjs** (>=7) - 仅 `./observable` 子路径运行时需要;主入口(promise 模式)不依赖 rxjs
 
 ### Dev Dependencies
 

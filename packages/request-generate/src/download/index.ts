@@ -17,6 +17,43 @@ import { generateServiceOptions } from '../utils/get-services-options'
 
 const DefaultDownloadDir = '.request'
 
+/**
+ * 下载元数据(条件请求 validator)
+ */
+interface DownloadMeta {
+  etag?: string
+  lastModified?: string
+}
+
+/**
+ * 下载结果(unchanged 表示服务端返回 304,内容未变化)
+ */
+interface DownloadResultInfo {
+  size: number
+  duration: number
+  unchanged?: boolean
+}
+
+function getMetaPath(name: string): string {
+  return path.join(DefaultDownloadDir, `${name}.meta.json`)
+}
+
+/**
+ * 读取下载元数据;文件不存在或损坏时返回空对象(全量下载,不中断)
+ */
+function readMeta(name: string): DownloadMeta {
+  try {
+    return JSON.parse(fs.readFileSync(getMetaPath(name), 'utf-8')) as DownloadMeta
+  }
+  catch {
+    return {}
+  }
+}
+
+function writeMeta(name: string, meta: DownloadMeta): void {
+  fs.writeFileSync(getMetaPath(name), JSON.stringify(meta, null, 2))
+}
+
 export class Download {
   public static options: GenerateOptions
 
@@ -52,7 +89,7 @@ export class Download {
 
       if (result.status === 'fulfilled') {
         if (enabled) {
-          collectDownloadResult(name, result.value.size, result.value.duration)
+          collectDownloadResult(name, result.value.size, result.value.duration, result.value.unchanged)
         }
       }
       else {
@@ -74,9 +111,39 @@ export class Download {
     }
   }
 
-  static async downloadOpenAPIFile(option: GenerateApplicationOptions): Promise<{ size: number, duration: number }> {
+  static async downloadOpenAPIFile(option: GenerateApplicationOptions): Promise<DownloadResultInfo> {
     const start = Date.now()
-    const response = await fetch(option.input)
+    // 与 startup 汇总展示保持一致的默认应用名
+    const name = option.name ?? 'default'
+    const specPath = path.join(DefaultDownloadDir, `${name}.json`)
+
+    // 本地文件输入:直读复制,不走网络与条件请求。
+    // 注意:input 由 gateway/openapi 拼接并压缩连续斜杠,https:// 会变成 https:/,
+    // 故按协议前缀判断而非完整 scheme:// 形式
+    if (!option.input.startsWith('http:') && !option.input.startsWith('https:')) {
+      const content = fs.readFileSync(option.input, 'utf-8')
+      fs.writeFileSync(specPath, content)
+      return { size: Buffer.byteLength(content), duration: Date.now() - start }
+    }
+
+    // 条件请求:spec 文件存在时才携带 validator,
+    // 避免文件缺失但 meta 残留时 304 跳过重建(后续生成阶段将找不到本地文档)
+    const meta = readMeta(name)
+    const headers: Record<string, string> = {}
+    const hasSpec = fs.existsSync(specPath)
+    if (hasSpec && meta.etag) {
+      headers['If-None-Match'] = meta.etag
+    }
+    if (hasSpec && meta.lastModified) {
+      headers['If-Modified-Since'] = meta.lastModified
+    }
+
+    const response = await fetch(option.input, { headers })
+
+    // 304:内容未变化,保留本地文档原样(生成阶段账本按内容 MD5 自然跳过)
+    if (response.status === 304) {
+      return { size: 0, duration: Date.now() - start, unchanged: true }
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -85,11 +152,21 @@ export class Download {
     }
 
     const data = await response.json()
-    const filePath = path.join('.request', `${option.name}.json`)
     const content = JSON.stringify(data, null, 2)
 
     // 写入文件
-    fs.writeFileSync(filePath, content)
+    fs.writeFileSync(specPath, content)
+
+    // 持久化 validator 供下次条件请求(ETag 优先,Last-Modified/Date 兜底)
+    const etag = response.headers.get('etag')
+    const lastModified = response.headers.get('last-modified') ?? response.headers.get('date')
+    if (etag || lastModified) {
+      writeMeta(name, {
+        etag: etag ?? undefined,
+        lastModified: lastModified ?? undefined,
+      })
+    }
+
     return { size: Buffer.byteLength(content), duration: Date.now() - start }
   }
 }

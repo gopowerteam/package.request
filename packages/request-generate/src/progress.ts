@@ -174,12 +174,19 @@ interface DownloadResult {
   name: string
   size: number | null
   duration: number | null
+  /** 服务端返回 304,内容未变化 */
+  unchanged?: boolean
 }
 
 const downloadResults: DownloadResult[] = []
 
-export function collectDownloadResult(name: string, size: number | null, duration: number | null) {
-  downloadResults.push({ name, size, duration })
+export function collectDownloadResult(
+  name: string,
+  size: number | null,
+  duration: number | null,
+  unchanged = false,
+) {
+  downloadResults.push({ name, size, duration, unchanged })
 }
 
 export function clearDownloadResults() {
@@ -205,7 +212,11 @@ export function outputDownloadSummary(totalDuration?: number) {
   const rows = downloadResults.map((r) => {
     const size = r.size === null ? chalk.gray('-') : formatSize(r.size)
     const time = r.duration === null ? chalk.gray('-') : formatDuration(r.duration)
-    const status = r.size === null ? chalk.red('✗') : chalk.green('✓')
+    const status = r.size === null
+      ? chalk.red('✗')
+      : r.unchanged
+        ? chalk.gray('≡')
+        : chalk.green('✓')
     return [r.name, size, time, status]
   })
 

@@ -52,7 +52,7 @@ npm install @gopowerteam/request-generate @gopowerteam/request
 yarn add @gopowerteam/request-generate @gopowerteam/request
 ```
 
-> `@gopowerteam/request` 是生成代码的运行时依赖,必须一同安装。若使用 Observable 模式,还需自行安装 `rxjs`。
+> `@gopowerteam/request` 是生成代码的运行时依赖,必须一同安装。`rxjs`(>=7)为可选 peer 依赖,仅在生成模式为 Observable(`responseType: 'observable'`)时需要安装。
 
 ## 快速开始
 

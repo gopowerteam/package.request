@@ -1,18 +1,7 @@
-#!/usr/bin/env tsx
-
-import path from 'node:path'
+#!/usr/bin/env node
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { program } from 'commander'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const RequestGenerate = await import(`file://${path.resolve(
-  __dirname,
-  '..',
-  'dist',
-  'index.mjs',
-)}`)
+import { download, loadConfigFile } from '../src/index'
 
 const params = program
   .name('@gopowerteam/request-generate')
@@ -21,9 +10,9 @@ const params = program
   .parse(process.argv)
   .opts()
 
-const { default: config } = await RequestGenerate.loadConfigFile(params.config)
+const { default: config } = await loadConfigFile(params.config)
 
-RequestGenerate.download(config)
+download(config)
   .then(() => {
     process.exit(0)
   })

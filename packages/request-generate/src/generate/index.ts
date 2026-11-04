@@ -9,6 +9,7 @@ import { parseV2 } from '../parse/v2'
 import { parseV3 } from '../parse/v3'
 import { clearResults, collectResult, outputSummary, printPhaseBanner, startSpinner, stopSpinner } from '../progress'
 import { registerHandlebarTemplates } from '../template'
+import { checkRequestVersion } from '../utils/check-request-version'
 import { getOpenApiDocument } from '../utils/get-openapi-document'
 import { getOpenAPIVersion } from '../utils/get-openapi-version'
 import { generateServiceOptions } from '../utils/get-services-options'
@@ -31,6 +32,11 @@ export class Generate {
     // 保存配置
     Generate.options = options
     const enabled = options.logger !== false
+
+    // 校验宿主 @gopowerteam/request 版本是否满足生成产物要求(logger 关闭时静默)
+    if (enabled) {
+      checkRequestVersion()
+    }
 
     if (enabled) {
       printPhaseBanner('开始生成接口代码：')

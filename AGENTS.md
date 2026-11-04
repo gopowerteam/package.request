@@ -40,7 +40,9 @@ entities, parser layout, template helpers). Read the relevant child file before 
 - `./plugins` → `src/plugins/index.ts` (exports `AbortService` — a `RequestPlugin` giving each
   instance a cancel scope: it injects an `AbortController` signal in `before`, `abort()` kills
   that instance's in-flight requests)
-- `axios` is marked `external` — never bundle it.
+- `./observable` → `src/observable/generate-request-service.ts` (`ObservableGenerateRequestService` —
+  代码生成 Observable 模式基类;唯一依赖 rxjs 的入口,promise 模式宿主无需安装 rxjs)
+- `axios` and `rxjs` are marked `neverBundle` — never bundle them.
 
 `@gopowerteam/request-generate` (`tsdown.config.mts`):
 - `.` → `src/index.ts` (ESM only, `platform: node`, `target: node16`)

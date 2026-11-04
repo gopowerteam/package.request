@@ -1,11 +1,8 @@
 {
   "name": "@gopowerteam/request",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "private": false,
-  "engines": {
-    "node": ">=22.12.0"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gopowerteam/package.request.git",
@@ -30,6 +27,11 @@
       "types": "./dist/plugins/index.d.mts",
       "import": "./dist/plugins/index.mjs",
       "require": "./dist/plugins/index.cjs"
+    },
+    "./observable": {
+      "types": "./dist/observable/generate-request-service.d.mts",
+      "import": "./dist/observable/generate-request-service.mjs",
+      "require": "./dist/observable/generate-request-service.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -38,9 +40,12 @@
   "files": [
     "README.md",
     "adapters.d.ts",
-    "plugins.d.ts",
-    "dist"
+    "dist",
+    "plugins.d.ts"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "tsdown --watch",
     "test": "vitest run",
@@ -50,6 +55,14 @@
     "build": "tsdown",
     "lint": "eslint . --fix"
   },
+  "peerDependencies": {
+    "rxjs": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "rxjs": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "axios": "1.13.5",
     "qs": "6.15.0"
@@ -57,6 +70,7 @@
   "devDependencies": {
     "@types/node": "24.10.15",
     "@types/qs": "6.14.0",
+    "rxjs": "7.8.2",
     "tsdown": "0.22.12",
     "typescript": "5.9.3",
     "vitest": "3.2.4"

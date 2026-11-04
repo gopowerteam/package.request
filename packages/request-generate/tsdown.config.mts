@@ -1,7 +1,12 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/vite-plugin/index.ts'],
+  entry: {
+    'index': 'src/index.ts',
+    'vite-plugin/index': 'src/vite-plugin/index.ts',
+    'generate': 'bin/generate.mts',
+    'download': 'bin/download.mts',
+  },
   format: ['esm'],
   dts: true,
   clean: true,
@@ -9,7 +14,6 @@ export default defineConfig({
   target: 'node16',
   deps: {
     neverBundle: [
-      'rxjs',
       'axios',
       'handlebars',
       '@apidevtools/swagger-parser',
