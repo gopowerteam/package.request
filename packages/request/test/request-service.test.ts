@@ -155,4 +155,36 @@ describe('测试RequestService', () => {
 
     expect(catchHook).toHaveBeenCalled()
   })
+
+  it('响应阶段插件顺序应为全局插件先于实例插件', async () => {
+    const order: string[] = []
+    const { adapter, config } = createMockSetup()
+
+    // 全局插件(配置级)
+    const globalPlugin = new TestRequestPlugin()
+    globalPlugin.after = () => order.push('global')
+    globalPlugin.catch = () => order.push('global')
+    config.plugins = [globalPlugin]
+
+    // 实例插件(请求级)
+    const instancePlugin = new TestRequestPlugin()
+    instancePlugin.after = () => order.push('instance')
+    instancePlugin.catch = () => order.push('instance')
+
+    const request = RequestService.getInstance()
+
+    // after 阶段:全局 → 实例
+    await request.send({ path: '/orders', method: 'GET' }, [instancePlugin])
+    expect(order).toEqual(['global', 'instance'])
+
+    // catch 阶段:全局 → 实例
+    order.length = 0
+    adapter.shouldThrow = true
+    await request
+      .send({ path: '/orders', method: 'GET' }, [instancePlugin])
+      .catch(() => {
+        //
+      })
+    expect(order).toEqual(['global', 'instance'])
+  })
 })

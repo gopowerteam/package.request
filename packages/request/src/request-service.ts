@@ -73,7 +73,10 @@ export class RequestService {
   }
 
   /**
-   * 执行前置插件逻辑
+   * 执行响应阶段(after/catch)插件逻辑
+   *
+   * 执行顺序与 before 阶段保持一致:全局插件 → 实例插件。
+   * 行为变更:此前顺序为实例插件 → 全局插件,现已统一。
    */
   private execResponsePlugin(
     leftcycle: ResponseLifecycle,
@@ -82,15 +85,15 @@ export class RequestService {
     response: AdapterResponse,
   ) {
     // 执行全局插件
-    plugins.forEach((plugin) => {
+    RequestService.config.plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
       if (leftcycleFn) {
         leftcycleFn.bind(plugin)(response, options)
       }
     })
 
-    // 执行上下文插件
-    RequestService.config.plugins.forEach((plugin) => {
+    // 执行实例插件
+    plugins.forEach((plugin) => {
       const leftcycleFn = plugin[leftcycle]
       if (leftcycleFn) {
         leftcycleFn.bind(plugin)(response, options)
