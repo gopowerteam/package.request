@@ -246,6 +246,10 @@ export class RequestService {
 
   /**
    * 生成请求路径
+   *
+   * 插件 before 钩子在此仅执行副作用(如埋点):其追加参数(extraParams)
+   * 为 axios 配置级(由适配器直接展开),不会并入 URL;
+   * 且此处执行未 await,async 副作用不保证在返回前完成。
    * @param {RequestSendOptions} options 请求选项
    * @param {RequestPlugin[]} plugins 请求插件
    * @returns string
