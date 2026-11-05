@@ -30,10 +30,12 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
+  - '@parcel/watcher'
+  - vue-demi
 
 registry: https://registry.npmmirror.com
 
 allowBuilds:
-  '@parcel/watcher': set this to true or false
+  '@parcel/watcher': true
   esbuild: true
-  vue-demi: set this to true or false
+  vue-demi: true
