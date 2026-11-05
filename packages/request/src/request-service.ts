@@ -52,7 +52,7 @@ export class RequestService {
   ) {
     const extraParams = {}
 
-    const appendParams = (params: Record<string, any>) => {
+    const appendParams = (params: Record<string, unknown>) => {
       Object.assign(extraParams, params || {})
     }
 
@@ -145,7 +145,7 @@ export class RequestService {
   private startRequest(
     adapter: RequestAdapter,
     options: RequestSendOptions,
-    extraParams?: Record<string, any>,
+    extraParams?: Record<string, unknown>,
   ) {
     return adapter.request({
       baseURL: RequestService.config.gateway,

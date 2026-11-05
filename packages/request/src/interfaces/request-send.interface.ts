@@ -17,7 +17,7 @@ export interface RequestSendOptions {
   method: RequestMethod | string
   headers?: Record<string, string | boolean>
   paramsPath?: Record<string, string | number>
-  paramsQuery?: Record<string, any>
-  paramsBody?: any
+  paramsQuery?: Record<string, unknown>
+  paramsBody?: unknown
   signal?: AbortSignal
 }

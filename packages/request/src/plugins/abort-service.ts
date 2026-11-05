@@ -21,7 +21,7 @@ export class AbortService implements RequestPlugin {
    */
   public async before(
     options: RequestSendOptions,
-    _appendParams?: (params: Record<string, any>) => void,
+    _appendParams?: (params: Record<string, unknown>) => void,
   ): Promise<void> {
     const controller = new AbortController()
     this.controllers.add(controller)

@@ -38,7 +38,7 @@ function getKeyWithDot(key: string, childKey: string, allowDots: boolean): strin
  * 递归处理对象值
  */
 function processValue(
-  value: any,
+  value: unknown,
   options: QueryStringifyOptions,
   parentKey = '',
 ): string[] {
@@ -98,12 +98,12 @@ function processValue(
         ? getKeyWithDot(parentKey, childKey, options.allowDots || false)
         : childKey
 
-      result.push(...processValue(value[childKey], options, fullKey))
+      result.push(...processValue((value as Record<string, unknown>)[childKey], options, fullKey))
     })
   }
   else {
     const shouldEncode = options.encode !== false
-    const encodedValue = encodeValue(value.toString(), shouldEncode)
+    const encodedValue = encodeValue(String(value), shouldEncode)
     const encodedKey = options.encodeValuesOnly
       ? parentKey
       : encodeValue(parentKey, shouldEncode)
@@ -117,7 +117,7 @@ function processValue(
  * 将对象序列化为查询字符串
  */
 export function stringify(
-  obj: Record<string, any>,
+  obj: Record<string, unknown>,
   options: QueryStringifyOptions = {},
 ): string {
   const {

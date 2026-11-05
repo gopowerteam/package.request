@@ -11,19 +11,19 @@ export interface RequestAdapter {
   /**
    * 发送请求
    */
-  request: (options: RequestAdapterOptions) => Promise<any>
+  request: (options: RequestAdapterOptions) => Promise<unknown>
 
   /**
    * 转换Response
-   * @param response
+   * @param response 适配器原始响应(类型由具体适配器实现内部收窄)
    */
-  transformResponse: (response: any) => AdapterResponse
+  transformResponse: (response: unknown) => AdapterResponse
 
   /**
    * 转换Exception
-   * @param response
+   * @param response 适配器原始异常(类型由具体适配器实现内部收窄)
    */
-  transformException: (response: any) => AdapterResponse
+  transformException: (response: unknown) => AdapterResponse
 }
 
 export interface RequestAdapterOptions {
@@ -31,9 +31,9 @@ export interface RequestAdapterOptions {
   pathURL: string
   headers: Record<string, string | boolean>
   method: RequestMethod | string
-  paramsQuery?: Record<string, any>
-  paramsBody?: any
-  extraParams?: any
+  paramsQuery?: Record<string, unknown>
+  paramsBody?: unknown
+  extraParams?: Record<string, unknown>
   signal?: AbortSignal
 }
 

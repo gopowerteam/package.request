@@ -120,12 +120,13 @@ export class AxiosAdapter implements RequestAdapter {
    * @param response
    * @returns AdapterResponse
    */
-  public transformResponse(response: AxiosResponse): AdapterResponse {
+  public transformResponse(response: unknown): AdapterResponse {
+    const res = response as AxiosResponse
     return {
-      data: response.data,
-      statusText: response.statusText,
-      status: response.status,
-      headers: response.headers as AdapterResponseHeaders,
+      data: res.data,
+      statusText: res.statusText,
+      status: res.status,
+      headers: res.headers as AdapterResponseHeaders,
     }
   }
 
@@ -133,16 +134,17 @@ export class AxiosAdapter implements RequestAdapter {
    * 转换Response
    * @returns AdapterResponse
    */
-  public transformException(exception: AxiosError): AdapterResponse {
+  public transformException(exception: unknown): AdapterResponse {
+    const err = exception as AxiosError
     const response: AdapterResponse = {
-      data: exception.response?.data || {},
-      statusText: exception.response?.statusText || '',
-      status: exception.response?.status || 400,
-      headers: (exception.response?.headers as AdapterResponseHeaders) || {},
+      data: err.response?.data || {},
+      statusText: err.response?.statusText || '',
+      status: err.response?.status || 400,
+      headers: (err.response?.headers as AdapterResponseHeaders) || {},
     }
 
     // 取消的请求标记 canceled,调用方可据此静默处理
-    if (axios.isCancel(exception)) {
+    if (axios.isCancel(err)) {
       response.canceled = true
     }
 

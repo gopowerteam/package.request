@@ -9,7 +9,7 @@
 export interface ObservableLike<T> {
   subscribe: (observer?: {
     next?: (value: T) => void
-    error?: (err: any) => void
+    error?: (err: unknown) => void
     complete?: () => void
   }) => { unsubscribe: () => void } | void
 }
