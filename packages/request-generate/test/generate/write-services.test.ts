@@ -143,8 +143,10 @@ describe('writeServices - 生成内容继承基类(模板护栏)', () => {
       expect(content).not.toContain('switch(true)')
       expect(content).not.toContain('private request = RequestService.getInstance()')
 
-      // 方法调用方式保持不变
-      expect(content).toContain('this.generateRequest(')
+      // 数据分支经 sendData 泛型分发,URL 分支直接走 toURL
+      expect(content).toContain('this.sendData<')
+      expect(content).toContain('RequestGenerateType.URL')
+      expect(content).not.toContain('this.generateRequest(')
     }
     finally {
       process.chdir(cwd)

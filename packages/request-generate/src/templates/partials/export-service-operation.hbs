@@ -46,11 +46,11 @@ public {{{name}}}(
     {{/if}}
   }
 
-  return this.generateRequest(
-    requestSendOptions,
-    requestPlugins,
-    requestGenerateOptions
-  )
+  if (requestGenerateOptions?.type === RequestGenerateType.URL) {
+    return this.request.toURL(requestSendOptions, requestPlugins)
+  }
+
+  return this.sendData<{{{responseRef}}}>(requestSendOptions, requestPlugins) as {{>export-operation-response }}
 
 
 }
