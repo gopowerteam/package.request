@@ -19,6 +19,7 @@ const TYPE_MAPPINGS = new Map<string, string>([
   ['string', 'string'],
   ['void', 'void'],
   ['null', 'null'],
+  ['never', 'never'],
 ])
 
 /**

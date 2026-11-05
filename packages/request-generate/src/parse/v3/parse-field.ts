@@ -4,7 +4,7 @@ import { parseSchemaType } from './parse-schema-type'
 
 export function parseField(
   name: string,
-  properties: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+  properties: boolean | OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
   required = false,
 ) {
   // 创建字段
@@ -18,7 +18,8 @@ export function parseField(
   field.imports = imports
   field.enums = enums
 
-  if (!('$ref' in properties)) {
+  // boolean schema(3.1)无 description
+  if (typeof properties !== 'boolean' && !('$ref' in properties)) {
     field.description = properties.description
   }
 

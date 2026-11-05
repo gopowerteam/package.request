@@ -4,11 +4,12 @@
 [![npm downloads](https://img.shields.io/npm/dm/@gopowerteam/request-generate.svg)](https://www.npmjs.com/package/@gopowerteam/request-generate)
 [![types](https://img.shields.io/npm/types/@gopowerteam/request-generate.svg)](https://www.npmjs.com/package/@gopowerteam/request-generate)
 
-基于 OpenAPI / Swagger 规范自动生成类型安全 Service 代码的工具链。支持 **OpenAPI v2 与 v3**,提供 **CLI**、**编程式 API** 与 **Vite 插件** 三种接入方式,生成的代码直接消费 [`@gopowerteam/request`](https://www.npmjs.com/package/@gopowerteam/request) 的 `RequestService`。
+基于 OpenAPI / Swagger 规范自动生成类型安全 Service 代码的工具链。支持 **OpenAPI v2 / v3 / v3.1**,提供 **CLI**、**编程式 API** 与 **Vite 插件** 三种接入方式,生成的代码直接消费 [`@gopowerteam/request`](https://www.npmjs.com/package/@gopowerteam/request) 的 `RequestService`。
 
 ## 特性
 
-- **双版本规范** —— 同时解析 OpenAPI / Swagger 2.0 与 3.0 文档
+- **三版本规范** —— 同时解析 OpenAPI / Swagger 2.0、3.0 与 3.1(JSON Schema 2020-12)文档
+- **3.1 兼容范围** —— type 数组可空(`type: [string, 'null']`)、多类型联合、boolean schema、`const`、3.0 `nullable: true`;`prefixItems`(tuple)降级 `any[]`,顶层 `webhooks` 忽略,嵌套 `$defs` 引用降级 `any`
 - **三种接入方式** —— CLI(开箱即用)、编程式 API(集成到脚本)、Vite 插件(开发时自动生成)
 - **类型安全产物** —— 生成完整的 Service 类与 Model 类型定义,IDE 自动补全全程在线
 - **灵活命名** —— 通过 `serviceResolve` / `operationResolve` 自定义服务类名与方法名,支持中文 tag 处理与 `operationId` 清洗
