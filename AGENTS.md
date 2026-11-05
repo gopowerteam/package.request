@@ -28,6 +28,7 @@ services from OpenAPI/Swagger specs).
 | `packages/request-generate/`   | `@gopowerteam/request-generate` — OpenAPI → TS codegen CLI + plugin  |
 | `apps/playground-test/`       | `playground-test` — tsx scripts exercising both packages             |
 | `apps/playground-test-vite/`  | `playground-test-vite` — Vue 3 + Vite app for manual plugin testing  |
+| `apps/docs/`                  | `request-docs` — VuePress 2 documentation site for both packages     |
 
 Each `packages/*` has its **own `AGENTS.md`** with package-specific architecture (entrypoints,
 entities, parser layout, template helpers). Read the relevant child file before editing that package.
@@ -69,6 +70,8 @@ pnpm vitest run -t "pattern"                                     # by test name
 
 pnpm play:test               # playground-test dev: codegen script, then request script (tsx)
 pnpm play:test-vite          # apps/playground-test-vite dev server (vite)
+pnpm docs:dev                # apps/docs VuePress dev server
+pnpm docs:build              # apps/docs site build (dead-link check included)
 
 pnpm --filter @gopowerteam/request build                       # single package
 pnpm --filter @gopowerteam/request-generate test

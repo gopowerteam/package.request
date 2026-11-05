@@ -39,3 +39,7 @@ dist/
 generated/
 http
 .request
+
+# vuepress
+**/.vuepress/.temp
+**/.vuepress/.cache

@@ -19,6 +19,8 @@ pnpm lint             # ESLint
 pnpm typecheck        # tsc --noEmit（依赖 build 产物）
 pnpm play:test        # apps/playground-test：先跑 codegen 再跑请求脚本（tsx）
 pnpm play:test-vite   # apps/playground-test-vite 开发服务器（Vue 3 + Vite）
+pnpm docs:dev         # apps/docs 文档站开发服务器（VuePress 2）
+pnpm docs:build       # apps/docs 文档站构建（含死链检查）
 pnpm commit           # 交互式提交（中文约定式提交）
 ```
 

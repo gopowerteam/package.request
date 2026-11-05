@@ -28,7 +28,9 @@
     "commit": "git-cz",
     "preinstall": "npx only-allow pnpm",
     "cs": "changeset && changeset version",
-    "publish-packages": "turbo run build && changeset version && changeset publish --provenance"
+    "publish-packages": "turbo run build && changeset version && changeset publish --provenance",
+    "docs:dev": "pnpm --filter request-docs run docs:dev",
+    "docs:build": "pnpm --filter request-docs run docs:build"
   },
   "workspaces": [
     "playground/*",

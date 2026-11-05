@@ -1,0 +1,16 @@
+{
+  "name": "request-docs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@vuepress/bundler-vite": "2.0.0-rc.31",
+    "@vuepress/theme-default": "2.0.0-rc.31",
+    "vue": "^3.5.0",
+    "vuepress": "2.0.0-rc.31"
+  }
+}
