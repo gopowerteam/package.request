@@ -187,4 +187,19 @@ describe('测试RequestService', () => {
       })
     expect(order).toEqual(['global', 'instance'])
   })
+
+  it('send 应支持响应类型泛型', async () => {
+    createMockSetup()
+    const request = RequestService.getInstance()
+
+    const data = await request.send<{ id: number }>({
+      path: '/users/1',
+      method: 'GET',
+    })
+
+    // 类型断言在 tsc 类型检查时生效(tsconfig include 含 test 目录)
+    expectTypeOf(data).toEqualTypeOf<{ id: number }>()
+
+    expect(data).toBeTypeOf('object')
+  })
 })

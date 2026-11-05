@@ -168,7 +168,7 @@ export class RequestService {
    * @param response 请求响应对象
    * @returns Promise
    */
-  private execInterceptors(response: AdapterResponse, hasException = false) {
+  private execInterceptors<T = any>(response: AdapterResponse, hasException = false): Promise<T> {
     const interceptors = RequestService.config?.interceptors
 
     if (
@@ -201,14 +201,17 @@ export class RequestService {
 
   /**
    * 发送请求
+   *
+   * 泛型 T 为信任断言:运行时数据经用户拦截器(interceptors.success.exec)
+   * 转换产出,类型系统无法验证其与 T 一致,调用方需自行保证。
    * @param {RequestSendOptions} options 请求选项
    * @param {RequestPlugin[]} requestPlugins 请求插件
    * @returns Promise
    */
-  public async send(
+  public async send<T = any>(
     options: RequestSendOptions,
     requestPlugins: (RequestPlugin | undefined)[] = [],
-  ): Promise<any> {
+  ): Promise<T> {
     if (!RequestService.config) {
       throw new Error('请检查请求配置是否完成')
     }
@@ -241,7 +244,7 @@ export class RequestService {
     }
 
     // 执行拦截器
-    return this.execInterceptors(response, hasException)
+    return this.execInterceptors<T>(response, hasException)
   }
 
   /**

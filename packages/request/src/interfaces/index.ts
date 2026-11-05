@@ -1,3 +1,4 @@
+export * from './observable-like.interface'
 export * from './request-adapter.interface'
 export * from './request-generate.interface'
 export * from './request-plugin.interface'

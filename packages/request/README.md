@@ -95,6 +95,25 @@ bootstrap()
 
 通过 `RequestService.getInstance().send(options, plugins?)` 发起请求。
 
+### 响应类型泛型
+
+`send<T>` 以响应泛型标注返回值类型(`Promise<T>`),直调场景(非代码生成)推荐显式声明:
+
+```ts
+interface UserInfo {
+  id: number
+  name: string
+}
+
+const user = await request.send<UserInfo>({
+  path: '/users/{id}',
+  method: RequestMethod.Get,
+  paramsPath: { id: 42 },
+})
+```
+
+> 注意:`T` 为信任断言 —— 运行时数据经用户拦截器(`success.exec`)转换产出,类型系统无法验证其与 `T` 一致,需自行保证拦截器产出与声明类型匹配。`@gopowerteam/request-generate` 生成的服务方法已自动携带类型,无需手动标注。
+
 ### `RequestSendOptions`
 
 | 字段 | 类型 | 说明 |

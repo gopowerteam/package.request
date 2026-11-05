@@ -2,6 +2,7 @@ import type { Observable } from 'rxjs'
 import type { RequestGenerateOptions, RequestPlugin, RequestSendOptions } from '../interfaces'
 import { from } from 'rxjs'
 import { GenerateRequestService } from '../generate-request-service'
+import { RequestGenerateType } from '../interfaces'
 
 /**
  * 代码生成服务基类(Observable 模式)
@@ -14,18 +15,23 @@ import { GenerateRequestService } from '../generate-request-service'
  * 避免主入口引入 rxjs 依赖(promise 模式宿主无需安装 rxjs)。
  */
 export class ObservableGenerateRequestService extends GenerateRequestService {
-  protected override generateRequest(
+  protected override generateRequest<R = any>(
     requestSendOptions: RequestSendOptions,
     requestPlugins: (RequestPlugin | undefined)[] = [],
     requestGenerateOptions?: RequestGenerateOptions,
-  ): string | Observable<any> {
-    return super.generateRequest(requestSendOptions, requestPlugins, requestGenerateOptions)
+  ): string | Observable<R> {
+    if (requestGenerateOptions?.type === RequestGenerateType.URL) {
+      return this.request.toURL(requestSendOptions, requestPlugins)
+    }
+
+    return this.sendData<R>(requestSendOptions, requestPlugins)
   }
 
-  protected override sendData(
+  protected override sendData<R = any>(
     requestSendOptions: RequestSendOptions,
     requestPlugins: (RequestPlugin | undefined)[],
-  ): Observable<any> {
-    return from(super.sendData(requestSendOptions, requestPlugins))
+  ): Observable<R> {
+    // 基类数据分支运行时恒为 Promise,此处断言以适配 from() 的 ObservableInput 形参
+    return from(super.sendData<R>(requestSendOptions, requestPlugins) as Promise<R>)
   }
 }
