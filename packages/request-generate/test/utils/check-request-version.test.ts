@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { checkRequestVersion } from '../../src/utils/check-request-version'
+import { checkRequestVersion, MIN_REQUEST_VERSION } from '../../src/utils/check-request-version'
 
 describe('checkRequestVersion - 宿主 request 版本校验', () => {
   let tmpCwd = ''
@@ -43,11 +43,11 @@ describe('checkRequestVersion - 宿主 request 版本校验', () => {
 
     expect(warnSpy).toHaveBeenCalledOnce()
     expect(warnSpy.mock.calls[0][0]).toContain('0.3.3')
-    expect(warnSpy.mock.calls[0][0]).toContain('0.4.0')
+    expect(warnSpy.mock.calls[0][0]).toContain(MIN_REQUEST_VERSION)
   })
 
   it('版本等于下限时不应告警', () => {
-    writeRequestVersion('0.4.0')
+    writeRequestVersion(MIN_REQUEST_VERSION)
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     checkRequestVersion()

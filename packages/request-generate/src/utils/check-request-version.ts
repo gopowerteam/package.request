@@ -6,7 +6,7 @@ import process from 'node:process'
  * 生成产物依赖的最低 @gopowerteam/request 版本
  * (生成代码 extends GenerateRequestService / ObservableGenerateRequestService)
  */
-export const MIN_REQUEST_VERSION = '0.4.0'
+export const MIN_REQUEST_VERSION = '0.5.0'
 
 /**
  * 解析 semver 版本号为 [主, 次, 补] 数字数组;非法格式返回 undefined
