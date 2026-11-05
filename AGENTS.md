@@ -26,8 +26,8 @@ services from OpenAPI/Swagger specs).
 | ------------------------------ | -------------------------------------------------------------------- |
 | `packages/request/`            | `@gopowerteam/request` — adapter-based HTTP client, axios built-in   |
 | `packages/request-generate/`   | `@gopowerteam/request-generate` — OpenAPI → TS codegen CLI + plugin  |
-| `playground/test/`             | `playground-test` — tsx scripts exercising both packages             |
-| `playground/test-vite/`        | `playground-test-vite` — Vue 3 + Vite app for manual plugin testing  |
+| `apps/playground-test/`       | `playground-test` — tsx scripts exercising both packages             |
+| `apps/playground-test-vite/`  | `playground-test-vite` — Vue 3 + Vite app for manual plugin testing  |
 
 Each `packages/*` has its **own `AGENTS.md`** with package-specific architecture (entrypoints,
 entities, parser layout, template helpers). Read the relevant child file before editing that package.
@@ -68,7 +68,7 @@ pnpm vitest run packages/request/test/request-service.test.ts   # one file
 pnpm vitest run -t "pattern"                                     # by test name
 
 pnpm play:test               # playground-test dev: codegen script, then request script (tsx)
-pnpm play:test-vite          # playground/test-vite dev server (vite)
+pnpm play:test-vite          # apps/playground-test-vite dev server (vite)
 
 pnpm --filter @gopowerteam/request build                       # single package
 pnpm --filter @gopowerteam/request-generate test
@@ -91,7 +91,7 @@ Notes:
 - Some non-test helpers sit in `test/` too (e.g. `request-plugin.ts`, `response-interceptors.ts`)
   — they are imported by tests, not run directly.
 - Vitest globals are enabled; do not add `import { describe } from 'vitest'`.
-- `request/tsconfig.json` includes `../../playground/test/src/**/*.ts` so the playground
+- `request/tsconfig.json` includes `../../apps/playground-test/src/**/*.ts` so the playground
   is type-checked against the package source during IDE/tsc flows.
 
 ## Conventions that differ from defaults
@@ -124,7 +124,7 @@ Notes:
 
 - The old README still describes the upstream Turborepo starter (`docs`/`web`/`ui`) — **ignore it**;
   it does not match this repo.
-- `pnpm-workspace.yaml` hoists `@vue/runtime-core` and `exceljs` — needed by `playground/test-vite`.
+- `pnpm-workspace.yaml` hoists `@vue/runtime-core` and `exceljs` — needed by `apps/playground-test-vite`.
 - `request-generate`'s runtime config file is `request.config.ts` at the package root (CommonJS
   `module.exports` despite the `.ts` extension — loaded via `tsx`). It maps gateway applications
   (`mall-service`, `file-service`) and writes generated code to `./generated`.

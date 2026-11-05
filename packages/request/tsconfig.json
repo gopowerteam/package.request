@@ -17,5 +17,5 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["src", "../../playground/test/src/**/*.ts", "test"]
+  "include": ["src", "../../apps/playground-test/src/**/*.ts", "test"]
 }
