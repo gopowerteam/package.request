@@ -61,16 +61,17 @@ const importServiceTemplate = `
 import { {{{name}}} as {{group}}_{{name}} } from '{{path}}'
 {{/each}}
 {{/each}}
-{{else}}
-{{#each services}}
+{{/if}}
+{{#if flatServices}}
+{{#each flatServices}}
 import { {{{name}}} } from '{{path}}'
 {{/each}}
 {{/if}}
 `
 
 const defineServiceMapTemplate = `
-{{#if groups}}
 const serviceMap = {
+  {{#if groups}}
   {{#each groups}}
   {{{name}}}: {
     {{#each services}}
@@ -78,14 +79,13 @@ const serviceMap = {
     {{/each}}
   },
   {{/each}}
-}
-{{else}}
-const serviceMap = {
-{{#each services}}
+  {{/if}}
+  {{#if flatServices}}
+  {{#each flatServices}}
   {{{name}}},
-{{/each}}
+  {{/each}}
+  {{/if}}
 }
-{{/if}}
 `
 
 export const generateCodeTemplate = `

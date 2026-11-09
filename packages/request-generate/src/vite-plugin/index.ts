@@ -21,6 +21,21 @@ export interface PluginOptions {
   dts: string | boolean
   /** 显式指定 request-generate 配置文件路径;未指定时自动发现 */
   configFile?: string
+  /**
+   * Service 分组策略:
+   * - 'http':按 http 目录段分组(缺省,向后兼容)
+   * - 'first-dir':按扫描目录下第一级子目录分组(多应用布局 <output>/<app>/services/)
+   * - 'none':强制扁平
+   */
+  groupStrategy?: GroupStrategy
+}
+
+export type GroupStrategy = 'http' | 'first-dir' | 'none'
+
+/** 扫描中间结构:原始绝对路径用于分组与报错,alias 改写路径用于导入 */
+interface ScannedService {
+  absolutePath: string
+  importPath: string
 }
 
 interface ServiceItem {
@@ -83,15 +98,22 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
         : (generateOptions.baseDir ?? viteConfig.root)
       const targetDir = path.resolve(scanBase, scanDir)
 
-      const paths = getServicePaths(options, targetDir, viteConfig)
-      const services = getServiceItems(paths)
+      const scanned = scanServiceFiles(targetDir, viteConfig, options.alias)
+      const strategy = options.groupStrategy ?? 'http'
+      const services = buildServiceItems(scanned, strategy, targetDir)
       const groups = getServiceGroups(services)
+      const flatServices = services.filter(service => !service.group)
+
+      // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
+      groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
+      assertUniqueServiceNames(flatServices)
+      assertUniqueTopLevelKeys(groups, flatServices)
 
       if (services.length > 0) {
-        generatedCode = renderCode(services, groups)
+        generatedCode = renderCode(groups, flatServices)
 
         if (options.dts !== false) {
-          generateDeclare(services, groups, options, viteConfig)
+          generateDeclare(groups, flatServices, options, viteConfig)
         }
       }
     },
@@ -125,18 +147,18 @@ function toPascalCase(str = ''): string {
 }
 
 /**
- * 生成服务路径
- * @param options PluginOptions
+ * 扫描 targetDir 下所有 *Service.ts,并改写为 alias 导入路径
  * @param targetDir 已解析的扫描目录绝对路径
  * @param config Vite 已解析配置
- * @returns string[]
+ * @param alias 目标别名
+ * @returns ScannedService[]
  */
-function getServicePaths(
-  options: PluginOptions,
+function scanServiceFiles(
   targetDir: string,
   config: ResolvedConfig,
-) {
-  const paths: string[] = []
+  alias: string,
+): ScannedService[] {
+  const files: string[] = []
 
   // 遍历目录
   const walk = (dir: string) => {
@@ -146,7 +168,7 @@ function getServicePaths(
       const stat = fs.statSync(fullpath)
 
       if (stat.isFile() && fullpath.endsWith('Service.ts')) {
-        paths.push(fullpath)
+        files.push(fullpath)
       }
       else if (stat.isDirectory()) {
         walk(path.join(dir, file))
@@ -156,12 +178,12 @@ function getServicePaths(
 
   // 查找别名配置,缺失时给出明确错误
   const aliasMatch = config.resolve.alias.find(
-    alias => alias.find === options.alias,
+    candidate => candidate.find === alias,
   )
 
   if (!aliasMatch) {
     throw new Error(
-      `Vite alias "${options.alias}" 未在配置中找到,请在 vite.config 中配置 resolve.alias;当前已配置: ${config.resolve.alias.map(alias => String(alias.find)).join(', ')}`,
+      `Vite alias "${alias}" 未在配置中找到,请在 vite.config 中配置 resolve.alias;当前已配置: ${config.resolve.alias.map(candidate => String(candidate.find)).join(', ')}`,
     )
   }
 
@@ -170,53 +192,150 @@ function getServicePaths(
   }
 
   const replacement = aliasMatch.replacement.replace(/\\/g, '/')
-  return paths.map((filepath) => {
+  return files.map((filepath) => {
     // 显式判定替代显式 replace:字符串 replace 未命中时会静默产出绝对路径 import
     if (!filepath.startsWith(replacement)) {
       throw new Error(
-        `Service 文件 "${filepath}" 不在 alias "${options.alias}"(指向 "${replacement}")目录内,请检查 resolve.alias 与扫描目录(dir/output)是否匹配`,
+        `Service 文件 "${filepath}" 不在 alias "${alias}"(指向 "${replacement}")目录内,请检查 resolve.alias 与扫描目录(dir/output)是否匹配`,
       )
     }
-    return options.alias + filepath.slice(replacement.length)
+    return { absolutePath: filepath, importPath: alias + filepath.slice(replacement.length) }
   })
 }
 
 /**
- * 生成服务项
- * @param paths
- * @returns ServiceItem[]
+ * 由扫描结果构建 ServiceItem(名称/分组/导入路径)
+ * @param scanned 扫描结果
+ * @param strategy 分组策略
+ * @param scanRoot 扫描根目录(first-dir 策略的相对基准)
  */
-function getServiceItems(paths: string[]): ServiceItem[] {
-  return paths.map((filePath) => {
-    const name = toPascalCase(path.basename(filePath, '.ts'))
+function buildServiceItems(
+  scanned: ScannedService[],
+  strategy: GroupStrategy,
+  scanRoot: string,
+): ServiceItem[] {
+  const rawDirByGroup = new Map<string, string>()
 
-    return {
-      name,
-      group: getServiceGroup(filePath),
-      path: filePath.replace(/\.ts$/g, ''),
-    }
-  })
+  return scanned.map(({ absolutePath, importPath }) => ({
+    name: toPascalCase(path.basename(importPath, '.ts')),
+    group: resolveGroup(absolutePath, importPath, strategy, scanRoot, rawDirByGroup),
+    path: importPath.replace(/\.ts$/g, ''),
+  }))
 }
 
 /**
- * 从服务路径中提取分组名
+ * 按策略解析单个 Service 的分组
+ */
+function resolveGroup(
+  absolutePath: string,
+  importPath: string,
+  strategy: GroupStrategy,
+  scanRoot: string,
+  rawDirByGroup: Map<string, string>,
+): string | undefined {
+  switch (strategy) {
+    case 'none':
+      return undefined
+    case 'http':
+      return getHttpGroup(importPath)
+    case 'first-dir': {
+      const relative = path.relative(scanRoot, absolutePath).replace(/\\/g, '/')
+      const segments = relative.split('/')
+
+      // 文件直接位于扫描根,无首级子目录 → 未分组(扁平)
+      if (segments.length < 2) {
+        return undefined
+      }
+
+      const rawDir = segments[0]!
+      const group = toGroupName(rawDir)
+
+      // 撞名断言:不同原始目录 PascalCase 后同名 → 报错而非静默合并
+      const prevRawDir = rawDirByGroup.get(group)
+      if (prevRawDir && prevRawDir !== rawDir) {
+        throw new Error(
+          `Service 分组名冲突: 目录 "${prevRawDir}" 与 "${rawDir}" 均映射为分组 "${group}",请调整目录命名`,
+        )
+      }
+      rawDirByGroup.set(group, rawDir)
+
+      return group
+    }
+  }
+}
+
+/**
+ * 目录/路径段 → 分组名(PascalCase);要求为合法标识符,避免产出非法对象键
+ */
+function toGroupName(raw: string): string {
+  const name = toPascalCase(raw)
+  if (!/^[A-Z_$][\w$]*$/i.test(name)) {
+    throw new Error(`Service 分组名 "${name}"(来自 "${raw}")不是合法的标识符,请调整目录命名`)
+  }
+  return name
+}
+
+/**
+ * 从服务导入路径中提取分组名('http' 策略)
  *
  * 约定: <alias>/http/<group?>/.../<Name>Service.ts
  * group 为 http 下的第一级目录;若为 services(默认目录)则视为无分组。
  */
-function getServiceGroup(filePath: string): string | undefined {
-  const segments = filePath.split('/')
+function getHttpGroup(importPath: string): string | undefined {
+  const segments = importPath.split('/')
   const httpIndex = segments.indexOf(HTTP_DIR_SEGMENT)
 
-  if (httpIndex === -1 || httpIndex + 1 >= segments.length)
+  if (httpIndex === -1 || httpIndex + 1 >= segments.length) {
     return undefined
+  }
 
-  const group = segments[httpIndex + 1]
+  const group = segments[httpIndex + 1]!
 
-  if (group === DEFAULT_SERVICE_DIR)
+  if (group === DEFAULT_SERVICE_DIR) {
     return undefined
+  }
 
-  return toPascalCase(group)
+  return toGroupName(group)
+}
+
+/**
+ * 断言组内(或全扁平)Service 无重名:重名会产出对象字面量重复键(TS1117/运行时静默覆盖)
+ */
+function assertUniqueServiceNames(services: ServiceItem[], groupName?: string): void {
+  const seen = new Map<string, ServiceItem>()
+
+  for (const service of services) {
+    const prev = seen.get(service.name)
+    if (prev) {
+      throw new Error(
+        `Service 重名: ${groupName
+          ? `分组 "${groupName}" 下 `
+          : ''}"${service.name}" 同时来自 ${prev.path} 与 ${service.path},请调整生成配置(serviceResolve)或启用 groupStrategy 分组`,
+      )
+    }
+    seen.set(service.name, service)
+  }
+}
+
+/**
+ * 断言 serviceMap 顶层键唯一:分组名与扁平 Service 名共享顶层命名空间
+ */
+function assertUniqueTopLevelKeys(groups: GroupItem[], flatServices: ServiceItem[]): void {
+  const keys = new Map<string, string>()
+  const register = (key: string, source: string) => {
+    const prev = keys.get(key)
+    if (prev) {
+      throw new Error(`serviceMap 顶层键冲突: "${key}" 同时来自 ${prev} 与 ${source}`)
+    }
+    keys.set(key, source)
+  }
+
+  for (const group of groups) {
+    register(group.name, `分组 "${group.name}"`)
+  }
+  for (const service of flatServices) {
+    register(service.name, `Service "${service.path}"`)
+  }
 }
 
 /**
@@ -248,35 +367,35 @@ function getServiceGroups(services: ServiceItem[]): GroupItem[] {
 
 /**
  * 渲染虚拟模块代码
- * @param services
- * @param groups
+ * @param groups 分组 Service(可能为空)
+ * @param flatServices 未分组 Service(可能为空)
  */
-function renderCode(services: ServiceItem[], groups: GroupItem[]): string {
+function renderCode(groups: GroupItem[], flatServices: ServiceItem[]): string {
   const template = Handlebars.compile(generateCodeTemplate)
 
   return template({
     groups: groups.length ? groups : undefined,
-    services,
+    flatServices: flatServices.length ? flatServices : undefined,
   })
 }
 
 /**
  * 生成类型声明文件
- * @param services
- * @param groups
+ * @param groups 分组 Service(可能为空)
+ * @param flatServices 未分组 Service(可能为空)
  * @param options
  * @param config
  */
 function generateDeclare(
-  services: ServiceItem[],
   groups: GroupItem[],
+  flatServices: ServiceItem[],
   options: PluginOptions,
   config: ResolvedConfig,
 ) {
   const template = Handlebars.compile(generateDeclareTemplate)
   const content = template({
     groups: groups.length ? groups : undefined,
-    services,
+    flatServices: flatServices.length ? flatServices : undefined,
     MODULE_ID,
   })
 

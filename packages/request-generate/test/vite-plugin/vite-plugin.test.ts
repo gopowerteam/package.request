@@ -149,8 +149,8 @@ describe('vite-plugin requestGeneratePlugin', () => {
     expect(code).toContain('UserService,')
   })
 
-  // 固化现状:groups 分支的模板只遍历 groups,未分组 service 被丢弃(疑似 bug,详见测试报告)
-  it('存在分组时,无分组 service 不会进入虚拟模块(疑似 bug 现状固化)', async () => {
+  // #5 修复:groups 与扁平 service 混合渲染,未分组 service 不再被静默丢弃
+  it('存在分组时,无分组 service 也进入虚拟模块(混合渲染)', async () => {
     vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'src/http' }))
     writeService(path.join(tmpRoot, 'src/http/mall'), 'OrderService')
     writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
@@ -162,7 +162,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
 
     const code = hooks.load('virtual:request') ?? ''
     expect(code).toContain('Mall_OrderService')
-    expect(code).not.toContain('UserService')
+    expect(code).toContain('UserService')
   })
 
   it('dts: false 时不生成声明文件', async () => {
@@ -261,5 +261,163 @@ describe('vite-plugin requestGeneratePlugin', () => {
     await hooks.buildStart()
 
     expect(loadConfigFile).toHaveBeenCalledWith('custom.config.ts', tmpRoot)
+  })
+
+  it('groupStrategy: \'first-dir\' 以扫描目录下第一级子目录作为分组', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    // 多应用布局: <output>/<app>/services/XxxService.ts
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+    writeService(path.join(tmpRoot, 'generated/crm-service/services'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = hooks.load('virtual:request') ?? ''
+    expect(code).toContain('import { AuthService as DsoService_AuthService } from \'@/dso-service/services/AuthService\'')
+    expect(code).toContain('import { AuthService as CrmService_AuthService } from \'@/crm-service/services/AuthService\'')
+    expect(code).toContain('DsoService: {')
+    expect(code).toContain('AuthService: DsoService_AuthService,')
+    expect(code).toContain('CrmService: {')
+
+    // d.ts 同步分组声明
+    const dts = fs.readFileSync(path.join(tmpRoot, 'request.d.ts'), 'utf-8')
+    expect(dts).toContain('DsoService_AuthService')
+  })
+
+  it('groupStrategy: \'first-dir\' 两个目录 PascalCase 后撞名时报错(dso-service vs Dso-service)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'UserService')
+    writeService(path.join(tmpRoot, 'generated/Dso-service/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(
+      /目录 ".+" 与 ".+" 均映射为分组 "DsoService"/,
+    )
+  })
+
+  it('groupStrategy: \'first-dir\' 同组内 Service 重名时报错并列出两个路径', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+    writeService(path.join(tmpRoot, 'generated/dso-service/services/nested'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(
+      /分组 "DsoService" 下 "AuthService" 同时来自/,
+    )
+  })
+
+  it('分组名与扁平 Service 名顶层撞键时报错', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    // 目录 mall-service → 分组 MallService;扫描根下扁平文件 MallService.ts → 同名撞键
+    writeService(path.join(tmpRoot, 'generated/mall-service/services'), 'OrderService')
+    writeService(path.join(tmpRoot, 'generated'), 'MallService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(/serviceMap 顶层键冲突: "MallService"/)
+  })
+
+  it('groupStrategy: \'none\' 强制扁平,重名时报错', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+    writeService(path.join(tmpRoot, 'generated/crm-service/services'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'none',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(
+      /"AuthService" 同时来自/,
+    )
+  })
+
+  it('groupStrategy: \'none\' 无重名时输出扁平结构', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'none',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = hooks.load('virtual:request') ?? ''
+    expect(code).toContain('import { AuthService } from \'@/dso-service/services/AuthService\'')
+    expect(code).toContain('AuthService,')
+    expect(code).not.toContain('DsoService: {')
+  })
+
+  it('分组名为非法标识符(数字开头)时报错', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/2xx-app/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(/不是合法的标识符/)
+  })
+
+  it('first-dir:文件直接位于扫描根时视为未分组(扁平)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated'), 'RootService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = hooks.load('virtual:request') ?? ''
+    expect(code).toContain('import { RootService } from')
+    expect(code).toContain('RootService,')
   })
 })
