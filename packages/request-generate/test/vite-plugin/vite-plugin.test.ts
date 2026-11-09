@@ -220,7 +220,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     await expect(hooks.buildStart()).rejects.toThrow('未指定扫描目录')
   })
 
-  it('alias 未在 Vite 配置中找到时抛出明确错误', async () => {
+  it('alias 未在 Vite 配置中找到时抛出明确错误,并附上当前已配置的别名列表', async () => {
     writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
 
     const plugin = requestGeneratePlugin({ alias: '$src', dts: true })
@@ -228,6 +228,20 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot)) // 仅有 '@' 别名
 
     await expect(hooks.buildStart()).rejects.toThrow('Vite alias "$src" 未在配置中找到')
+    await expect(hooks.buildStart()).rejects.toThrow('当前已配置: @')
+  })
+
+  it('service 文件不在 alias 指向目录内时抛出明确错误(而非静默产出坏 import)', async () => {
+    // alias '@' 指向 <root>/src,扫描目录为 <root>/generated → 改写必然未命中
+    writeService(path.join(tmpRoot, 'generated/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true, dir: 'generated' })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+
+    await expect(hooks.buildStart()).rejects.toThrow(
+      /不在 alias "@"\(指向 ".*\/src"\)目录内/,
+    )
   })
 
   it('generate.startup 失败时包装为统一错误', async () => {

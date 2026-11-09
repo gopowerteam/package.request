@@ -161,7 +161,7 @@ function getServicePaths(
 
   if (!aliasMatch) {
     throw new Error(
-      `Vite alias "${options.alias}" 未在配置中找到,请在 vite.config 中配置 resolve.alias`,
+      `Vite alias "${options.alias}" 未在配置中找到,请在 vite.config 中配置 resolve.alias;当前已配置: ${config.resolve.alias.map(alias => String(alias.find)).join(', ')}`,
     )
   }
 
@@ -170,7 +170,15 @@ function getServicePaths(
   }
 
   const replacement = aliasMatch.replacement.replace(/\\/g, '/')
-  return paths.map(filepath => filepath.replace(replacement, options.alias))
+  return paths.map((filepath) => {
+    // 显式判定替代显式 replace:字符串 replace 未命中时会静默产出绝对路径 import
+    if (!filepath.startsWith(replacement)) {
+      throw new Error(
+        `Service 文件 "${filepath}" 不在 alias "${options.alias}"(指向 "${replacement}")目录内,请检查 resolve.alias 与扫描目录(dir/output)是否匹配`,
+      )
+    }
+    return options.alias + filepath.slice(replacement.length)
+  })
 }
 
 /**
