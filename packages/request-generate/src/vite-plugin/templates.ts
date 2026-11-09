@@ -88,12 +88,29 @@ const serviceMap = {
 }
 `
 
+const exportServiceTemplate = `
+{{#if groups}}
+{{#each groups}}
+{{#each services}}
+export { {{group}}_{{name}} as {{{name}}} }
+{{/each}}
+{{/each}}
+{{/if}}
+{{#if flatServices}}
+{{#each flatServices}}
+export { {{{name}}} }
+{{/each}}
+{{/if}}
+`
+
 export const generateCodeTemplate = `
 ${importServiceTemplate.trim()}
 
 ${defineServiceMapTemplate.trim()}
 
 ${useRequestFunctionCodeTemplate.trim()}
+
+${exportServiceTemplate.trim()}
 `
 
 export const generateDeclareTemplate = `declare module '{{{MODULE_ID}}}' {
@@ -102,6 +119,8 @@ export const generateDeclareTemplate = `declare module '{{{MODULE_ID}}}' {
   ${defineServiceMapTemplate.trim()}
 
   ${useRequestFunctionTypeTemplate.trim()}
+
+  ${exportServiceTemplate.trim()}
 }
 `
 

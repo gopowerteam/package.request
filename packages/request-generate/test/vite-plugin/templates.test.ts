@@ -14,6 +14,7 @@ describe('vite-plugin templates', () => {
     expect(code).toContain('const serviceMap = {')
     expect(code).toContain('UserService,')
     expect(code).toContain('export function useRequest(')
+    expect(code).toContain('export { UserService }')
     expect(code).not.toContain('declare module')
   })
 
@@ -59,6 +60,7 @@ describe('vite-plugin templates', () => {
     expect(code).toContain('declare module \'virtual:request\'')
     expect(code).toContain('): [T1,T2]')
     expect(code).toContain('UserService')
+    expect(code).toContain('export { UserService }')
     expect(code.trim().endsWith('}')).toBe(true)
   })
 })
