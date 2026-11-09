@@ -58,6 +58,68 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
   // 将状态收敛到插件闭包内,避免多实例/多测试共享全局
   let viteConfig: ResolvedConfig | undefined
   let generatedCode = ''
+  let generationPromise: Promise<void> | undefined
+
+  /**
+   * 生成 + 扫描装配(幂等:结果记忆化,失败同样记忆化避免重复执行副作用)
+   */
+  const doGenerate = async (): Promise<void> => {
+    if (!viteConfig) {
+      throw new Error('Vite 配置尚未解析完成,无法执行 request-generate 插件')
+    }
+
+    // 1. 加载 request-generate 配置(进程内,支持 .ts)
+    const { default: generateOptions } = await loadConfigFile(
+      options.configFile,
+      viteConfig.root,
+    )
+
+    // 2. 进程内生成接口文件(替代子进程调用)
+    try {
+      await Generate.startup(generateOptions)
+    }
+    catch (error) {
+      throw new Error('request-generate 接口生成失败', { cause: error })
+    }
+
+    // 3. 扫描产物并生成虚拟模块代码 / 类型声明
+    const scanDir = options.dir ?? generateOptions.output
+    if (!scanDir) {
+      throw new Error(
+        '未指定扫描目录,请在插件选项 dir 或 request.config.ts 的 output 中配置',
+      )
+    }
+
+    // 扫描基准与生成器口径对齐:显式 dir 按 vite root;回退 output 按 baseDir(生成产物落地基准)
+    const scanBase = options.dir
+      ? viteConfig.root
+      : (generateOptions.baseDir ?? viteConfig.root)
+    const targetDir = path.resolve(scanBase, scanDir)
+
+    const scanned = scanServiceFiles(targetDir, viteConfig, options.alias)
+    const strategy = options.groupStrategy ?? 'http'
+    const services = buildServiceItems(scanned, strategy, targetDir)
+    const groups = getServiceGroups(services)
+    const flatServices = services.filter(service => !service.group)
+
+    // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
+    groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
+    assertUniqueServiceNames(flatServices)
+    assertUniqueTopLevelKeys(groups, flatServices)
+
+    if (services.length > 0) {
+      generatedCode = renderCode(groups, flatServices)
+
+      if (options.dts !== false) {
+        generateDeclare(groups, flatServices, options, viteConfig)
+      }
+    }
+  }
+
+  const ensureGenerated = (): Promise<void> => {
+    generationPromise ??= doGenerate()
+    return generationPromise
+  }
 
   return {
     name: 'request-generate',
@@ -65,66 +127,20 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
     configResolved(config) {
       viteConfig = config
     },
-    async buildStart() {
-      if (!viteConfig) {
-        throw new Error('Vite 配置尚未解析完成,无法执行 request-generate 插件')
-      }
-
-      // 1. 加载 request-generate 配置(进程内,支持 .ts)
-      const { default: generateOptions } = await loadConfigFile(
-        options.configFile,
-        viteConfig.root,
-      )
-
-      // 2. 进程内生成接口文件(替代子进程调用)
-      try {
-        await Generate.startup(generateOptions)
-      }
-      catch (error) {
-        throw new Error('request-generate 接口生成失败', { cause: error })
-      }
-
-      // 3. 扫描产物并生成虚拟模块代码 / 类型声明
-      const scanDir = options.dir ?? generateOptions.output
-      if (!scanDir) {
-        throw new Error(
-          '未指定扫描目录,请在插件选项 dir 或 request.config.ts 的 output 中配置',
-        )
-      }
-
-      // 扫描基准与生成器口径对齐:显式 dir 按 vite root;回退 output 按 baseDir(生成产物落地基准)
-      const scanBase = options.dir
-        ? viteConfig.root
-        : (generateOptions.baseDir ?? viteConfig.root)
-      const targetDir = path.resolve(scanBase, scanDir)
-
-      const scanned = scanServiceFiles(targetDir, viteConfig, options.alias)
-      const strategy = options.groupStrategy ?? 'http'
-      const services = buildServiceItems(scanned, strategy, targetDir)
-      const groups = getServiceGroups(services)
-      const flatServices = services.filter(service => !service.group)
-
-      // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
-      groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
-      assertUniqueServiceNames(flatServices)
-      assertUniqueTopLevelKeys(groups, flatServices)
-
-      if (services.length > 0) {
-        generatedCode = renderCode(groups, flatServices)
-
-        if (options.dts !== false) {
-          generateDeclare(groups, flatServices, options, viteConfig)
-        }
-      }
-    },
+    buildStart: () => ensureGenerated(),
     resolveId(id: string) {
       return id === MODULE_ID
         ? MODULE_ID
         : undefined
     },
-    load(id: string) {
-      if (id !== MODULE_ID)
-        return
+    async load(id: string) {
+      if (id !== MODULE_ID) {
+        return undefined
+      }
+
+      // 惰性兜底:非 rollup 构建管道(如 vitest 走 vite transform)不执行 buildStart,
+      // 首次 load 时现场生成+扫描,不再依赖 buildStart 的执行时序
+      await ensureGenerated()
 
       if (!generatedCode) {
         throw new Error(

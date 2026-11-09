@@ -38,7 +38,7 @@ interface PluginHooks {
   configResolved: (config: ResolvedConfig) => void
   buildStart: () => Promise<void>
   resolveId: (id: string) => string | undefined | null
-  load: (id: string) => string | undefined | null
+  load: (id: string) => Promise<string | undefined | null> | string | undefined | null
 }
 
 function getHooks(plugin: unknown): PluginHooks {
@@ -100,9 +100,9 @@ describe('vite-plugin requestGeneratePlugin', () => {
     expect(loadConfigFile).toHaveBeenCalledWith(undefined, tmpRoot)
     expect(hooks.resolveId('virtual:request')).toBe('virtual:request')
     expect(hooks.resolveId('other-id')).toBeUndefined()
-    expect(hooks.load('other-id')).toBeUndefined()
+    await expect(hooks.load('other-id')).resolves.toBeUndefined()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { UserService } from \'@/http/services/UserService\'')
     expect(code).toContain('const serviceMap = {')
     expect(code).toContain('UserService,')
@@ -127,7 +127,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { OrderService as Mall_OrderService } from \'@/http/mall/OrderService\'')
     expect(code).toContain('import { TradeService as Mall_TradeService } from \'@/http/mall/order/TradeService\'')
     expect(code).toContain('Mall: {')
@@ -144,7 +144,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { UserService } from \'@/services/UserService\'')
     expect(code).toContain('UserService,')
   })
@@ -160,7 +160,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('Mall_OrderService')
     expect(code).toContain('UserService')
   })
@@ -195,7 +195,8 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot))
     await hooks.buildStart()
 
-    expect(() => hooks.load('virtual:request'))
+    await expect(hooks.load('virtual:request'))
+      .rejects
       .toThrow('未在 "src/http/services" 下找到任何 Service 文件')
 
     // 未传 dir 时错误提示回退为空字符串(目录信息来自 options.dir,而非实际扫描目录)
@@ -204,7 +205,8 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooksWithoutDir.configResolved(createViteConfig(tmpRoot))
     await hooksWithoutDir.buildStart()
 
-    expect(() => hooksWithoutDir.load('virtual:request'))
+    await expect(hooksWithoutDir.load('virtual:request'))
+      .rejects
       .toThrow('未在 "" 下找到任何 Service 文件')
   })
 
@@ -279,7 +281,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { AuthService as DsoService_AuthService } from \'@/dso-service/services/AuthService\'')
     expect(code).toContain('import { AuthService as CrmService_AuthService } from \'@/crm-service/services/AuthService\'')
     expect(code).toContain('DsoService: {')
@@ -380,7 +382,7 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { AuthService } from \'@/dso-service/services/AuthService\'')
     expect(code).toContain('AuthService,')
     expect(code).not.toContain('DsoService: {')
@@ -416,8 +418,26 @@ describe('vite-plugin requestGeneratePlugin', () => {
     hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
     await hooks.buildStart()
 
-    const code = hooks.load('virtual:request') ?? ''
+    const code = (await hooks.load('virtual:request')) ?? ''
     expect(code).toContain('import { RootService } from')
     expect(code).toContain('RootService,')
+  })
+
+  it('vitest 场景:不执行 buildStart 直接 load 时现场生成+扫描(惰性兜底)', async () => {
+    writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+
+    // 不调用 buildStart,直接 load → 惰性执行生成与扫描
+    const code = (await hooks.load('virtual:request')) ?? ''
+    expect(code).toContain('UserService')
+    expect(Generate.startup).toHaveBeenCalled()
+
+    // 幂等:再次 load 不重复执行生成
+    const startupCalls = vi.mocked(Generate.startup).mock.calls.length
+    await hooks.load('virtual:request')
+    expect(vi.mocked(Generate.startup).mock.calls.length).toBe(startupCalls)
   })
 })
