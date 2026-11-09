@@ -10,13 +10,20 @@ services from OpenAPI/Swagger specs).
 ## Toolchain (verify before assuming)
 
 - **pnpm 11.15.1** — enforced via `preinstall: only-allow pnpm`. Do NOT use npm/yarn.
-- **Node ≥ 22.12** (`engines`); CI (`publish.yml`) runs **Node 24**.
-- **TypeScript ^5.9.3**, target `ESNext`, `moduleResolution: bundler`, `strict: true`,
+  (Root `package.json` pins `packageManager: pnpm@11.15.1`; keep it in sync with CI.)
+- **Node ≥ 24.11** (`engines`) — 这是必须的,不是建议值。工具链硬性要求:
+  `tsdown@0.23` 需 24.11+、`vitest@5` 需 24.0+、`lint-staged@17` 需 22.22+、
+  `@apidevtools/swagger-parser@13` 需 22.19+。CI (`ci.yml`) 只跑 **Node 24**,
+  `publish.yml` 固定 `24.11`;不再做多版本矩阵。
+- **TypeScript ^6.0.3**, target `ESNext`, `moduleResolution: bundler`, `strict: true`,
   `noUnusedLocals` / `noUnusedParameters` / `noImplicitReturns` on.
+  **不要升到 TypeScript 7** —— TS7 是原生 Go 编译器,不再提供 `typescript/lib/tsc` 内部路径,
+  `vue-tsc` 会直接崩(`ERR_PACKAGE_PATH_NOT_EXPORTED`),`typescript-eslint` 也会拒绝加载
+  (报 `typescript-eslint does not support TS 7.0`),ESLint 全链路失效。
 - **Bundler is `tsdown`** (NOT `tsup` — the old docs were wrong). Each package has its own
   `tsdown.config.{ts,mts}`. Do not switch packages to tsup.
-- **ESLint 10** with `@antfu/eslint-config` 9.1.0 (`eslint.config.mjs`, flat config, no `.eslintrc`).
-- **Vitest 3** with `globals: true`, `environment: 'node'`. Tests rely on global `describe/it/expect`.
+- **ESLint 10** with `@antfu/eslint-config` 10.0.0 (`eslint.config.mjs`, flat config, no `.eslintrc`).
+- **Vitest 5** with `globals: true`, `environment: 'node'`. Tests rely on global `describe/it/expect`.
 - Registry mirror: `pnpm-workspace.yaml` pins `https://registry.npmmirror.com`.
   Publishing targets `registry.npmjs.org` (`publishConfig`).
 
@@ -37,7 +44,8 @@ entities, parser layout, template helpers). Read the relevant child file before 
 
 `@gopowerteam/request` (`tsdown.config.ts`):
 - `.` → `src/index.ts` (ESM + CJS + dts)
-- `./adapters` → `src/adapters/index.ts`
+- `./adapters` → `src/adapters/index.ts` (exports both `AxiosAdapter` and `FetchAdapter` —
+  行为对齐的两种实现,可直接平行替换;共用 `DEFAULT_QUERY_OPTIONS` 序列化与 `timeout` 语义)
 - `./plugins` → `src/plugins/index.ts` (exports `AbortService` — a `RequestPlugin` giving each
   instance a cancel scope: it injects an `AbortController` signal in `before`, `abort()` kills
   that instance's in-flight requests)
@@ -121,7 +129,7 @@ Notes:
   runs `changesets/action` → `pnpm build` → `pnpm run release` (`changeset publish --provenance`).
   After publish a `sync` job triggers npmmirror sync for both packages. Only `zhuchentong`
   triggers the release job.
-- `ci.yml` gates every PR and master push: lint + build + typecheck + test on Node 22/24 matrix.
+- `ci.yml` gates every PR and master push: lint + build + typecheck + test on **Node 24**.
 
 ## Things easy to get wrong
 

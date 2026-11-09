@@ -20,7 +20,12 @@ describe('vite-plugin templates', () => {
   it('generateCodeTemplate 有分组时生成分组别名导入与嵌套 serviceMap', () => {
     const grouped = { name: 'OrderService', group: 'Mall', path: '@/http/mall/OrderService' }
     const code = Handlebars.compile(generateCodeTemplate)({
-      groups: [{ name: 'Mall', services: [grouped] }],
+      groups: [
+        {
+          name: 'Mall',
+          services: [grouped],
+        },
+      ],
       services: [grouped],
     })
 

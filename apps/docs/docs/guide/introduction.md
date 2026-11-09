@@ -21,8 +21,9 @@ RequestService(单例,全局配置)
    │  before 插件 → 适配器调度 → after/catch 插件 → 拦截器
    ▼
 RequestAdapter(可插拔)
-   ├── AxiosAdapter(内置,默认)
-   └── 自定义(fetch / 小程序 / 任意运行时)
+   ├── AxiosAdapter(内置,基于 axios)
+   ├── FetchAdapter(内置,基于原生 fetch)
+   └── 自定义(小程序 / 任意运行时)
 ```
 
 `RequestService` 不直接依赖任何 HTTP 客户端 —— 所有底层调用经 `RequestAdapter` 接口转发。换运行时只需换适配器,业务代码零改动。
@@ -56,8 +57,8 @@ OpenAPI 文档(JSON / URL)
 
 ## 环境要求
 
-- Node.js ≥ 22.12(本仓库工具链要求;浏览器环境无此限制)
-- `@gopowerteam/request` 依赖 `axios` 与 `qs`(自动安装)
+- Node.js ≥ 24.11(本仓库工具链要求;浏览器环境无此限制)
+- `@gopowerteam/request` 依赖 `axios`(自动安装),查询参数序列化为内置实现,无额外运行时依赖
 - Observable 模式需要 `rxjs` >= 7(可选 peer,promise 模式无需安装)
 
 ## 下一步

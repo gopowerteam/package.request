@@ -11,7 +11,12 @@ class MockAdapter {
 
   public async request(options: RequestAdapterOptions) {
     this.lastOptions = options
-    return { data: {}, status: 200, statusText: 'OK', headers: {} }
+    return {
+      data: {},
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+    }
   }
 
   public transformResponse(response: any) {
@@ -19,7 +24,12 @@ class MockAdapter {
   }
 
   public transformException(_exception: any) {
-    return { data: {}, status: 400, statusText: '', headers: {} }
+    return {
+      data: {},
+      status: 400,
+      statusText: '',
+      headers: {},
+    }
   }
 }
 
@@ -29,10 +39,18 @@ function createMockSetup() {
     gateway: 'http://127.0.0.1:9',
     adapter: adapter as any,
     interceptors: {
-      status: { exec: () => true },
-      success: { exec: r => r },
-      error: { exec: r => r },
-      exception: { exec: r => r },
+      status: {
+        exec: () => true,
+      },
+      success: {
+        exec: r => r,
+      },
+      error: {
+        exec: r => r,
+      },
+      exception: {
+        exec: r => r,
+      },
     },
     plugins: [],
   }
@@ -145,13 +163,21 @@ describe('取消请求端到端(离线)', () => {
       gateway: 'http://127.0.0.1:9',
       adapter: new AxiosAdapter(),
       interceptors: {
-        status: { exec: () => true },
-        success: { exec: r => r },
-        error: { exec: r => r },
-        exception: { exec: (r) => {
-          exceptionResponses.push(r)
-          return r
-        } },
+        status: {
+          exec: () => true,
+        },
+        success: {
+          exec: r => r,
+        },
+        error: {
+          exec: r => r,
+        },
+        exception: {
+          exec: (r) => {
+            exceptionResponses.push(r)
+            return r
+          },
+        },
       },
       plugins: [],
     }

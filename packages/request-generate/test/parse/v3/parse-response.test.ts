@@ -88,7 +88,9 @@ describe('parseOperation (V3) - Response 多 media 类型支持', () => {
           200: {
             description: 'OK',
             content: {
-              '*/*': { schema: { $ref: '#/components/schemas/Any' } },
+              '*/*': {
+                schema: { $ref: '#/components/schemas/Any' },
+              },
             },
           },
         },
@@ -105,7 +107,9 @@ describe('parseOperation (V3) - Response 多 media 类型支持', () => {
           200: {
             description: 'PDF binary',
             content: {
-              'application/pdf': { schema: { type: 'string', format: 'binary' } },
+              'application/pdf': {
+                schema: { type: 'string', format: 'binary' },
+              },
             },
           },
         },
@@ -146,7 +150,9 @@ describe('parseOperation (V3) - Response 多 media 类型支持', () => {
           200: {
             description: 'csv',
             content: {
-              'text/csv': { schema: { type: 'string' } },
+              'text/csv': {
+                schema: { type: 'string' },
+              },
             },
           },
         },
@@ -160,7 +166,11 @@ describe('parseOperation (V3) - Response 多 media 类型支持', () => {
         responses: {
           200: {
             description: 'ok',
-            content: { 'text/plain': { schema: { type: 'string' } } },
+            content: {
+              'text/plain': {
+                schema: { type: 'string' },
+              },
+            },
           },
         },
       })
@@ -176,8 +186,12 @@ describe('parseOperation (V3) - Response 多 media 类型支持', () => {
           200: {
             description: 'OK',
             content: {
-              'application/pdf': { schema: { type: 'string', format: 'binary' } },
-              'application/json': { schema: { $ref: '#/components/schemas/Data' } },
+              'application/pdf': {
+                schema: { type: 'string', format: 'binary' },
+              },
+              'application/json': {
+                schema: { $ref: '#/components/schemas/Data' },
+              },
             },
           },
         },

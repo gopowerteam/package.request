@@ -52,8 +52,16 @@ async function generateFor(bodyParam: OperationParameter): Promise<string> {
     service.operations.push(operation)
 
     writeServices(
-      { services: [service], models: [] },
-      { output: tmpDir, application: 'mall', exportModels: false, input: '' },
+      {
+        services: [service],
+        models: [],
+      },
+      {
+        output: tmpDir,
+        application: 'mall',
+        exportModels: false,
+        input: '',
+      },
     )
 
     return fs.readFileSync(

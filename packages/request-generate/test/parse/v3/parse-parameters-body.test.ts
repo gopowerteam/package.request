@@ -58,7 +58,9 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       const param = parseParametersBody(
         {
           content: {
-            '*/*': { schema: { $ref: '#/components/schemas/Anything' } },
+            '*/*': {
+              schema: { $ref: '#/components/schemas/Anything' },
+            },
           },
         } as OpenAPIV3.RequestBodyObject,
         ctx,
@@ -77,7 +79,9 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
             'multipart/form-data': {
               schema: {
                 type: 'object',
-                properties: { file: { type: 'string', format: 'binary' } },
+                properties: {
+                  file: { type: 'string', format: 'binary' },
+                },
               },
             },
           },
@@ -121,7 +125,9 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       const param = parseParametersBody(
         {
           content: {
-            'application/x-www-form-urlencoded': { schema: { type: 'object' } },
+            'application/x-www-form-urlencoded': {
+              schema: { type: 'object' },
+            },
           },
         } as OpenAPIV3.RequestBodyObject,
         ctx,
@@ -133,7 +139,11 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
     it('text/plain 应映射为 string', () => {
       const param = parseParametersBody(
         {
-          content: { 'text/plain': { schema: { type: 'string' } } },
+          content: {
+            'text/plain': {
+              schema: { type: 'string' },
+            },
+          },
         } as OpenAPIV3.RequestBodyObject,
         ctx,
       )
@@ -158,8 +168,12 @@ describe('parseParametersBody (V3) - media 类型匹配', () => {
       const param = parseParametersBody(
         {
           content: {
-            'multipart/form-data': { schema: { type: 'object' } },
-            'application/json': { schema: { $ref: '#/components/schemas/Payload' } },
+            'multipart/form-data': {
+              schema: { type: 'object' },
+            },
+            'application/json': {
+              schema: { $ref: '#/components/schemas/Payload' },
+            },
           },
         } as OpenAPIV3.RequestBodyObject,
         ctx,

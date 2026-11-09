@@ -31,7 +31,9 @@ const options: GenerateOptions = {
 
       if (/[\u4E00-\u9FA5]+/.test(tagName)) {
         const tag = tags.find(tag => tag.name === tagName)
-        return tag && tag.description ? tag.description.replace(/\s/g, '').replace(/Controller$/g, '') : 'default'
+        return tag && tag.description
+          ? tag.description.replace(/\s/g, '').replace(/Controller$/g, '')
+          : 'default'
       }
       else {
         return tagName

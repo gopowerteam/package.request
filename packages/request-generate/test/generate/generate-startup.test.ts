@@ -59,7 +59,9 @@ describe('generate.startup - 编排流程', () => {
     await withTempCwd(async () => {
       prepareLocalDocument('app', v2Minimal)
 
-      const options = createOptions({ applications: { app: 'mall-service' } })
+      const options = createOptions({
+        applications: { app: 'mall-service' },
+      })
       await Generate.startup(options)
 
       expect(Generate.options).toBe(options)
@@ -100,7 +102,9 @@ describe('generate.startup - 编排流程', () => {
   it('账本与指纹完全匹配时应跳过重新生成', async () => {
     await withTempCwd(async () => {
       prepareLocalDocument('app', v2Minimal)
-      const options = createOptions({ applications: { app: 'mall-service' } })
+      const options = createOptions({
+        applications: { app: 'mall-service' },
+      })
 
       await Generate.startup(options)
 
@@ -117,9 +121,15 @@ describe('generate.startup - 编排流程', () => {
   it('文档不可解析时应中断且不提交账本、不落盘产物', async () => {
     await withTempCwd(async () => {
       // swagger-parser 在解析层即拒绝 swagger 1.2(版本守卫在 parse 阶段先触发)
-      prepareLocalDocument('bad', { swagger: '1.2', info: { title: 'x', version: '1' }, paths: {} })
+      prepareLocalDocument('bad', {
+        swagger: '1.2',
+        info: { title: 'x', version: '1' },
+        paths: {},
+      })
 
-      const options = createOptions({ applications: { bad: 'legacy' } })
+      const options = createOptions({
+        applications: { bad: 'legacy' },
+      })
 
       await expect(Generate.startup(options)).rejects.toThrow(/请求文件.*失败,请稍后重试/)
 
@@ -133,7 +143,9 @@ describe('generate.startup - 编排流程', () => {
     await withTempCwd(async () => {
       prepareLocalDocument('broken', '{ this is not json !!')
 
-      const options = createOptions({ applications: { broken: 'svc' } })
+      const options = createOptions({
+        applications: { broken: 'svc' },
+      })
 
       await expect(Generate.startup(options)).rejects.toThrow(/请求文件.*失败,请稍后重试/)
     })
@@ -145,7 +157,10 @@ describe('generate.startup - 编排流程', () => {
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
       try {
-        await Generate.startup(createOptions({ applications: { app: 'svc' }, logger: false }))
+        await Generate.startup(createOptions({
+          applications: { app: 'svc' },
+          logger: false,
+        }))
 
         expect(logSpy).not.toHaveBeenCalled()
       }
@@ -161,7 +176,10 @@ describe('generate.startup - 编排流程', () => {
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
       try {
-        await Generate.startup(createOptions({ applications: { app: 'svc' }, logger: true }))
+        await Generate.startup(createOptions({
+          applications: { app: 'svc' },
+          logger: true,
+        }))
 
         const output = logSpy.mock.calls.map(args => args.join(' ')).join('\n')
         expect(output).toContain('开始生成接口代码')

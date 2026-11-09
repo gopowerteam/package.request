@@ -24,7 +24,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24.11'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
 
@@ -74,7 +74,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24.11'
           cache: pnpm
 
       - name: Install dependencies

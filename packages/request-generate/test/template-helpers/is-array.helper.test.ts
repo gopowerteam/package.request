@@ -40,7 +40,10 @@ describe('isArrayHelper - Handlebars 数组检测助手函数', () => {
 
     it('嵌套数组应被正确识别', () => {
       const options = createMockOptions('is array', 'not array')
-      expect(isArrayHelper.fn.call({}, [[1, 2], [3, 4]], options)).toBe('is array')
+      expect(isArrayHelper.fn.call({}, [
+        [1, 2],
+        [3, 4],
+      ], options)).toBe('is array')
     })
   })
 })

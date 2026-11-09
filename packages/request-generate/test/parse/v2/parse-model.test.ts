@@ -78,7 +78,9 @@ describe('parseModel (V2) - model 解析', () => {
   it('无 type 字段的 schema 也应正常处理(走 properties 兜底)', () => {
     // parseFields 只读 properties,不依赖 type 字段
     const model = parseModel('Loose', {
-      properties: { id: { type: 'string' } },
+      properties: {
+        id: { type: 'string' },
+      },
     } as OpenAPIV2.SchemaObject)
     expect(model.fields).toHaveLength(1)
     expect(model.fields[0].name).toBe('id')

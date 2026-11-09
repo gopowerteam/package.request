@@ -39,8 +39,16 @@ describe('writeServices - 不修改原始 entity', () => {
       const originalApplication = service.application
 
       writeServices(
-        { services: [service], models: [] },
-        { output: tmpDir, application: 'mall', exportModels: false, input: '' },
+        {
+          services: [service],
+          models: [],
+        },
+        {
+          output: tmpDir,
+          application: 'mall',
+          exportModels: false,
+          input: '',
+        },
       )
 
       // 关键断言:原始 entity 未被修改
@@ -81,8 +89,16 @@ describe('writeServices - 不修改原始 entity', () => {
       service.operations.push(operation)
 
       writeServices(
-        { services: [service], models: [] },
-        { output: tmpDir, application: 'ignored', exportModels: false, input: '' },
+        {
+          services: [service],
+          models: [],
+        },
+        {
+          output: tmpDir,
+          application: 'ignored',
+          exportModels: false,
+          input: '',
+        },
       )
 
       expect(service.application).toBe('ORIGINAL')
@@ -100,8 +116,18 @@ describe('writeServices - 生成内容继承基类(模板护栏)', () => {
   })
 
   it.each([
-    ['promise 模式', 'promise', 'GenerateRequestService', '@gopowerteam/request'],
-    ['observable 模式', 'observable', 'ObservableGenerateRequestService', '@gopowerteam/request/observable'],
+    [
+      'promise 模式',
+      'promise',
+      'GenerateRequestService',
+      '@gopowerteam/request',
+    ],
+    [
+      'observable 模式',
+      'observable',
+      'ObservableGenerateRequestService',
+      '@gopowerteam/request/observable',
+    ],
   ] as const)('%s 应 extends 正确基类且 import 路径正确', async (_label, responseType, className, importPath) => {
     const { default: fs } = await import('node:fs')
     const { default: path } = await import('node:path')
@@ -128,8 +154,16 @@ describe('writeServices - 生成内容继承基类(模板护栏)', () => {
       service.operations.push(operation)
 
       writeServices(
-        { services: [service], models: [] },
-        { output: tmpDir, application: 'mall', exportModels: false, input: '' },
+        {
+          services: [service],
+          models: [],
+        },
+        {
+          output: tmpDir,
+          application: 'mall',
+          exportModels: false,
+          input: '',
+        },
       )
 
       const content = fs.readFileSync(path.join(tmpDir, 'services', 'UserService.ts'), 'utf-8')

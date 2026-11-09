@@ -63,7 +63,11 @@ function stableSerialize(value: unknown): string {
   switch (typeof value) {
     case 'object':
       return `{${Object.entries(value as Record<string, unknown>)
-        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+        .sort(([a], [b]) => (a < b
+          ? -1
+          : a > b
+            ? 1
+            : 0))
         .map(([key, item]) => `${key}:${stableSerialize(item)}`)
         .join(',')}}`
     case 'undefined':
@@ -90,7 +94,9 @@ export function getConfigFingerprint(
     exportModels: options.exportModels,
     exportServices: options.exportServices
       ? {
-          excludeQueryParams: [...(options.exportServices.excludeQueryParams ?? [])].sort(),
+          excludeQueryParams: [
+            ...(options.exportServices.excludeQueryParams ?? []),
+          ].sort(),
           operationResolve: options.exportServices.operationResolve?.toString(),
           responseType: options.exportServices.responseType,
           serviceResolve: options.exportServices.serviceResolve?.toString(),

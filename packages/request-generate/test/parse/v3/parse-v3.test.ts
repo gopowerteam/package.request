@@ -35,7 +35,12 @@ describe('parseOperation (V3) - response.$ref 修复', () => {
       operationId: 'listUsers',
       tags: ['user'],
       parameters: [
-        { name: 'page', in: 'query', required: false, schema: { type: 'integer' } },
+        {
+          name: 'page',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer' },
+        },
       ],
       responses: {
         200: {
@@ -89,7 +94,10 @@ describe('parseSchemaType (V3) - 边界与错误信息', () => {
 
   it('allOf 中带 $ref 时应合并到 ref 链', () => {
     const result = parseSchemaType({
-      allOf: [{ $ref: '#/components/schemas/A' }, { $ref: '#/components/schemas/B' }],
+      allOf: [
+        { $ref: '#/components/schemas/A' },
+        { $ref: '#/components/schemas/B' },
+      ],
     } as OpenAPIV3.SchemaObject)
 
     expect(result.ref).toBe('A|B')

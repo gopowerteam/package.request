@@ -70,7 +70,9 @@ function resolveBodyType(
 ): { schemaType: SchemaType, mediaType?: string } {
   // 1. JSON 家族优先
   if (consumes.some(mt => classifyMediaType(mt) === 'json')) {
-    return { schemaType: parseSchemaType(schema) }
+    return {
+      schemaType: parseSchemaType(schema),
+    }
   }
 
   // 2. 找第一个已知非 JSON 媒体(跳过 unknown)
@@ -87,5 +89,7 @@ function resolveBodyType(
   }
 
   // 3. 兜底:schema 派生
-  return { schemaType: parseSchemaType(schema) }
+  return {
+    schemaType: parseSchemaType(schema),
+  }
 }

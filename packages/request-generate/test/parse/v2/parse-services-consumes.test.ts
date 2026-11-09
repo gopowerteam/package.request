@@ -15,9 +15,15 @@ describe('parseV2 - document.consumes 与 operation.consumes 优先级', () => {
             tags: ['file'],
             consumes: ['application/pdf'],
             parameters: [
-              { name: 'body', in: 'body', schema: { type: 'string' } },
+              {
+                name: 'body',
+                in: 'body',
+                schema: { type: 'string' },
+              },
             ],
-            responses: { 200: { description: 'OK' } },
+            responses: {
+              200: { description: 'OK' },
+            },
           },
         },
       },
@@ -39,9 +45,15 @@ describe('parseV2 - document.consumes 与 operation.consumes 优先级', () => {
             operationId: 'upload',
             tags: ['file'],
             parameters: [
-              { name: 'body', in: 'body', schema: { type: 'string' } },
+              {
+                name: 'body',
+                in: 'body',
+                schema: { type: 'string' },
+              },
             ],
-            responses: { 200: { description: 'OK' } },
+            responses: {
+              200: { description: 'OK' },
+            },
           },
         },
       },
@@ -62,16 +74,24 @@ describe('parseV2 - document.consumes 与 operation.consumes 优先级', () => {
             operationId: 'create',
             tags: ['user'],
             parameters: [
-              { name: 'body', in: 'body', schema: { $ref: '#/definitions/User' } },
+              {
+                name: 'body',
+                in: 'body',
+                schema: { $ref: '#/definitions/User' },
+              },
             ],
-            responses: { 200: { description: 'OK' } },
+            responses: {
+              200: { description: 'OK' },
+            },
           },
         },
       },
       definitions: {
         User: {
           type: 'object',
-          properties: { id: { type: 'string' } },
+          properties: {
+            id: { type: 'string' },
+          },
         },
       },
     }

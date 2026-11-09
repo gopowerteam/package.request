@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { parseParametersPath } from '../../../src/parse/v2/parse-parameters-path'
 
 function pathParam(overrides: Partial<OpenAPIV2.ParameterObject> = {}): OpenAPIV2.Parameter {
-  return ({ name: 'id', in: 'path', type: 'string', required: true, ...overrides }) as any
+  return ({
+    name: 'id',
+    in: 'path',
+    type: 'string',
+    required: true,
+    ...overrides,
+  }) as any
 }
 
 describe('parseParametersPath (V2) - path 参数解析', () => {
@@ -40,7 +46,11 @@ describe('parseParametersPath (V2) - path 参数解析', () => {
     const result = parseParametersPath([
       pathParam({ name: 'pathId', type: 'string' }),
       { name: 'q', in: 'query', type: 'string' } as any,
-      { name: 'body', in: 'body', schema: { type: 'object' } } as any,
+      {
+        name: 'body',
+        in: 'body',
+        schema: { type: 'object' },
+      } as any,
       { name: 'file', in: 'formData', type: 'file' } as any,
     ])
     expect(result).toHaveLength(1)

@@ -10,7 +10,7 @@ pnpm add @gopowerteam/request
 npm install @gopowerteam/request
 ```
 
-`axios` 与 `qs` 为运行时依赖,自动安装。
+`axios` 为运行时依赖,自动安装。
 
 ## 全局配置
 
@@ -45,7 +45,7 @@ setup({
 | `gateway` | `string` | 是 | API 网关地址,作为请求的 `baseURL` |
 | `adapter` | `RequestAdapter` | 否 | 底层 HTTP 客户端适配器,不传时调用 `send` 会抛错 |
 | `timeout` | `number` | 否 | 请求超时时间(毫秒) |
-| `qs` | `IStringifyOptions` | 否 | `qs` 序列化选项,覆盖默认的数组 / 空值行为 |
+| `qs` | `QueryStringifyOptions` | 否 | 内置序列化选项,覆盖默认的数组 / 空值 / 排序行为 |
 | `interceptors` | 见下 | 是 | 四类响应拦截器,**缺一不可** |
 | `plugins` | `RequestPlugin[]` | 否 | 全局插件,对所有请求生效 |
 

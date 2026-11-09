@@ -27,7 +27,9 @@ export function writeServices(
     const serviceWithContext: Service = {
       ...service,
       application:
-        Generate.options.appendService === false ? '' : options.application,
+        Generate.options.appendService === false
+          ? ''
+          : options.application,
     }
 
     writeService(serviceWithContext, path.join(output, filename))

@@ -22,7 +22,9 @@ describe('getServiceName - 名称消毒', () => {
         },
       }
 
-      const result = getServiceName('/x', 'get', { tags: ['x'] } as OpenAPIV3.OperationObject, [])
+      const result = getServiceName('/x', 'get', {
+        tags: ['x'],
+      } as OpenAPIV3.OperationObject, [])
       expect(result).toBe('XbtScaOpenController')
     })
 
@@ -37,7 +39,9 @@ describe('getServiceName - 名称消毒', () => {
         },
       }
 
-      expect(getServiceName('/x', 'get', { tags: ['x'] } as OpenAPIV3.OperationObject, [])).toBe('UserService')
+      expect(getServiceName('/x', 'get', {
+        tags: ['x'],
+      } as OpenAPIV3.OperationObject, [])).toBe('UserService')
     })
 
     it('返回数组时应逐项消毒', () => {
@@ -51,7 +55,9 @@ describe('getServiceName - 名称消毒', () => {
         },
       }
 
-      const result = getServiceName('/x', 'get', { tags: ['x'] } as OpenAPIV3.OperationObject, [])
+      const result = getServiceName('/x', 'get', {
+        tags: ['x'],
+      } as OpenAPIV3.OperationObject, [])
       expect(result).toEqual(['UserService', 'AdminApi', 'Default'])
     })
 
@@ -66,7 +72,9 @@ describe('getServiceName - 名称消毒', () => {
         },
       }
 
-      expect(getServiceName('/x', 'get', { tags: ['x'] } as OpenAPIV3.OperationObject, [])).toBe('UserService')
+      expect(getServiceName('/x', 'get', {
+        tags: ['x'],
+      } as OpenAPIV3.OperationObject, [])).toBe('UserService')
     })
 
     it('返回 default 字面量时应转为 Default', () => {
@@ -80,7 +88,9 @@ describe('getServiceName - 名称消毒', () => {
         },
       }
 
-      expect(getServiceName('/x', 'get', { tags: ['x'] } as OpenAPIV3.OperationObject, [])).toBe('Default')
+      expect(getServiceName('/x', 'get', {
+        tags: ['x'],
+      } as OpenAPIV3.OperationObject, [])).toBe('Default')
     })
   })
 
@@ -93,7 +103,9 @@ describe('getServiceName - 名称消毒', () => {
         exportModels: false,
       }
 
-      const result = getServiceName('/x', 'get', { tags: ['user-service'] } as OpenAPIV3.OperationObject, [])
+      const result = getServiceName('/x', 'get', {
+        tags: ['user-service'],
+      } as OpenAPIV3.OperationObject, [])
       expect(result).toEqual(['UserService'])
     })
 
@@ -125,7 +137,9 @@ describe('getServiceName - 名称消毒', () => {
     it('无 Generate.options 时也应回退到默认逻辑', () => {
       ;(Generate as any).options = undefined
 
-      expect(getServiceName('/x', 'get', { tags: ['foo-bar'] } as OpenAPIV3.OperationObject, [])).toEqual(['FooBar'])
+      expect(getServiceName('/x', 'get', {
+        tags: ['foo-bar'],
+      } as OpenAPIV3.OperationObject, [])).toEqual(['FooBar'])
     })
   })
 })

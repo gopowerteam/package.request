@@ -181,9 +181,9 @@ Output: ESM only (`platform: node`, `target: node16`) with `.d.mts`/`.d.cts` dec
 
 ### Dev Dependencies
 
-- **vite** - For plugin testing
-- **vitest** - Testing
-- **tsdown** - Bundler
-- **typescript** - v5.9.3
+- **vite** - For plugin testing (v8)
+- **vitest** - Testing (v5)
+- **tsdown** - Bundler (v0.23)
+- **typescript** - v6.0.3(不要升 v7,见根 `AGENTS.md`)
 
 <!-- MANUAL: Custom project notes can be added below -->

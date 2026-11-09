@@ -33,7 +33,12 @@ export function getServiceName(
   const resolve = Generate.options?.exportServices?.serviceResolve
 
   if (resolve) {
-    const result = resolve({ path, method, object: operationObject, tags })
+    const result = resolve({
+      path,
+      method,
+      object: operationObject,
+      tags,
+    })
     // 用户返回的名称必须消毒为合法 PascalCase 标识符,
     // 否则生成的类名会包含连字符等非法字符导致语法错误
     return sanitizeServiceName(result)

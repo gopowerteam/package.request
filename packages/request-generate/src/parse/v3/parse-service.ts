@@ -11,7 +11,9 @@ export function parseService(
   services: Service[],
 ) {
   const toNames = (name: string | string[]) =>
-    Array.isArray(name) ? name : [name]
+    Array.isArray(name)
+      ? name
+      : [name]
 
   const names = toNames(
     getServiceName(

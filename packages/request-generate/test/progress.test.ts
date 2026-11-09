@@ -19,9 +19,13 @@ import {
 const oraState = vi.hoisted(() => {
   const instances: Array<{ stop: ReturnType<typeof vi.fn> }> = []
   const oraMock = vi.fn(() => {
-    const instance = { stop: vi.fn() }
+    const instance = {
+      stop: vi.fn(),
+    }
     instances.push(instance)
-    return { start: vi.fn(() => instance) }
+    return {
+      start: vi.fn(() => instance),
+    }
   })
   return { instances, oraMock }
 })
@@ -85,7 +89,10 @@ describe('progress printPhaseBanner', () => {
 
 describe('progress renderTable', () => {
   it('渲染表头与数据行', () => {
-    const output = renderTable(['Name', 'Count'], [['a', '1'], ['b', '2']])
+    const output = renderTable(['Name', 'Count'], [
+      ['a', '1'],
+      ['b', '2'],
+    ])
 
     expect(output).toContain('Name')
     expect(output).toContain('a')
@@ -95,7 +102,9 @@ describe('progress renderTable', () => {
   it('支持汇总行与列对齐配置', () => {
     const output = renderTable(
       ['Name', 'Count'],
-      [['a', '1']],
+      [
+        ['a', '1'],
+      ],
       ['Total', '1'],
       ['left', 'right'],
     )

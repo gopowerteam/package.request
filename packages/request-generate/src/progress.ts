@@ -72,7 +72,9 @@ export function renderTable(
   summaryRow?: string[],
   alignments: Alignment[] = header.map(() => 'left'),
 ) {
-  const data = summaryRow ? [header, ...rows, summaryRow] : [header, ...rows]
+  const data = summaryRow
+    ? [header, ...rows, summaryRow]
+    : [header, ...rows]
   const hasSummary = Boolean(summaryRow)
 
   const config = {
@@ -141,7 +143,12 @@ export function outputSummary() {
   const alignments: Alignment[] = ['left', 'right', 'right', 'center']
 
   if (results.length === 0) {
-    const emptyRow = [chalk.gray('(none)'), '0', '0', chalk.gray('-')]
+    const emptyRow = [
+      chalk.gray('(none)'),
+      '0',
+      '0',
+      chalk.gray('-'),
+    ]
     // eslint-disable-next-line no-console
     console.log(renderTable(header, [emptyRow], undefined, alignments))
     return
@@ -203,15 +210,24 @@ export function outputDownloadSummary(totalDuration?: number) {
   const alignments: Alignment[] = ['left', 'right', 'right', 'center']
 
   if (downloadResults.length === 0) {
-    const emptyRow = [chalk.gray('(none)'), chalk.gray('-'), chalk.gray('-'), chalk.gray('-')]
+    const emptyRow = [
+      chalk.gray('(none)'),
+      chalk.gray('-'),
+      chalk.gray('-'),
+      chalk.gray('-'),
+    ]
     // eslint-disable-next-line no-console
     console.log(renderTable(header, [emptyRow], undefined, alignments))
     return
   }
 
   const rows = downloadResults.map((r) => {
-    const size = r.size === null ? chalk.gray('-') : formatSize(r.size)
-    const time = r.duration === null ? chalk.gray('-') : formatDuration(r.duration)
+    const size = r.size === null
+      ? chalk.gray('-')
+      : formatSize(r.size)
+    const time = r.duration === null
+      ? chalk.gray('-')
+      : formatDuration(r.duration)
     const status = r.size === null
       ? chalk.red('✗')
       : r.unchanged
@@ -230,7 +246,9 @@ export function outputDownloadSummary(totalDuration?: number) {
       : chalk.bold.red(`${okCount}/${total} ok`)
 
   const totalTime
-    = totalDuration === undefined ? chalk.gray('-') : chalk.bold(formatDuration(totalDuration))
+    = totalDuration === undefined
+      ? chalk.gray('-')
+      : chalk.bold(formatDuration(totalDuration))
 
   const summaryRow = [
     chalk.bold('Total'),

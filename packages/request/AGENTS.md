@@ -15,6 +15,7 @@ Core HTTP request library implementing the adapter pattern for flexible HTTP cli
 | `src/request-service.ts`        | Main service class handling request lifecycle               |
 | `src/request-setup.ts`          | Configuration setup and initialization                      |
 | `src/adapters/axios.adapter.ts` | Axios HTTP client adapter implementation                    |
+| `src/adapters/fetch.adapter.ts` | Native fetch adapter (behavioural parity with AxiosAdapter) |
 | `src/adapters/index.ts`         | Adapter barrel export                                       |
 | `src/interfaces/*.ts`           | Type definitions for adapters, plugins, setup, send options |
 
@@ -77,8 +78,7 @@ import type { RequestAdapter } from './interfaces/request-adapter.interface'
 
 // External imports first, then internal
 import axios from 'axios'
-import * as qs from 'qs'
-import { stringify } from './utils/query-string'
+import { DEFAULT_QUERY_OPTIONS, stringify } from './utils/query-string'
 ```
 
 #### Naming Conventions
@@ -154,7 +154,9 @@ Entry points defined in `tsdown.config.ts`:
 ### External
 
 - **axios** - HTTP client
-- **qs** - Query string parsing
+
+查询参数序列化使用内置的 `src/utils/query-string.ts`(`stringify` + `DEFAULT_QUERY_OPTIONS`),
+**不再依赖 `qs`** —— 不要在适配器或服务层重新引入 qs。
 
 ### Peer (optional)
 
@@ -162,8 +164,8 @@ Entry points defined in `tsdown.config.ts`:
 
 ### Dev Dependencies
 
-- **vitest** - Testing
-- **tsdown** - Bundler (ESM + CJS)
-- **typescript** - v5.9.3
+- **vitest** - Testing (v5)
+- **tsdown** - Bundler (ESM + CJS, v0.23)
+- **typescript** - v6.0.3(不要升 v7,见根 `AGENTS.md`)
 
 <!-- MANUAL: Custom project notes can be added below -->

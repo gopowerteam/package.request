@@ -14,10 +14,17 @@ describe('parseV2 - formData 端到端(模式 B)', () => {
             tags: ['file'],
             consumes: ['multipart/form-data'],
             parameters: [
-              { name: 'file', in: 'formData', type: 'file', required: true },
+              {
+                name: 'file',
+                in: 'formData',
+                type: 'file',
+                required: true,
+              },
               { name: 'description', in: 'formData', type: 'string' },
             ],
-            responses: { 200: { description: 'OK' } },
+            responses: {
+              200: { description: 'OK' },
+            },
           },
         },
       },
@@ -44,7 +51,9 @@ describe('parseV2 - formData 端到端(模式 B)', () => {
             parameters: [
               { name: 'file', in: 'formData', type: 'file' },
             ],
-            responses: { 200: { description: 'OK' } },
+            responses: {
+              200: { description: 'OK' },
+            },
           },
         },
       },

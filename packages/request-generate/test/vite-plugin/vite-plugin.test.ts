@@ -9,7 +9,9 @@ import { loadConfigFile } from '../../src/load-config'
 import requestGeneratePlugin from '../../src/vite-plugin'
 
 vi.mock('../../src/generate', () => ({
-  Generate: { startup: vi.fn() },
+  Generate: {
+    startup: vi.fn(),
+  },
 }))
 
 vi.mock('../../src/load-config', () => ({
@@ -25,7 +27,10 @@ const baseGenerateOptions = {
 
 function generateOptions(overrides: Partial<GenerateOptions> = {}) {
   return {
-    default: { ...baseGenerateOptions, ...overrides } as GenerateOptions,
+    default: {
+      ...baseGenerateOptions,
+      ...overrides,
+    } as GenerateOptions,
   }
 }
 
@@ -43,7 +48,11 @@ function getHooks(plugin: unknown): PluginHooks {
 function createViteConfig(root: string, replacement = path.join(root, 'src')): ResolvedConfig {
   return {
     root,
-    resolve: { alias: [{ find: '@', replacement }] },
+    resolve: {
+      alias: [
+        { find: '@', replacement },
+      ],
+    },
   } as unknown as ResolvedConfig
 }
 

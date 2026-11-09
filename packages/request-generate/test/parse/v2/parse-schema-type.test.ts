@@ -27,7 +27,9 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
 
     it('应正确剥离 #/definitions/ 命名空间', () => {
       const result = parseSchemaType({
-        allOf: [{ $ref: '#/definitions/VeryLongModelName' }],
+        allOf: [
+          { $ref: '#/definitions/VeryLongModelName' },
+        ],
       })
       expect(result.imports).toEqual(['VeryLongModelName'])
     })
@@ -36,7 +38,10 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
   describe('anyOf - 内联基本类型联合', () => {
     it('两个内联基本类型应用 | 连接 type(注意 integer 经 getMappedType 映射为 number)', () => {
       const result = parseSchemaType({
-        anyOf: [{ type: 'string' }, { type: 'integer' }],
+        anyOf: [
+          { type: 'string' },
+          { type: 'integer' },
+        ],
       })
       expect(result.type).toBe('string|number')
       expect(result.ref).toBeUndefined()
@@ -74,7 +79,9 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
       // 现有 NonArray 分支条件已含 !schema.allOf,所以会正确跳过
       const result = parseSchemaType({
         type: 'object',
-        allOf: [{ $ref: '#/definitions/Mixin' }],
+        allOf: [
+          { $ref: '#/definitions/Mixin' },
+        ],
       } as OpenAPIV2.SchemaObject)
       expect(result.imports).toEqual(['Mixin'])
       expect(result.type).toBe('any')
@@ -84,7 +91,9 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
       // 关键回归:新分支必须插在 object 兜底之前,否则 allOf 会被静默丢弃
       const result = parseSchemaType({
         type: 'object',
-        allOf: [{ $ref: '#/definitions/Mixin' }],
+        allOf: [
+          { $ref: '#/definitions/Mixin' },
+        ],
       } as OpenAPIV2.SchemaObject)
       expect(result.imports).toEqual(['Mixin'])
       expect(result.type).toBe('any')
@@ -106,7 +115,9 @@ describe('parseSchemaType (V2) - allOf/anyOf/oneOf 组合类型', () => {
       // NonArray 不检查 properties,只要 type 是 string 且无 allOf/anyOf/oneOf 就命中
       const result = parseSchemaType({
         type: 'object',
-        properties: { id: { type: 'string' } },
+        properties: {
+          id: { type: 'string' },
+        },
       })
       expect(result.type).toBe('any')
       expect(result.ref).toBeUndefined()

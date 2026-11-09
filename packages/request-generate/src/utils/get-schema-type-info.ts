@@ -22,7 +22,12 @@ export function getSchemaTypeInfo(
   schema: boolean | OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 ): SchemaTypeInfo {
   if (typeof schema === 'boolean') {
-    return { types: [schema ? 'any' : 'never'], isNullable: false }
+    return {
+      types: [
+        schema ? 'any' : 'never',
+      ],
+      isNullable: false,
+    }
   }
 
   // 引用对象无自身类型信息(可空性由 $ref 目标决定,调用方单独处理)
@@ -44,7 +49,10 @@ export function getSchemaTypeInfo(
 
   // 仅声明 null 的极端形态(type: ['null'])→ 'null' 作为唯一类型,不再二次附加
   if (types.length === 0 && isNullable) {
-    return { types: ['null'], isNullable: false }
+    return {
+      types: ['null'],
+      isNullable: false,
+    }
   }
 
   return { types, isNullable }

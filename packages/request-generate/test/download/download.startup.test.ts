@@ -38,11 +38,19 @@ describe('download.startup - 目录创建与多应用下载', () => {
   })
 
   it('多应用循环下载并写入 .request 目录', async () => {
-    const docA = { swagger: '2.0', info: { title: 'A', version: '1' } }
-    const docB = { openapi: '3.0.0', info: { title: 'B', version: '1' } }
+    const docA = {
+      swagger: '2.0',
+      info: { title: 'A', version: '1' },
+    }
+    const docB = {
+      openapi: '3.0.0',
+      info: { title: 'B', version: '1' },
+    }
 
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const body = String(input).includes('svc-a') ? docA : docB
+      const body = String(input).includes('svc-a')
+        ? docA
+        : docB
       return new Response(JSON.stringify(body), { status: 200 })
     })
 
@@ -97,7 +105,9 @@ describe('download.startup - 目录创建与多应用下载', () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('network boom'))
 
     await expect(
-      Download.startup(createOptions({ applications: { alpha: 'svc-a' } })),
+      Download.startup(createOptions({
+        applications: { alpha: 'svc-a' },
+      })),
     ).rejects.toThrow('network boom')
 
     // .request 目录在任何下载发生前已创建
@@ -112,11 +122,17 @@ describe('download.startup - 目录创建与多应用下载', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
     try {
-      await Download.startup(createOptions({ applications: { alpha: 'svc-a' }, logger: false }))
+      await Download.startup(createOptions({
+        applications: { alpha: 'svc-a' },
+        logger: false,
+      }))
       expect(logSpy).not.toHaveBeenCalled()
 
       logSpy.mockClear()
-      await Download.startup(createOptions({ applications: { alpha: 'svc-a' }, logger: true }))
+      await Download.startup(createOptions({
+        applications: { alpha: 'svc-a' },
+        logger: true,
+      }))
 
       const output = logSpy.mock.calls.map(args => args.join(' ')).join('\n')
       expect(output).toContain('开始下载接口文件')
@@ -128,7 +144,10 @@ describe('download.startup - 目录创建与多应用下载', () => {
         async () => new Response('Not Found', { status: 404, statusText: 'Not Found' }),
       )
       await expect(
-        Download.startup(createOptions({ applications: { alpha: 'svc-a' }, logger: true })),
+        Download.startup(createOptions({
+          applications: { alpha: 'svc-a' },
+          logger: true,
+        })),
       ).rejects.toThrow(/下载失败/)
       expect(logSpy.mock.calls.map(args => args.join(' ')).join('\n')).toContain('✗')
     }

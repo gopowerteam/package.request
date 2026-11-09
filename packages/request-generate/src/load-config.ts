@@ -28,7 +28,10 @@ const JS_EXTENSIONS = ['.js', '.mjs', '.cjs']
 /**
  * 支持的配置文件扩展名
  */
-const SUPPORTED_EXTENSIONS = [...TS_EXTENSIONS, ...JS_EXTENSIONS]
+const SUPPORTED_EXTENSIONS = [
+  ...TS_EXTENSIONS,
+  ...JS_EXTENSIONS,
+]
 
 /**
  * 动态加载配置后的模块命名空间形状
@@ -85,7 +88,9 @@ export async function loadConfigFile(
     ? await tsImport(fileUrl, { parentURL: import.meta.url })
     : await import(fileUrl)) as ConfigModule
 
-  return { default: resolveConfigDefault(mod) }
+  return {
+    default: resolveConfigDefault(mod),
+  }
 }
 
 /**

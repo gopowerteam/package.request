@@ -41,7 +41,9 @@ function createOptions(
     name,
     application: service,
     input: `${options.gateway}/${service}/${openapi}`.replace(/\/{2,3}/g, '/'),
-    output: name ? path.join(options.output, name) : options.output,
+    output: name
+      ? path.join(options.output, name)
+      : options.output,
     exportModels: options.exportModels,
     forceClear: options.forceClear,
   }
@@ -61,6 +63,8 @@ export function generateServiceOptions(
     )
   }
   else {
-    return [createOptions(options, 'default')]
+    return [
+      createOptions(options, 'default'),
+    ]
   }
 }

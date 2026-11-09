@@ -4,7 +4,12 @@ import { Generate } from '../../../src/generate'
 import { parseParametersQuery } from '../../../src/parse/v2/parse-parameters-query'
 
 function queryParam(overrides: Partial<OpenAPIV2.ParameterObject> = {}): OpenAPIV2.Parameter {
-  return ({ name: 'page', in: 'query', type: 'integer' as any, ...overrides }) as any
+  return ({
+    name: 'page',
+    in: 'query',
+    type: 'integer' as any,
+    ...overrides,
+  }) as any
 }
 
 describe('parseParametersQuery (V2) - query 参数解析', () => {
@@ -47,7 +52,11 @@ describe('parseParametersQuery (V2) - query 参数解析', () => {
       const result = parseParametersQuery([
         queryParam({ name: 'q' }),
         { name: 'id', in: 'path', type: 'string' } as any,
-        { name: 'body', in: 'body', schema: { type: 'object' } } as any,
+        {
+          name: 'body',
+          in: 'body',
+          schema: { type: 'object' },
+        } as any,
         { name: 'file', in: 'formData', type: 'file' } as any,
       ])
       expect(result).toHaveLength(1)
@@ -85,7 +94,9 @@ describe('parseParametersQuery (V2) - query 参数解析', () => {
         gateway: '',
         openapi: '',
         output: '/tmp',
-        exportServices: { excludeQueryParams: ['page'] },
+        exportServices: {
+          excludeQueryParams: ['page'],
+        },
       } as any
 
       const result = parseParametersQuery([
@@ -101,7 +112,9 @@ describe('parseParametersQuery (V2) - query 参数解析', () => {
         gateway: '',
         openapi: '',
         output: '/tmp',
-        exportServices: { excludeQueryParams: ['user'] },
+        exportServices: {
+          excludeQueryParams: ['user'],
+        },
       } as any
 
       const result = parseParametersQuery([

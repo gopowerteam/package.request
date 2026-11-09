@@ -1,4 +1,5 @@
 import type { AdapterResponse } from '../src/interfaces/request-adapter.interface'
+import axios from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AxiosAdapter } from '../src/adapters/axios.adapter'
 
@@ -74,7 +75,10 @@ describe('axiosAdapter - Axios HTTP 客户端适配器', () => {
 
     it('应正确处理数组类型响应数据', () => {
       const axiosResponse = {
-        data: [{ id: 1 }, { id: 2 }],
+        data: [
+          { id: 1 },
+          { id: 2 },
+        ],
         status: 200,
         statusText: 'OK',
         headers: {},
@@ -320,5 +324,75 @@ describe('axiosAdapter - Content-Type 注入(按运行时 body 类型)', () => {
     })
 
     expect(lastRequestCall().signal).toBe(controller.signal)
+  })
+})
+
+describe('axiosAdapter - paramsSerializer(内置序列化器)', () => {
+  // 触发 axios.create 并取出其收到的配置
+  const createInstanceConfig = (qs?: any): any => {
+    ;(AxiosAdapter as any).axiosInstance = undefined
+    const adapter = new AxiosAdapter()
+    adapter.injectConfig({ gateway: 'https://api.test', qs } as any)
+    // request() 内部会首次调用 getAxiosInstance() 并缓存实例
+    adapter.request({
+      baseURL: '',
+      pathURL: '/users',
+      method: 'GET',
+      headers: {},
+      paramsQuery: { a: 1 },
+    })
+    return (axios.create as any).mock.calls.at(-1)[0]
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    ;(AxiosAdapter as any).axiosInstance = undefined
+  })
+
+  it('默认应按 repeat 格式序列化数组', () => {
+    const serialize = createInstanceConfig().paramsSerializer.serialize
+    expect(serialize({
+      ids: [1, 2],
+    })).toBe('ids=1&ids=2')
+  })
+
+  it('默认应对键名排序', () => {
+    const serialize = createInstanceConfig().paramsSerializer.serialize
+    expect(serialize({ b: 1, a: 2 })).toBe('a=2&b=1')
+  })
+
+  it('默认应过滤空字符串 / null / undefined', () => {
+    const serialize = createInstanceConfig().paramsSerializer.serialize
+    expect(serialize({ a: '', b: null, c: undefined, d: 'x' })).toBe('d=x')
+  })
+
+  it('默认应使用 allowDots 展开嵌套对象', () => {
+    const serialize = createInstanceConfig().paramsSerializer.serialize
+    expect(serialize({
+      filter: { name: 'foo' },
+    })).toBe('filter.name=foo')
+  })
+
+  it('自定义 qs 选项应覆盖默认值', () => {
+    const serialize = createInstanceConfig({ arrayFormat: 'comma' }).paramsSerializer.serialize
+    expect(serialize({
+      ids: [1, 2, 3],
+    })).toBe('ids=1%2C2%2C3')
+  })
+
+  it('自定义 filter 应生效', () => {
+    const serialize = createInstanceConfig({
+      filter: (_: string, value: unknown) => (value === 'x'
+        ? undefined
+        : value),
+    }).paramsSerializer.serialize
+    expect(serialize({ a: 'x', b: 'y' })).toBe('b=y')
+  })
+
+  it('自定义 sort 应生效', () => {
+    const serialize = createInstanceConfig({
+      sort: (a: string, b: string) => b.localeCompare(a),
+    }).paramsSerializer.serialize
+    expect(serialize({ a: 1, b: 2 })).toBe('b=2&a=1')
   })
 })

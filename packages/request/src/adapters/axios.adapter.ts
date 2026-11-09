@@ -7,13 +7,13 @@ import type {
   RequestAdapterOptions,
 } from '../interfaces/request-adapter.interface'
 import axios from 'axios'
-import * as qs from 'qs'
 import {
   hasContentTypeHeader,
   isBlob,
   isFormData,
   isURLSearchParams,
 } from '../utils/content-type'
+import { DEFAULT_QUERY_OPTIONS, stringify } from '../utils/query-string'
 
 export class AxiosAdapter implements RequestAdapter {
   private static axiosInstance: AxiosInstance
@@ -35,21 +35,10 @@ export class AxiosAdapter implements RequestAdapter {
         },
         paramsSerializer: {
           serialize: params =>
-            qs.stringify(
-              params,
-              this.config?.qs || {
-                arrayFormat: 'repeat',
-                skipNulls: true,
-                allowDots: true,
-                encodeValuesOnly: true,
-                encode: true,
-                sort: (a: string, b: string) => a.localeCompare(b),
-                filter: (_, value) =>
-                  ['', undefined, null].includes(value)
-                    ? undefined
-                    : value,
-              },
-            ),
+            stringify(params, {
+              ...DEFAULT_QUERY_OPTIONS,
+              ...(this.config?.qs || {}),
+            }),
         },
       })
     }

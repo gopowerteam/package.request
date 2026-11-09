@@ -16,7 +16,12 @@ describe('parseOperation (V2) - Response 解析', () => {
         operationId: 'getUser',
         tags: ['user'],
         parameters: [
-          { name: 'id', in: 'path', type: 'string', required: true } as any,
+          {
+            name: 'id',
+            in: 'path',
+            type: 'string',
+            required: true,
+          } as any,
         ],
         responses: {
           200: {
@@ -174,7 +179,12 @@ describe('parseOperation (V2) - Response 解析', () => {
         operationId: 'getUser',
         tags: ['user'],
         parameters: [
-          { name: 'id', in: 'path', type: 'string', required: true } as any,
+          {
+            name: 'id',
+            in: 'path',
+            type: 'string',
+            required: true,
+          } as any,
         ],
         responses: {
           200: {

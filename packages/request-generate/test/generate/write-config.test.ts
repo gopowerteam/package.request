@@ -92,7 +92,12 @@ describe('write-config - MD5 与账本读取', () => {
 
       const md5 = md5Of('{"hello":"world"}')
       const ledger = [
-        { name: 'test', md5, configMd5: 'fingerprint', updatedAt: new Date().toISOString() },
+        {
+          name: 'test',
+          md5,
+          configMd5: 'fingerprint',
+          updatedAt: new Date().toISOString(),
+        },
       ]
 
       expect(isNeedUpdate('test', ledger, './generated', 'fingerprint')).toBeUndefined()
@@ -106,7 +111,12 @@ describe('write-config - MD5 与账本读取', () => {
       fs.mkdirSync(path.join('generated', 'test'), { recursive: true })
 
       const ledger = [
-        { name: 'test', md5: 'outdated-md5', configMd5: 'fingerprint', updatedAt: new Date().toISOString() },
+        {
+          name: 'test',
+          md5: 'outdated-md5',
+          configMd5: 'fingerprint',
+          updatedAt: new Date().toISOString(),
+        },
       ]
 
       expect(isNeedUpdate('test', ledger, './generated', 'fingerprint')).toBe(md5Of('{"hello":"world"}'))
@@ -120,7 +130,11 @@ describe('write-config - MD5 与账本读取', () => {
       fs.mkdirSync(path.join('generated', 'test'), { recursive: true })
 
       const ledger = [
-        { name: 'test', md5: md5Of('{"hello":"world"}'), updatedAt: new Date().toISOString() },
+        {
+          name: 'test',
+          md5: md5Of('{"hello":"world"}'),
+          updatedAt: new Date().toISOString(),
+        },
       ]
 
       expect(isNeedUpdate('test', ledger, './generated', 'fingerprint')).toBe(md5Of('{"hello":"world"}'))
@@ -135,29 +149,57 @@ describe('write-config - 生成规则指纹', () => {
   })
 
   it('responseType 变化应改变指纹', () => {
-    const base = createOptions({ exportServices: { responseType: 'promise' } })
-    const changed = createOptions({ exportServices: { responseType: 'observable' } })
+    const base = createOptions({
+      exportServices: { responseType: 'promise' },
+    })
+    const changed = createOptions({
+      exportServices: { responseType: 'observable' },
+    })
 
     expect(getConfigFingerprint(base)).not.toBe(getConfigFingerprint(changed))
   })
 
   it('excludeQueryParams 内容变化应改变指纹', () => {
-    const base = createOptions({ exportServices: { excludeQueryParams: ['page'] } })
-    const changed = createOptions({ exportServices: { excludeQueryParams: ['page', 'size'] } })
+    const base = createOptions({
+      exportServices: {
+        excludeQueryParams: ['page'],
+      },
+    })
+    const changed = createOptions({
+      exportServices: {
+        excludeQueryParams: ['page', 'size'],
+      },
+    })
 
     expect(getConfigFingerprint(base)).not.toBe(getConfigFingerprint(changed))
   })
 
   it('resolve 函数源码变化应改变指纹', () => {
-    const base = createOptions({ exportServices: { serviceResolve: () => 'a' } })
-    const changed = createOptions({ exportServices: { serviceResolve: () => 'b' } })
+    const base = createOptions({
+      exportServices: {
+        serviceResolve: () => 'a',
+      },
+    })
+    const changed = createOptions({
+      exportServices: {
+        serviceResolve: () => 'b',
+      },
+    })
 
     expect(getConfigFingerprint(base)).not.toBe(getConfigFingerprint(changed))
   })
 
   it('excludeQueryParams 顺序变化不应改变指纹(等价语义)', () => {
-    const a = createOptions({ exportServices: { excludeQueryParams: ['page', 'size', 'order'] } })
-    const b = createOptions({ exportServices: { excludeQueryParams: ['order', 'size', 'page'] } })
+    const a = createOptions({
+      exportServices: {
+        excludeQueryParams: ['page', 'size', 'order'],
+      },
+    })
+    const b = createOptions({
+      exportServices: {
+        excludeQueryParams: ['order', 'size', 'page'],
+      },
+    })
 
     expect(getConfigFingerprint(a)).toBe(getConfigFingerprint(b))
   })

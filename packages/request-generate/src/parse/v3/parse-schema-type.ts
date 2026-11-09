@@ -35,7 +35,9 @@ function resolveEnums(schema: { enum?: unknown[], const?: unknown }): string[] |
     && constValue !== null
     && PRIMITIVE_CONST_TYPES.has(typeof constValue)
   ) {
-    return [String(constValue)]
+    return [
+      String(constValue),
+    ]
   }
 
   return undefined
@@ -58,7 +60,9 @@ export function parseSchemaType(
 ): SchemaType {
   // Boolean Schema(3.1)
   if (typeof schema === 'boolean') {
-    return { type: schema ? 'any' : 'never' }
+    return {
+      type: schema ? 'any' : 'never',
+    }
   }
 
   const { types, isNullable } = getSchemaTypeInfo(schema)
@@ -107,7 +111,9 @@ export function parseSchemaType(
       return { type: mapped, enums }
     }
 
-    return { type: withNullable(mapped, isNullable) }
+    return {
+      type: withNullable(mapped, isNullable),
+    }
   }
 
   // Array(3.0 type: 'array' 或 3.1 type: ['array', ...])
@@ -118,7 +124,9 @@ export function parseSchemaType(
 
     // prefixItems(3.1 tuple)暂不支持 → 降级 any[](P2)
     if (!arraySchema.items && arraySchema.prefixItems) {
-      return { type: withNullable('any[]', isNullable) }
+      return {
+        type: withNullable('any[]', isNullable),
+      }
     }
 
     // 数组元素为 $ref
@@ -127,7 +135,9 @@ export function parseSchemaType(
 
       // 元素引用嵌套 $defs → 整体降级 any[](避免悬空 import)
       if (items.$ref.includes('$defs')) {
-        return { type: withNullable('any[]', isNullable) }
+        return {
+          type: withNullable('any[]', isNullable),
+        }
       }
 
       const ref = getCamelName(stripNamespace(items.$ref))
@@ -136,7 +146,9 @@ export function parseSchemaType(
       return {
         type: 'any[]',
         ref: withNullable(`${type ?? ref}[]`, isNullable),
-        imports: type ? undefined : [ref],
+        imports: type
+          ? undefined
+          : [ref],
       }
     }
 

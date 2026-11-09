@@ -16,12 +16,20 @@ function buildField(name: string, type: string, required = false): Field {
 
 function buildClient(): GenerateClient {
   const user = new Model('User')
-  user.fields = [buildField('id', 'string', true), buildField('name', 'string')]
+  user.fields = [
+    buildField('id', 'string', true),
+    buildField('name', 'string'),
+  ]
 
   const order = new Model('Order')
-  order.fields = [buildField('amount', 'number')]
+  order.fields = [
+    buildField('amount', 'number'),
+  ]
 
-  return { models: [user, order], services: [] }
+  return {
+    models: [user, order],
+    services: [],
+  }
 }
 
 /**
@@ -95,7 +103,12 @@ describe('writeModels - 写入模型文件', () => {
       fs.mkdirSync('models', { recursive: true })
       fs.writeFileSync(path.join('models', 'Stale.ts'), 'old content')
 
-      writeModels(buildClient(), { output: '.', exportModels: true, forceClear: true, input: '' })
+      writeModels(buildClient(), {
+        output: '.',
+        exportModels: true,
+        forceClear: true,
+        input: '',
+      })
 
       expect(fs.existsSync(path.join('models', 'Stale.ts'))).toBe(false)
       expect(fs.existsSync(path.join('models', 'User.ts'))).toBe(true)

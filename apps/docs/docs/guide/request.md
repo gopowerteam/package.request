@@ -11,7 +11,7 @@
 | `service` | `string` | 服务前缀,拼接为 `/{service}/{path}` |
 | `headers` | `Record<string, string \| boolean>` | `false` 表示删除该头(axios 语义) |
 | `paramsPath` | `Record<string, string \| number>` | 路径参数 |
-| `paramsQuery` | `Record<string, unknown>` | 查询参数,经 `qs` 序列化 |
+| `paramsQuery` | `Record<string, unknown>` | 查询参数,经内置序列化器转为 query string |
 | `paramsBody` | `unknown` | 请求体 |
 | `signal` | `AbortSignal` | 取消信号,配合 `AbortController` / [AbortService](/guide/plugins.md#请求取消) |
 
@@ -152,7 +152,35 @@ class FetchAdapter implements RequestAdapter {
 - 两个 transform 的参数为 `unknown`,适配器实现内部自行收窄为底层客户端的真实类型
 - `AdapterResponse.data` 为 `Record<string, any>` —— 拦截器可直接取值
 
-内置的 [`AxiosAdapter`](/guide/getting-started.md) 已覆盖 axios 场景,含智能 Content-Type(FormData/Blob/URLSearchParams 自动推断,显式设置绝对优先)。
+内置两个适配器,行为对齐,可直接平行替换:
+
+- **`AxiosAdapter`** — 基于 axios,自动重试/代理等能力开箱即用
+- **`FetchAdapter`** — 基于原生 `fetch`,无额外运行时依赖
+
+两者都含智能 Content-Type(FormData/Blob/URLSearchParams 自动推断,显式设置绝对优先),
+并共用同一套查询参数序列化(`DEFAULT_QUERY_OPTIONS` + `config.qs`)与 `timeout` 语义
+(覆盖连接 + 响应体读取全过程)。
+
+```ts
+import { FetchAdapter } from '@gopowerteam/request/adapters'
+
+setup({
+  gateway: 'https://api.example.com',
+  adapter: new FetchAdapter(), // 换成 AxiosAdapter 即完成替换
+  // ...
+})
+```
+
+`FetchAdapter` 支持通过 `config` 定制:
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `fetch` | `typeof fetch` | 自定义 fetch 实现,默认 `globalThis.fetch`(便于 polyfill / 测试注入) |
+| `responseType` | `'auto' \| 'json' \| 'text' \| 'blob' \| 'arraybuffer'` | 响应体解析策略,默认 `auto`(按 Content-Type 推断) |
+
+插件 `appendParams` 的 `responseType` 会覆盖全局配置,例如 `appendParams({ responseType: 'blob' })`
+在两种适配器下都能让响应体返回二进制。其余 `cache` / `credentials` / `mode` / `redirect` /
+`referrer` / `referrerPolicy` / `integrity` / `keepalive` / `duplex` 会原样传入 `RequestInit`。
 
 ## API 导出速查
 
@@ -164,6 +192,6 @@ class FetchAdapter implements RequestAdapter {
 
 | 子路径 | 导出 |
 | --- | --- |
-| `@gopowerteam/request/adapters` | `AxiosAdapter` |
+| `@gopowerteam/request/adapters` | `AxiosAdapter` / `FetchAdapter` / `FetchAdapterConfig` |
 | `@gopowerteam/request/plugins` | `AbortService` |
 | `@gopowerteam/request/observable` | `ObservableGenerateRequestService`(见 [Observable 模式](/guide/observable.md))|

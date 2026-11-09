@@ -93,7 +93,9 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
       }
     },
     resolveId(id: string) {
-      return id === MODULE_ID ? MODULE_ID : undefined
+      return id === MODULE_ID
+        ? MODULE_ID
+        : undefined
     },
     load(id: string) {
       if (id !== MODULE_ID)
@@ -228,7 +230,9 @@ function getServiceGroups(services: ServiceItem[]): GroupItem[] {
     group.services.push(service)
   }
 
-  return [...map.values()]
+  return [
+    ...map.values(),
+  ]
 }
 
 /**
@@ -268,7 +272,9 @@ function generateDeclare(
   // 目标声明文件路径
   const declarationFilePath = path.resolve(
     config.root,
-    typeof options.dts === 'string' ? options.dts : DECLARATION_FILE,
+    typeof options.dts === 'string'
+      ? options.dts
+      : DECLARATION_FILE,
   )
 
   // 确保目标目录存在

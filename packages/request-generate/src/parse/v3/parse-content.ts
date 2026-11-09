@@ -39,7 +39,9 @@ export class ParseMediaError extends Error {
     label: MediaLabel,
     detail: string,
   ) {
-    const opLabel = operationId ? ` "${operationId}"` : ''
+    const opLabel = operationId
+      ? ` "${operationId}"`
+      : ''
     super(
       `[V3 ${label} 解析失败] ${method.toUpperCase()} ${path}${opLabel}: ${detail}`,
     )

@@ -49,10 +49,14 @@ describe('writeModel - 单个模型写入', () => {
 
     try {
       const user = new Model('User')
-      user.fields = [buildField('id', 'string', true)]
+      user.fields = [
+        buildField('id', 'string', true),
+      ]
 
       const order = new Model('Order')
-      order.fields = [buildField('amount', 'number')]
+      order.fields = [
+        buildField('amount', 'number'),
+      ]
 
       const output = path.join(tmpDir, 'Model.ts')
       writeModel(user, output)

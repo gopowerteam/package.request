@@ -123,7 +123,10 @@ export class Download {
     if (!option.input.startsWith('http:') && !option.input.startsWith('https:')) {
       const content = fs.readFileSync(option.input, 'utf-8')
       fs.writeFileSync(specPath, content)
-      return { size: Buffer.byteLength(content), duration: Date.now() - start }
+      return {
+        size: Buffer.byteLength(content),
+        duration: Date.now() - start,
+      }
     }
 
     // 条件请求:spec 文件存在时才携带 validator,
@@ -167,6 +170,9 @@ export class Download {
       })
     }
 
-    return { size: Buffer.byteLength(content), duration: Date.now() - start }
+    return {
+      size: Buffer.byteLength(content),
+      duration: Date.now() - start,
+    }
   }
 }

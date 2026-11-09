@@ -10,12 +10,16 @@ import { parseSchemaType } from '../../../src/parse/v3/parse-schema-type'
  */
 describe('parseSchemaType (V3.1) - type 数组与 nullable', () => {
   it('type: [string, "null"] → string | null', () => {
-    const result = parseSchemaType({ type: ['string', 'null'] } as unknown as OpenAPIV3.SchemaObject)
+    const result = parseSchemaType({
+      type: ['string', 'null'],
+    } as unknown as OpenAPIV3.SchemaObject)
     expect(result.type).toBe('string | null')
   })
 
   it('type: [string, number] 多类型 → 联合', () => {
-    const result = parseSchemaType({ type: ['string', 'number'] } as unknown as OpenAPIV3.SchemaObject)
+    const result = parseSchemaType({
+      type: ['string', 'number'],
+    } as unknown as OpenAPIV3.SchemaObject)
     expect(result.type).toBe('string | number')
   })
 
@@ -40,7 +44,9 @@ describe('parseSchemaType (V3.1) - type 数组与 nullable', () => {
   it('元素自身可空时括号包裹,保证优先级正确', () => {
     const result = parseSchemaType({
       type: 'array',
-      items: { type: ['string', 'null'] },
+      items: {
+        type: ['string', 'null'],
+      },
     } as unknown as OpenAPIV3.SchemaObject)
     expect(result.type).toBe('(string | null)[]')
   })
@@ -68,12 +74,19 @@ describe('parseSchemaType (V3.1) - const 与枚举', () => {
   })
 
   it('const 为对象等非原始类型 → 忽略降级(不产生垃圾字面量)', () => {
-    const result = parseSchemaType({ type: 'object', const: { a: 1 } } as unknown as OpenAPIV3.SchemaObject)
+    const result = parseSchemaType({
+      type: 'object',
+      const: { a: 1 },
+    } as unknown as OpenAPIV3.SchemaObject)
     expect(result.enums).toBeUndefined()
   })
 
   it('nullable + enum → 枚举字面量折叠进 type(\'a\' | \'b\' | null)', () => {
-    const result = parseSchemaType({ type: 'string', enum: ['a', 'b'], nullable: true } as unknown as OpenAPIV3.SchemaObject)
+    const result = parseSchemaType({
+      type: 'string',
+      enum: ['a', 'b'],
+      nullable: true,
+    } as unknown as OpenAPIV3.SchemaObject)
     expect(result.type).toBe('\'a\' | \'b\' | null')
     expect(result.enums).toBeUndefined()
   })
@@ -98,7 +111,10 @@ describe('parseSchemaType (V3.1) - prefixItems 降级', () => {
   it('type: [array, "null"] + prefixItems(tuple)→ 降级 any[] | null', () => {
     const result = parseSchemaType({
       type: ['array', 'null'],
-      prefixItems: [{ type: 'string' }, { type: 'number' }],
+      prefixItems: [
+        { type: 'string' },
+        { type: 'number' },
+      ],
     } as unknown as OpenAPIV3.SchemaObject)
     expect(result.type).toBe('any[] | null')
   })
@@ -146,7 +162,9 @@ describe('parseV3 (V3.1) - 整体集成', () => {
         User: {
           type: 'object',
           properties: {
-            name: { type: ['string', 'null'] },
+            name: {
+              type: ['string', 'null'],
+            },
             flag: true,
           },
         },
@@ -156,7 +174,12 @@ describe('parseV3 (V3.1) - 整体集成', () => {
     // 3.1 新增顶层字段,应被忽略且不影响解析
     webhooks: {
       newUser: {
-        post: { operationId: 'onNewUser', responses: { 200: { description: 'ok' } } },
+        post: {
+          operationId: 'onNewUser',
+          responses: {
+            200: { description: 'ok' },
+          },
+        },
       },
     },
   } as unknown as OpenAPIV3.Document

@@ -11,7 +11,7 @@ import type { RequestSetupConfig } from './interfaces/request-setup.interface'
 import {
   PluginLifecycle,
 } from './interfaces/request-plugin.interface'
-import { stringify } from './utils/query-string'
+import { DEFAULT_QUERY_OPTIONS, stringify } from './utils/query-string'
 
 export class RequestService {
   static config: RequestSetupConfig
@@ -280,11 +280,7 @@ export class RequestService {
       options.service,
     )
     const queryString = stringify(options.paramsQuery || {}, {
-      arrayFormat: 'repeat',
-      skipNulls: true,
-      allowDots: true,
-      encodeValuesOnly: true,
-      encode: true,
+      ...DEFAULT_QUERY_OPTIONS,
       addQueryPrefix: true,
       ...(RequestService.config.qs || {}),
     })

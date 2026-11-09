@@ -51,7 +51,9 @@ export function parseSchemaType(
     return {
       type: 'any[]',
       ref: `${type ?? ref}[]`,
-      imports: type ? undefined : [ref],
+      imports: type
+        ? undefined
+        : [ref],
     }
   }
 
@@ -81,7 +83,9 @@ export function parseSchemaType(
       const hasRef = ofSchemaArray.some(s => s.ref)
 
       return {
-        type: hasRef ? 'any' : ofSchemaArray.map(s => s.type).join('|'),
+        type: hasRef
+          ? 'any'
+          : ofSchemaArray.map(s => s.type).join('|'),
         ref: hasRef
           ? ofSchemaArray
               .map(s => (s.ref && getCamelName(s.ref)) || s.type)

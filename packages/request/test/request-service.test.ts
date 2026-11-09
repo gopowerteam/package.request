@@ -21,7 +21,12 @@ class MockAdapter {
     this.lastOptions = options
     if (this.shouldThrow)
       throw new Error('模拟网络异常')
-    return { data: {}, status: 200, statusText: 'OK', headers: {} }
+    return {
+      data: {},
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+    }
   }
 
   public transformResponse(response: any) {
@@ -29,7 +34,12 @@ class MockAdapter {
   }
 
   public transformException(_exception: any) {
-    return { data: {}, status: 400, statusText: '', headers: {} }
+    return {
+      data: {},
+      status: 400,
+      statusText: '',
+      headers: {},
+    }
   }
 }
 

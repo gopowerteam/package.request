@@ -36,7 +36,12 @@ describe('query-string', () => {
 
     describe('null and undefined values', () => {
       it('should skip null and undefined values by default', () => {
-        expect(stringify({ a: 'value', b: null, c: undefined, d: 'value2' }))
+        expect(stringify({
+          a: 'value',
+          b: null,
+          c: undefined,
+          d: 'value2',
+        }))
           .toBe('a=value&d=value2')
       })
 
@@ -48,36 +53,52 @@ describe('query-string', () => {
 
     describe('array formats', () => {
       it('should handle indices format (default)', () => {
-        expect(stringify({ arr: ['a', 'b', 'c'] }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }))
           .toBe('arr[0]=a&arr[1]=b&arr[2]=c')
-        expect(stringify({ arr: ['a', 'b', 'c'] }, { arrayFormat: 'indices' }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }, { arrayFormat: 'indices' }))
           .toBe('arr[0]=a&arr[1]=b&arr[2]=c')
       })
 
       it('should handle brackets format', () => {
-        expect(stringify({ arr: ['a', 'b', 'c'] }, { arrayFormat: 'brackets' }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }, { arrayFormat: 'brackets' }))
           .toBe('arr[]=a&arr[]=b&arr[]=c')
       })
 
       it('should handle indices format', () => {
-        expect(stringify({ arr: ['a', 'b', 'c'] }, { arrayFormat: 'indices' }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }, { arrayFormat: 'indices' }))
           .toBe('arr[0]=a&arr[1]=b&arr[2]=c')
       })
 
       it('should handle comma format', () => {
-        expect(stringify({ arr: ['a', 'b', 'c'] }, { arrayFormat: 'comma' }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }, { arrayFormat: 'comma' }))
           .toBe('arr=a%2Cb%2Cc')
-        expect(stringify({ numbers: [1, 2, 3] }, { arrayFormat: 'comma' }))
+        expect(stringify({
+          numbers: [1, 2, 3],
+        }, { arrayFormat: 'comma' }))
           .toBe('numbers=1%2C2%2C3')
       })
 
       it('should handle none format', () => {
-        expect(stringify({ arr: ['a', 'b', 'c'] }, { arrayFormat: 'none' }))
+        expect(stringify({
+          arr: ['a', 'b', 'c'],
+        }, { arrayFormat: 'none' }))
           .toBe('arr=a&arr=b&arr=c')
       })
 
       it('should handle arrays with null and undefined values in comma format', () => {
-        expect(stringify({ arr: ['a', null, 'c', undefined, 'd'] }, { arrayFormat: 'comma' }))
+        expect(stringify({
+          arr: ['a', null, 'c', undefined, 'd'],
+        }, { arrayFormat: 'comma' }))
           .toBe('arr=a%2Cc%2Cd')
       })
     })
@@ -138,7 +159,9 @@ describe('query-string', () => {
       it('should not encode when encode is false', () => {
         expect(stringify({ 'test key': 'test value' }, { encode: false }))
           .toBe('test key=test value')
-        expect(stringify({ arr: ['a b'] }, { encode: false }))
+        expect(stringify({
+          arr: ['a b'],
+        }, { encode: false }))
           .toBe('arr[0]=a b')
       })
 
@@ -211,12 +234,16 @@ describe('query-string', () => {
       })
 
       it('should handle numeric arrays in comma format', () => {
-        expect(stringify({ ids: [1, 2, 3, 4, 5] }, { arrayFormat: 'comma' }))
+        expect(stringify({
+          ids: [1, 2, 3, 4, 5],
+        }, { arrayFormat: 'comma' }))
           .toBe('ids=1%2C2%2C3%2C4%2C5')
       })
 
       it('should handle mixed type arrays in comma format', () => {
-        expect(stringify({ mixed: ['a', 1, true, null, 'b'] }, { arrayFormat: 'comma' }))
+        expect(stringify({
+          mixed: ['a', 1, true, null, 'b'],
+        }, { arrayFormat: 'comma' }))
           .toBe('mixed=a%2C1%2Ctrue%2Cb')
       })
 
@@ -259,6 +286,85 @@ describe('query-string', () => {
           arrayFormat: 'indices',
         }))
           .toBe('arr[0]=x&arr[1]=y')
+      })
+    })
+
+    describe('sort option', () => {
+      it('should sort top level keys when sort provided', () => {
+        expect(stringify({ c: 3, a: 1, b: 2 }, {
+          sort: (x, y) => x.localeCompare(y),
+        }))
+          .toBe('a=1&b=2&c=3')
+      })
+
+      it('should sort nested object keys at every level', () => {
+        const obj = {
+          z: 1,
+          a: { y: 2, b: 3 },
+        }
+        expect(stringify(obj, {
+          sort: (x, y) => x.localeCompare(y),
+        }))
+          .toBe('a.b=3&a.y=2&z=1')
+      })
+
+      it('should keep original key order without sort (backward compatible)', () => {
+        expect(stringify({ c: 3, a: 1 })).toBe('c=3&a=1')
+      })
+    })
+
+    describe('filter option', () => {
+      it('should drop pairs whose filter result is undefined', () => {
+        expect(stringify(
+          { a: '', b: 'x', c: null },
+          {
+            filter: (_, value) => (['', undefined, null].includes(value as any)
+              ? undefined
+              : value),
+          },
+        )).toBe('b=x')
+      })
+
+      it('should support downstream style empty string filtering', () => {
+        // 对齐 dso-app-container 的 filter 用法:字符串空值丢弃
+        expect(stringify(
+          { keyword: '', page: 1, status: null as any },
+          {
+            filter: (_, value) => (typeof value === 'string'
+              ? (value || undefined)
+              : value),
+          },
+        )).toBe('page=1')
+      })
+
+      it('should keep values returned by filter as-is', () => {
+        expect(stringify({ a: 'x', b: 'y' }, {
+          filter: () => 'z',
+        }))
+          .toBe('a=z&b=z')
+      })
+
+      it('filter should take precedence over skipNulls', () => {
+        // skipNulls=false 本应输出 a=,但 filter 先丢弃
+        expect(stringify(
+          { a: null, b: 'v' },
+          {
+            skipNulls: false,
+            filter: (_, value) => (value === null
+              ? undefined
+              : value),
+          },
+        )).toBe('b=v')
+      })
+
+      it('filter should be able to keep null when skipNulls is false', () => {
+        expect(stringify(
+          { a: null },
+          {
+            skipNulls: false,
+            filter: (_, value) => value,
+          },
+        )).toBe('a=')
       })
     })
   })

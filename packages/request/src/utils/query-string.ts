@@ -16,6 +16,28 @@ export interface QueryStringifyOptions {
   encode?: boolean
   /** 添加查询前缀，默认 false */
   addQueryPrefix?: boolean
+  /** 按键名排序，每层对象递归生效；不传时保持原始键序 */
+  sort?: (a: string, b: string) => number
+  /** 值过滤，返回 undefined 时丢弃该键值对；优先级高于 skipNulls */
+  filter?: (prefix: string, value: unknown) => unknown
+}
+
+/**
+ * 请求服务默认序列化选项
+ *
+ * axios 适配器与 `toURL()` 共用，避免两处默认值漂移。
+ */
+export const DEFAULT_QUERY_OPTIONS: QueryStringifyOptions = {
+  arrayFormat: 'repeat',
+  skipNulls: true,
+  allowDots: true,
+  encodeValuesOnly: true,
+  encode: true,
+  sort: (a: string, b: string) => a.localeCompare(b),
+  filter: (_prefix: string, value: unknown) =>
+    ['', undefined, null].includes(value as string)
+      ? undefined
+      : value,
 }
 
 /**
@@ -31,7 +53,18 @@ function encodeValue(value: string, encode: boolean): string {
  * 处理嵌套对象的键名
  */
 function getKeyWithDot(key: string, childKey: string, allowDots: boolean): string {
-  return allowDots ? `${key}.${childKey}` : `${key}[${childKey}]`
+  return allowDots
+    ? `${key}.${childKey}`
+    : `${key}[${childKey}]`
+}
+
+/**
+ * 按键名排序（sort 选项为函数时才排序）
+ */
+function sortKeys(keys: string[], sort?: (a: string, b: string) => number): string[] {
+  return sort
+    ? [...keys].sort(sort)
+    : keys
 }
 
 /**
@@ -43,6 +76,15 @@ function processValue(
   parentKey = '',
 ): string[] {
   const result: string[] = []
+
+  // filter 优先级最高：返回 undefined 时整条键值对丢弃
+  if (options.filter) {
+    const filtered = options.filter(parentKey, value)
+    if (filtered === undefined) {
+      return result
+    }
+    value = filtered
+  }
 
   if (value === null || value === undefined) {
     if (!options.skipNulls) {
@@ -57,7 +99,9 @@ function processValue(
       const filteredValues = value.filter(item => item !== null && item !== undefined)
       if (filteredValues.length > 0) {
         const commaValue = filteredValues.map(item =>
-          typeof item === 'object' ? JSON.stringify(item) : item.toString(),
+          typeof item === 'object'
+            ? JSON.stringify(item)
+            : item.toString(),
         ).join(',')
         const shouldEncode = options.encode !== false
         const encodedValue = encodeValue(commaValue, shouldEncode)
@@ -71,11 +115,15 @@ function processValue(
 
         if (options.arrayFormat === 'indices') {
           // 构建索引格式的键名
-          itemKey = parentKey ? `${parentKey}[${index}]` : `[${index}]`
+          itemKey = parentKey
+            ? `${parentKey}[${index}]`
+            : `[${index}]`
         }
         else if (options.arrayFormat === 'brackets') {
           // 构建括号格式的键名
-          itemKey = parentKey ? `${parentKey}[]` : '[]'
+          itemKey = parentKey
+            ? `${parentKey}[]`
+            : '[]'
         }
         else {
           // repeat 格式，直接使用父键名
@@ -93,7 +141,7 @@ function processValue(
     }
   }
   else if (typeof value === 'object') {
-    Object.keys(value).forEach((childKey) => {
+    sortKeys(Object.keys(value), options.sort).forEach((childKey) => {
       const fullKey = parentKey
         ? getKeyWithDot(parentKey, childKey, options.allowDots || false)
         : childKey
@@ -127,6 +175,8 @@ export function stringify(
     encodeValuesOnly = false,
     encode = true,
     addQueryPrefix = false,
+    sort,
+    filter,
   } = options
 
   if (!obj || typeof obj !== 'object') {
@@ -135,7 +185,7 @@ export function stringify(
 
   const parts: string[] = []
 
-  Object.keys(obj).forEach((key) => {
+  sortKeys(Object.keys(obj), sort).forEach((key) => {
     const value = obj[key]
     const processedValues = processValue(value, {
       arrayFormat,
@@ -144,11 +194,17 @@ export function stringify(
       encodeValuesOnly,
       encode,
       addQueryPrefix,
+      sort,
+      filter,
     }, key)
 
     parts.push(...processedValues)
   })
 
   const queryString = parts.join('&')
-  return addQueryPrefix ? (queryString ? `?${queryString}` : '?') : queryString
+  return addQueryPrefix
+    ? (queryString
+        ? `?${queryString}`
+        : '?')
+    : queryString
 }

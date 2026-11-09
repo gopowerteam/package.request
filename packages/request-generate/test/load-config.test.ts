@@ -7,7 +7,9 @@ import { tsImport } from 'tsx/esm/api'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadConfigFile } from '../src/load-config'
 
-vi.mock('tsx/esm/api', () => ({ tsImport: vi.fn() }))
+vi.mock('tsx/esm/api', () => ({
+  tsImport: vi.fn(),
+}))
 
 const baseConfig = {
   gateway: 'https://gateway.example.com',
@@ -54,14 +56,18 @@ describe('load-config loadConfigFile', () => {
     expect(tsImport).toHaveBeenCalledTimes(1)
     expect(tsImport).toHaveBeenCalledWith(
       pathToFileURL(path.join(tmpCwd, 'request.config.ts')).href,
-      { parentURL: expect.any(String) },
+      {
+        parentURL: expect.any(String),
+      },
     )
   })
 
   it('tsx 编译产物为双层 default(__esModule)时正确解包', async () => {
     fs.writeFileSync(path.join(tmpCwd, 'request.config.ts'), 'export default {}\n')
     const config = { ...baseConfig, gateway: 'https://inner' }
-    mockTsImport({ default: { __esModule: true, default: config } })
+    mockTsImport({
+      default: { __esModule: true, default: config },
+    })
 
     const { default: loaded } = await loadConfigFile()
 
