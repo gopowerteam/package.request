@@ -440,4 +440,53 @@ describe('vite-plugin requestGeneratePlugin', () => {
     await hooks.load('virtual:request')
     expect(vi.mocked(Generate.startup).mock.calls.length).toBe(startupCalls)
   })
+
+  it('generate: false 时跳过进程内生成,仅扫描+装配', async () => {
+    writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true, generate: false })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+    await hooks.buildStart()
+
+    expect(Generate.startup).not.toHaveBeenCalled()
+    const code = (await hooks.load('virtual:request')) ?? ''
+    expect(code).toContain('UserService')
+  })
+
+  it('throwOnError: false 时生成失败降级为可加载的空实现', async () => {
+    vi.mocked(Generate.startup).mockRejectedValueOnce(new Error('boom'))
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const plugin = requestGeneratePlugin({ alias: '@', dts: true, throwOnError: false })
+      const hooks = getHooks(plugin)
+      hooks.configResolved(createViteConfig(tmpRoot))
+
+      // buildStart 不抛出
+      await expect(hooks.buildStart()).resolves.toBeUndefined()
+
+      // 虚拟模块可加载,useRequest 调用时抛出带原因的运行时错误
+      const code = (await hooks.load('virtual:request')) ?? ''
+      expect(code).toContain('export function useRequest()')
+      expect(code).toContain('boom')
+
+      // d.ts 不落盘(编译期显式缺模块声明优于静默空类型)
+      expect(fs.existsSync(path.join(tmpRoot, 'request.d.ts'))).toBe(false)
+      expect(warnSpy).toHaveBeenCalled()
+    }
+    finally {
+      warnSpy.mockRestore()
+    }
+  })
+
+  it('throwOnError 缺省时生成失败仍抛出(向后兼容)', async () => {
+    vi.mocked(Generate.startup).mockRejectedValueOnce(new Error('boom'))
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+
+    await expect(hooks.buildStart()).rejects.toThrow('request-generate 接口生成失败')
+  })
 })

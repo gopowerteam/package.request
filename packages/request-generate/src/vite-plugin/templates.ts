@@ -104,3 +104,29 @@ export const generateDeclareTemplate = `declare module '{{{MODULE_ID}}}' {
   ${useRequestFunctionTypeTemplate.trim()}
 }
 `
+
+/**
+ * 降级模式代码(throwOnError: false):虚拟模块可加载,
+ * useRequest 调用时抛出带原因的明确运行时错误
+ */
+export function generateDegradedTemplate(reason: unknown): string {
+  // 还原被包装错误的 cause 链(如 'request-generate 接口生成失败' 包装的原始下载/解析错误)
+  const describe = (error: unknown): string => {
+    if (!(error instanceof Error)) {
+      return String(error)
+    }
+    const cause = error.cause instanceof Error
+      ? ` (原因: ${describe(error.cause)})`
+      : ''
+    return `${error.message}${cause}`
+  }
+
+  const message = JSON.stringify(
+    `[request-generate] 接口未生成(降级模式),请在 dev server 启动日志中查看原因: ${describe(reason)}`,
+  )
+
+  return `export function useRequest() {
+  throw new Error(${message})
+}
+`
+}

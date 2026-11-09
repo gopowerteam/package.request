@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import Handlebars from 'handlebars'
 import { Generate } from '../generate'
 import { loadConfigFile } from '../load-config'
-import { generateCodeTemplate, generateDeclareTemplate } from './templates'
+import { generateCodeTemplate, generateDeclareTemplate, generateDegradedTemplate } from './templates'
 
 // 虚拟模块ID
 const MODULE_ID = 'virtual:request'
@@ -28,6 +28,18 @@ export interface PluginOptions {
    * - 'none':强制扁平
    */
   groupStrategy?: GroupStrategy
+  /**
+   * 是否在插件内执行进程内生成(Generate.startup):
+   * - `true`(缺省):生成 + 扫描装配
+   * - `false`:跳过生成(交给外部管线,如 CI 中预先运行 request-download/request-generate),仅扫描 + 装配
+   */
+  generate?: boolean
+  /**
+   * 生成/扫描失败时是否抛出错误:
+   * - `true`(缺省):抛出,dev server 启动失败
+   * - `false`:降级为 console.warn + 可加载的空实现(useRequest 调用时抛出明确运行时错误),前端联调不被后端可用性阻塞
+   */
+  throwOnError?: boolean
 }
 
 export type GroupStrategy = 'http' | 'first-dir' | 'none'
@@ -68,51 +80,64 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
       throw new Error('Vite 配置尚未解析完成,无法执行 request-generate 插件')
     }
 
-    // 1. 加载 request-generate 配置(进程内,支持 .ts)
-    const { default: generateOptions } = await loadConfigFile(
-      options.configFile,
-      viteConfig.root,
-    )
-
-    // 2. 进程内生成接口文件(替代子进程调用)
     try {
-      await Generate.startup(generateOptions)
+      // 1. 加载 request-generate 配置(进程内,支持 .ts)
+      const { default: generateOptions } = await loadConfigFile(
+        options.configFile,
+        viteConfig.root,
+      )
+
+      // 2. 进程内生成接口文件(替代子进程调用);generate: false 时跳过(交给外部管线)
+      if (options.generate !== false) {
+        try {
+          await Generate.startup(generateOptions)
+        }
+        catch (error) {
+          throw new Error('request-generate 接口生成失败', { cause: error })
+        }
+      }
+
+      // 3. 扫描产物并生成虚拟模块代码 / 类型声明
+      const scanDir = options.dir ?? generateOptions.output
+      if (!scanDir) {
+        throw new Error(
+          '未指定扫描目录,请在插件选项 dir 或 request.config.ts 的 output 中配置',
+        )
+      }
+
+      // 扫描基准与生成器口径对齐:显式 dir 按 vite root;回退 output 按 baseDir(生成产物落地基准)
+      const scanBase = options.dir
+        ? viteConfig.root
+        : (generateOptions.baseDir ?? viteConfig.root)
+      const targetDir = path.resolve(scanBase, scanDir)
+
+      const scanned = scanServiceFiles(targetDir, viteConfig, options.alias)
+      const strategy = options.groupStrategy ?? 'http'
+      const services = buildServiceItems(scanned, strategy, targetDir)
+      const groups = getServiceGroups(services)
+      const flatServices = services.filter(service => !service.group)
+
+      // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
+      groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
+      assertUniqueServiceNames(flatServices)
+      assertUniqueTopLevelKeys(groups, flatServices)
+
+      if (services.length > 0) {
+        generatedCode = renderCode(groups, flatServices)
+
+        if (options.dts !== false) {
+          generateDeclare(groups, flatServices, options, viteConfig)
+        }
+      }
     }
     catch (error) {
-      throw new Error('request-generate 接口生成失败', { cause: error })
-    }
-
-    // 3. 扫描产物并生成虚拟模块代码 / 类型声明
-    const scanDir = options.dir ?? generateOptions.output
-    if (!scanDir) {
-      throw new Error(
-        '未指定扫描目录,请在插件选项 dir 或 request.config.ts 的 output 中配置',
-      )
-    }
-
-    // 扫描基准与生成器口径对齐:显式 dir 按 vite root;回退 output 按 baseDir(生成产物落地基准)
-    const scanBase = options.dir
-      ? viteConfig.root
-      : (generateOptions.baseDir ?? viteConfig.root)
-    const targetDir = path.resolve(scanBase, scanDir)
-
-    const scanned = scanServiceFiles(targetDir, viteConfig, options.alias)
-    const strategy = options.groupStrategy ?? 'http'
-    const services = buildServiceItems(scanned, strategy, targetDir)
-    const groups = getServiceGroups(services)
-    const flatServices = services.filter(service => !service.group)
-
-    // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
-    groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
-    assertUniqueServiceNames(flatServices)
-    assertUniqueTopLevelKeys(groups, flatServices)
-
-    if (services.length > 0) {
-      generatedCode = renderCode(groups, flatServices)
-
-      if (options.dts !== false) {
-        generateDeclare(groups, flatServices, options, viteConfig)
+      // throwOnError: false → 降级为警告 + 可加载的空实现(dev server 不被后端可用性阻塞)
+      if (options.throwOnError !== false) {
+        throw error
       }
+
+      console.warn('[request-generate] 接口生成/扫描失败,已降级为空实现:', error)
+      generatedCode = generateDegradedTemplate(error)
     }
   }
 
