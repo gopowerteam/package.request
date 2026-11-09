@@ -1,4 +1,5 @@
 import type { GenerateOptions } from '../../src/types/generate-options'
+import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { generateServiceOptions } from '../../src/utils/get-services-options'
 
@@ -34,6 +35,19 @@ describe('generateServiceOptions - 选项透传', () => {
       },
     }
 
+    it('baseDir 显式声明时 output 与 baseDir 均按其解析(monorepo 场景)', () => {
+      const baseDir = '/repo/root'
+      const apps = generateServiceOptions({
+        ...baseOptions,
+        baseDir,
+        applications: { 'app-a': 'key-a' },
+      })
+
+      expect(apps[0].baseDir).toBe(baseDir)
+      // 相对 output 以 baseDir 为基准,而非 process.cwd()
+      expect(apps[0].output).toBe(path.resolve(baseDir, 'src/http/app-a'))
+    })
+
     it('每个应用选项都应透传 forceClear=true', () => {
       const apps = generateServiceOptions({ ...multiOptions, forceClear: true })
 
@@ -56,9 +70,9 @@ describe('generateServiceOptions - 选项透传', () => {
       const apps = generateServiceOptions(multiOptions)
       const outputs = apps.map(app => app.output)
 
-      // path.join 会归一化掉前导 ./
-      expect(outputs).toContain('src/http/dso-service')
-      expect(outputs).toContain('src/http/mall-service')
+      // output 单点收敛为绝对路径(按 baseDir ?? cwd 解析),并保留应用子目录
+      expect(outputs).toContain(path.resolve('src/http/dso-service'))
+      expect(outputs).toContain(path.resolve('src/http/mall-service'))
     })
 
     it('字符串形式的应用配置也应透传 forceClear', () => {

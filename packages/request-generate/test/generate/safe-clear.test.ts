@@ -14,6 +14,40 @@ describe('safe-clear - 目录删除安全守卫', () => {
     )
   })
 
+  it('显式 baseDir 时守卫以 baseDir 为基准(monorepo:vite cwd ≠ baseDir 场景)', async () => {
+    const { default: fs } = await import('node:fs')
+    const { default: path } = await import('node:path')
+    const os = await import('node:os')
+
+    // baseDir 指向临时目录(monorepo 仓库根),目标目录在其下、但在进程 cwd 之外
+    const baseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-basedir-'))
+    const targetDir = path.join(baseDir, 'generated', 'app', 'models')
+
+    try {
+      fs.mkdirSync(targetDir, { recursive: true })
+
+      // 不传 baseDir(守卫为 cwd)→ 拒绝
+      expect(() => safeClearGeneratedDir(targetDir)).toThrow(/输出路径必须在项目目录内/)
+      // 传入 baseDir → 允许(force 跳过标记检查:目录已存在但无 .generated)
+      const markerPath = safeClearGeneratedDir(targetDir, true, baseDir)
+      // 目录被清空重建,标记路径由函数返回(文件本身由 writeGeneratedMarker 落盘)
+      expect(fs.existsSync(targetDir)).toBe(true)
+      expect(markerPath).toBe(path.join(targetDir, '.generated'))
+
+      // 拒绝清空 baseDir 本身
+      expect(() => safeClearGeneratedDir(baseDir, false, baseDir)).toThrow(
+        /输出路径必须在项目目录内/,
+      )
+      // baseDir 之外的路径仍拒绝
+      expect(() => safeClearGeneratedDir(process.cwd(), false, baseDir)).toThrow(
+        /输出路径必须在项目目录内/,
+      )
+    }
+    finally {
+      fs.rmSync(baseDir, { recursive: true, force: true })
+    }
+  })
+
   it('已存在目录但无 .generated 标记时应拒绝清空', async () => {
     const { default: fs } = await import('node:fs')
     const { default: path } = await import('node:path')

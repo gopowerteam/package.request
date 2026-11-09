@@ -5,6 +5,7 @@ import type {
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
+import process from 'node:process'
 import { version as packageVersion } from '../../package.json'
 
 const ConfigFileName = '.config.json'
@@ -38,10 +39,10 @@ export interface GenerationPlan {
 }
 
 /**
- * 配置文件路径(延迟解析,允许运行时切换 cwd,便于测试)
+ * 配置文件路径(允许通过 baseDir 锚定,缺省 process.cwd(),便于测试与 monorepo 场景)
  */
-function getConfigFilePath(): string {
-  return path.resolve('.request', ConfigFileName)
+function getConfigFilePath(baseDir = process.cwd()): string {
+  return path.resolve(baseDir, '.request', ConfigFileName)
 }
 
 /**
@@ -111,8 +112,8 @@ export function getConfigFingerprint(
 /**
  * 读取本地账本;文件不存在或内容损坏时返回空数组(全量重生成,不中断)
  */
-export function readLocalConfig(): ConfigFileItem[] {
-  const configFilePath = getConfigFilePath()
+export function readLocalConfig(baseDir = process.cwd()): ConfigFileItem[] {
+  const configFilePath = getConfigFilePath(baseDir)
 
   if (!fs.existsSync(configFilePath)) {
     return []
@@ -137,9 +138,10 @@ export function isNeedUpdate(
   config: ConfigFileItem[],
   output: string,
   configMd5: string,
+  baseDir = process.cwd(),
 ): string | void {
-  const file = path.resolve('.request', `${name}.json`)
-  const outputDir = path.resolve(output)
+  const file = path.resolve(baseDir, '.request', `${name}.json`)
+  const outputDir = path.resolve(baseDir, output)
 
   if (!fs.existsSync(file)) {
     throw new Error(`未找到相应的配置文件: ${file}`)
@@ -173,12 +175,13 @@ export function planGeneration(
   options: GenerateApplicationOptions[],
   generateOptions: GenerateOptions,
 ): GenerationPlan {
-  const config = readLocalConfig()
+  const baseDir = generateOptions.baseDir ?? process.cwd()
+  const config = readLocalConfig(baseDir)
   const entries = new Map<string, PendingConfigEntry>()
 
   const pending = options.filter((item) => {
     const itemConfigMd5 = getConfigFingerprint(generateOptions, item)
-    const md5 = isNeedUpdate(item.name!, config, generateOptions.output, itemConfigMd5)
+    const md5 = isNeedUpdate(item.name!, config, generateOptions.output, itemConfigMd5, baseDir)
 
     if (md5) {
       entries.set(item.name!, { md5, configMd5: itemConfigMd5 })
@@ -191,7 +194,7 @@ export function planGeneration(
 
   // 更新配置文件路径为本地文档(生成阶段不再走网络)
   pending.forEach((item) => {
-    item.input = path.resolve('.request', `${item.name}.json`)
+    item.input = path.resolve(baseDir, '.request', `${item.name}.json`)
   })
 
   return { entries, pending }
@@ -201,11 +204,13 @@ export function planGeneration(
  * 提交账本:更新/新增条目并写入配置文件
  *
  * @param entries 规划阶段产生的待提交条目
- * @param config 账本基础数据,缺省时重新读取(生成期间账本未被本进程修改)
+ * @param baseDir 账本文件解析基准(缺省 process.cwd())
+ * @param config 账本基础数据,缺省时按 baseDir 重新读取(生成期间账本未被本进程修改)
  */
 export function commitGenerationConfig(
   entries: Map<string, PendingConfigEntry>,
-  config: ConfigFileItem[] = readLocalConfig(),
+  baseDir = process.cwd(),
+  config: ConfigFileItem[] = readLocalConfig(baseDir),
 ): void {
   entries.forEach((entry, name) => {
     const configItem = config.find(x => x.name === name)
@@ -224,5 +229,5 @@ export function commitGenerationConfig(
     }
   })
 
-  fs.writeFileSync(getConfigFilePath(), JSON.stringify(config, null, 2))
+  fs.writeFileSync(getConfigFilePath(baseDir), JSON.stringify(config, null, 2))
 }

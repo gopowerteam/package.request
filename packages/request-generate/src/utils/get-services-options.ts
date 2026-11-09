@@ -4,6 +4,7 @@ import type {
   GenerateOptions,
 } from '../types/generate-options'
 import path from 'node:path'
+import process from 'node:process'
 
 /**
  * 创建单服务配置项
@@ -36,14 +37,17 @@ function createOptions(
       }
     }
   })()
+  const baseDir = options.baseDir ?? process.cwd()
 
   return {
     name,
     application: service,
     input: `${options.gateway}/${service}/${openapi}`.replace(/\/{2,3}/g, '/'),
-    output: name
+    // output 单点收敛:统一按 baseDir 解析为绝对路径,下游(write-models/services、账本检查)直接可用
+    output: path.resolve(baseDir, name
       ? path.join(options.output, name)
-      : options.output,
+      : options.output),
+    baseDir,
     exportModels: options.exportModels,
     forceClear: options.forceClear,
   }

@@ -77,10 +77,13 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
         )
       }
 
-      const paths = getServicePaths(
-        { ...options, dir: scanDir },
-        viteConfig,
-      )
+      // 扫描基准与生成器口径对齐:显式 dir 按 vite root;回退 output 按 baseDir(生成产物落地基准)
+      const scanBase = options.dir
+        ? viteConfig.root
+        : (generateOptions.baseDir ?? viteConfig.root)
+      const targetDir = path.resolve(scanBase, scanDir)
+
+      const paths = getServicePaths(options, targetDir, viteConfig)
       const services = getServiceItems(paths)
       const groups = getServiceGroups(services)
 
@@ -123,12 +126,14 @@ function toPascalCase(str = ''): string {
 
 /**
  * 生成服务路径
- * @param options PluginOptions(需包含 dir)
+ * @param options PluginOptions
+ * @param targetDir 已解析的扫描目录绝对路径
  * @param config Vite 已解析配置
  * @returns string[]
  */
 function getServicePaths(
-  options: PluginOptions & { dir: string },
+  options: PluginOptions,
+  targetDir: string,
   config: ResolvedConfig,
 ) {
   const paths: string[] = []
@@ -160,13 +165,11 @@ function getServicePaths(
     )
   }
 
-  const replacement = aliasMatch.replacement.replace(/\\/g, '/')
-  const targetDir = path.resolve(config.root, options.dir)
-
   if (fs.existsSync(targetDir)) {
     walk(targetDir)
   }
 
+  const replacement = aliasMatch.replacement.replace(/\\/g, '/')
   return paths.map(filepath => filepath.replace(replacement, options.alias))
 }
 

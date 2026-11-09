@@ -11,7 +11,8 @@ const GENERATED_MARKER = '.generated'
  * 安全清空目标目录
  *
  * 保护策略:
- * 1. 始终拒绝清空 cwd 或 cwd 之外的路径(即使 force=true)
+ * 1. 始终拒绝清空 baseDir 或 baseDir 之外的路径(即使 force=true);
+ *    baseDir 为相对路径解析基准(monorepo/插件场景为配置文件所在目录,缺省 process.cwd())
  * 2. 仅当目录中存在 `.generated` 标记文件时才允许清空
  *    (避免误删用户已存在的同名目录)
  * 3. 传入 force=true 可跳过标记检查(用于旧项目迁移,
@@ -19,14 +20,19 @@ const GENERATED_MARKER = '.generated'
  *
  * @param targetDir 待清空的目录路径
  * @param force 是否跳过 `.generated` 标记检查(默认 false)
+ * @param baseDir 允许清空的根目录基准(默认 process.cwd())
  * @returns 标记文件的完整路径(供调用方在重建目录后写入)
  */
-export function safeClearGeneratedDir(targetDir: string, force = false): string {
+export function safeClearGeneratedDir(
+  targetDir: string,
+  force = false,
+  baseDir = process.cwd(),
+): string {
   const resolved = path.resolve(targetDir)
-  const cwd = process.cwd()
+  const root = path.resolve(baseDir)
 
-  // 始终拒绝清空 cwd 或不在 cwd 内的路径(不受 force 影响)
-  if (resolved === cwd || !resolved.startsWith(`${cwd}${path.sep}`)) {
+  // 始终拒绝清空基准目录或其之外的路径(不受 force 影响)
+  if (resolved === root || !resolved.startsWith(`${root}${path.sep}`)) {
     throw new Error(`输出路径必须在项目目录内: ${resolved}`)
   }
 

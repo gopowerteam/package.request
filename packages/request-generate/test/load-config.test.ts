@@ -52,7 +52,9 @@ describe('load-config loadConfigFile', () => {
 
     const { default: loaded } = await loadConfigFile()
 
-    expect(loaded).toBe(config)
+    // 配置字段透传(返回值为展开后的新对象),并注入 baseDir = 配置文件所在目录
+    expect(loaded).toMatchObject(config)
+    expect(loaded.baseDir).toBe(tmpCwd)
     expect(tsImport).toHaveBeenCalledTimes(1)
     expect(tsImport).toHaveBeenCalledWith(
       pathToFileURL(path.join(tmpCwd, 'request.config.ts')).href,
@@ -71,7 +73,9 @@ describe('load-config loadConfigFile', () => {
 
     const { default: loaded } = await loadConfigFile()
 
-    expect(loaded).toBe(config)
+    // 配置字段透传(返回值为展开后的新对象),并注入 baseDir = 配置文件所在目录
+    expect(loaded).toMatchObject(config)
+    expect(loaded.baseDir).toBe(tmpCwd)
   })
 
   it('无 .ts 时回退到 request-generate.config.cjs(原生 import)', async () => {
@@ -121,7 +125,9 @@ describe('load-config loadConfigFile', () => {
 
     const { default: loaded } = await loadConfigFile()
 
-    expect(loaded).toBe(config)
+    // 配置字段透传(返回值为展开后的新对象),并注入 baseDir = 配置文件所在目录
+    expect(loaded).toMatchObject(config)
+    expect(loaded.baseDir).toBe(tmpCwd)
     expect(tsImport).toHaveBeenCalledWith(
       pathToFileURL(path.join(tmpCwd, 'request.config.ts')).href,
       expect.anything(),
@@ -160,7 +166,8 @@ describe('load-config loadConfigFile', () => {
 
     const { default: loaded } = await loadConfigFile('custom.config.ts')
 
-    expect(loaded).toBe(config)
+    expect(loaded).toMatchObject(config)
+    expect(loaded.baseDir).toBe(tmpCwd)
     expect(tsImport).toHaveBeenCalledWith(
       pathToFileURL(path.join(tmpCwd, 'custom.config.ts')).href,
       expect.anything(),
@@ -184,5 +191,33 @@ describe('load-config loadConfigFile', () => {
     fs.writeFileSync(path.join(tmpCwd, 'config.json'), '{}\n')
 
     await expect(loadConfigFile('config.json')).rejects.toThrow('不支持的配置文件类型 ".json"')
+  })
+
+  it('配置显式声明 baseDir 时优先于配置文件所在目录', async () => {
+    fs.writeFileSync(path.join(tmpCwd, 'request.config.ts'), 'export default {}\n')
+    const explicitBase = path.join(tmpCwd, 'packages', 'app')
+    const config = { ...baseConfig, baseDir: explicitBase }
+    mockTsImport({ default: config })
+
+    const { default: loaded } = await loadConfigFile()
+
+    expect(loaded.baseDir).toBe(explicitBase)
+  })
+
+  it('配置文件位于 cwd 之外时 baseDir 锚定到配置文件目录(而非 cwd)', async () => {
+    const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-load-config-ext-'))
+    try {
+      const configFile = path.join(externalDir, 'request.config.ts')
+      fs.writeFileSync(configFile, 'export default {}\n')
+      const config = { ...baseConfig }
+      mockTsImport({ default: config })
+
+      const { default: loaded } = await loadConfigFile(configFile)
+
+      expect(loaded.baseDir).toBe(externalDir)
+    }
+    finally {
+      fs.rmSync(externalDir, { recursive: true, force: true })
+    }
   })
 })

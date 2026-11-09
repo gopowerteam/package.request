@@ -5,6 +5,7 @@ import type {
 import { Buffer } from 'node:buffer'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import process from 'node:process'
 import {
   clearDownloadResults,
   collectDownloadResult,
@@ -16,6 +17,13 @@ import {
 import { generateServiceOptions } from '../utils/get-services-options'
 
 const DefaultDownloadDir = '.request'
+
+/**
+ * 快照目录解析:相对路径以 baseDir(配置文件所在目录)为基准,缺省 process.cwd()
+ */
+function getSnapshotDir(baseDir = process.cwd()): string {
+  return path.resolve(baseDir, DefaultDownloadDir)
+}
 
 /**
  * 下载元数据(条件请求 validator)
@@ -34,24 +42,24 @@ interface DownloadResultInfo {
   unchanged?: boolean
 }
 
-function getMetaPath(name: string): string {
-  return path.join(DefaultDownloadDir, `${name}.meta.json`)
+function getMetaPath(name: string, baseDir = process.cwd()): string {
+  return path.join(getSnapshotDir(baseDir), `${name}.meta.json`)
 }
 
 /**
  * 读取下载元数据;文件不存在或损坏时返回空对象(全量下载,不中断)
  */
-function readMeta(name: string): DownloadMeta {
+function readMeta(name: string, baseDir = process.cwd()): DownloadMeta {
   try {
-    return JSON.parse(fs.readFileSync(getMetaPath(name), 'utf-8')) as DownloadMeta
+    return JSON.parse(fs.readFileSync(getMetaPath(name, baseDir), 'utf-8')) as DownloadMeta
   }
   catch {
     return {}
   }
 }
 
-function writeMeta(name: string, meta: DownloadMeta): void {
-  fs.writeFileSync(getMetaPath(name), JSON.stringify(meta, null, 2))
+function writeMeta(name: string, meta: DownloadMeta, baseDir = process.cwd()): void {
+  fs.writeFileSync(getMetaPath(name, baseDir), JSON.stringify(meta, null, 2))
 }
 
 export class Download {
@@ -59,13 +67,14 @@ export class Download {
 
   static async startup(options: GenerateOptions) {
     const enabled = options.logger !== false
+    const baseDir = options.baseDir ?? process.cwd()
 
     // 生成服务列表
     const applicationOptions = generateServiceOptions(options)
 
     // 创建.request目录
-    if (!fs.existsSync(DefaultDownloadDir)) {
-      fs.mkdirSync(DefaultDownloadDir, { recursive: true })
+    if (!fs.existsSync(getSnapshotDir(baseDir))) {
+      fs.mkdirSync(getSnapshotDir(baseDir), { recursive: true })
     }
 
     if (enabled) {
@@ -115,7 +124,7 @@ export class Download {
     const start = Date.now()
     // 与 startup 汇总展示保持一致的默认应用名
     const name = option.name ?? 'default'
-    const specPath = path.join(DefaultDownloadDir, `${name}.json`)
+    const specPath = path.join(getSnapshotDir(option.baseDir), `${name}.json`)
 
     // 本地文件输入:直读复制,不走网络与条件请求。
     // 注意:input 由 gateway/openapi 拼接并压缩连续斜杠,https:// 会变成 https:/,
@@ -131,7 +140,7 @@ export class Download {
 
     // 条件请求:spec 文件存在时才携带 validator,
     // 避免文件缺失但 meta 残留时 304 跳过重建(后续生成阶段将找不到本地文档)
-    const meta = readMeta(name)
+    const meta = readMeta(name, option.baseDir)
     const headers: Record<string, string> = {}
     const hasSpec = fs.existsSync(specPath)
     if (hasSpec && meta.etag) {
@@ -167,7 +176,7 @@ export class Download {
       writeMeta(name, {
         etag: etag ?? undefined,
         lastModified: lastModified ?? undefined,
-      })
+      }, option.baseDir)
     }
 
     return {

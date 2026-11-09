@@ -10,6 +10,11 @@ export interface GenerateOptions {
   openapi: string
   // 输出目录
   output: string
+  /**
+   * 相对路径解析基准(.request 快照/账本、output):
+   * 由 loadConfigFile 自动注入为配置文件所在目录;缺省 process.cwd()(CLI 直连参数等场景)
+   */
+  baseDir?: string
   // 输出Model路径
   exportModels: boolean
   // 开启日志输出
@@ -50,7 +55,7 @@ export type ApplicationConfig
  */
 export type GenerateApplicationOptions = Pick<
   GenerateOptions,
-  'exportModels' | 'output' | 'forceClear'
+  'exportModels' | 'output' | 'forceClear' | 'baseDir'
 > & {
   // 服务名称
   name?: string

@@ -35,7 +35,7 @@ export class Generate {
 
     // 校验宿主 @gopowerteam/request 版本是否满足生成产物要求(logger 关闭时静默)
     if (enabled) {
-      checkRequestVersion()
+      checkRequestVersion(options.baseDir)
     }
 
     if (enabled) {
@@ -67,7 +67,7 @@ export class Generate {
     }
 
     // 解析与写入全部成功后才提交账本;中途失败保持旧账本,下次运行重新生成
-    commitGenerationConfig(entries)
+    commitGenerationConfig(entries, options.baseDir)
 
     if (enabled) {
       stopSpinner()

@@ -53,7 +53,8 @@ interface ConfigModule {
  *
  * @param filePath 通过 --config 指定的路径(可选)
  * @param cwd 解析配置文件的基准目录(默认 process.cwd())
- * @returns `{ default: 配置对象 }`,配置对象统一位于 default 字段
+ * @returns `{ default: 配置对象 }`,配置对象统一位于 default 字段;
+ *          并自动注入 `baseDir`(配置文件所在目录,配置显式声明优先)作为相对路径解析基准
  */
 export async function loadConfigFile(
   filePath?: string,
@@ -88,8 +89,14 @@ export async function loadConfigFile(
     ? await tsImport(fileUrl, { parentURL: import.meta.url })
     : await import(fileUrl)) as ConfigModule
 
+  const config = resolveConfigDefault(mod)
+
   return {
-    default: resolveConfigDefault(mod),
+    default: {
+      ...config,
+      // 相对路径基准:配置显式声明优先,否则锚定到配置文件所在目录(消除 cwd 依赖)
+      baseDir: config.baseDir ?? path.dirname(absolutePath),
+    },
   }
 }
 

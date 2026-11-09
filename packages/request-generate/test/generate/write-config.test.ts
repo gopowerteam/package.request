@@ -315,3 +315,58 @@ describe('write-config - 增量规划与账本提交', () => {
     })
   })
 })
+
+describe('write-config - baseDir 锚定(monorepo 场景)', () => {
+  it('baseDir 显式锚定时无需 chdir:快照/账本/输入均落在 baseDir 下', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-basedir-'))
+    try {
+      const baseDir = path.join(tmpDir, 'repo-root')
+      fs.mkdirSync(path.join(baseDir, '.request'), { recursive: true })
+      fs.writeFileSync(path.join(baseDir, '.request', 'app.json'), '{"hello":"world"}')
+      fs.mkdirSync(path.join(baseDir, 'generated', 'app'), { recursive: true })
+
+      // 进程 cwd 不在 baseDir 内(模拟 vite 进程 cwd = 子包目录)
+      const md5 = isNeedUpdate('app', [], './generated', 'fp', baseDir)
+      expect(md5).toBe(md5Of('{"hello":"world"}'))
+
+      // output 相对路径按 baseDir 解析;账本传入 isNeedUpdate 的 config 参数
+      const ledger = [
+        {
+          name: 'app',
+          md5: md5Of('{"hello":"world"}'),
+          configMd5: 'fp',
+          updatedAt: new Date().toISOString(),
+        },
+      ]
+      expect(isNeedUpdate('app', ledger, './generated', 'fp', baseDir)).toBeUndefined()
+
+      const plan = planGeneration(
+        [
+          {
+            name: 'app',
+            input: 'https://gw/x',
+            output: './generated',
+            exportModels: true,
+          },
+        ],
+        createOptions({ baseDir }),
+      )
+      expect(plan.pending[0].input).toBe(path.join(baseDir, '.request', 'app.json'))
+
+      commitGenerationConfig(plan.entries, baseDir)
+      expect(readLocalConfig(baseDir)).toHaveLength(1)
+    }
+    finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true })
+    }
+  })
+
+  it('baseDir 缺省时回退 process.cwd()(向后兼容)', () => {
+    withTempCwd(() => {
+      fs.mkdirSync('.request', { recursive: true })
+      fs.writeFileSync('.request/legacy.json', '{}')
+      expect(readLocalConfig()).toEqual([])
+      expect(isNeedUpdate('legacy', [], './generated', 'fp')).toBe(md5Of('{}'))
+    })
+  })
+})

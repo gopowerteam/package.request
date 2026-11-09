@@ -21,7 +21,7 @@ export function writeModels(
   const output = path.join(options.output, 'models')
 
   // 安全清空历史文件(仅当目录由本工具生成时才会清空,forceClear 可跳过标记检查)
-  const markerPath = safeClearGeneratedDir(output, options.forceClear ?? false)
+  const markerPath = safeClearGeneratedDir(output, options.forceClear ?? false, options.baseDir)
 
   // 写入Models
   client.models.forEach((model) => {
