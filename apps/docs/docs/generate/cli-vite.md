@@ -85,8 +85,66 @@ export default defineConfig({
 | 选项 | 类型 | 说明 |
 | --- | --- | --- |
 | `alias` | `string` | 必须与 `resolve.alias` 一致,用于解析 Service 路径 |
-| `dir` | `string` | Service 文件所在目录(相对项目根)|
+| `dir` | `string` | Service 文件所在目录(相对项目根);未指定时回退 `request.config.ts` 的 `output` |
 | `dts` | `string \| boolean` | 声明文件输出路径;`false` 不生成 |
+| `groupStrategy` | `'http' \| 'first-dir' \| 'none'` | Service 分组策略,缺省 `'http'`;见下方「多应用分组」 |
+| `generate` | `boolean` | 缺省 `true` 在插件内进程生成;`false` 跳过生成(交给外部管线),仅扫描 + 装配 |
+| `throwOnError` | `boolean` | 缺省 `true` 失败即抛出;`false` 降级为警告 + 空实现(useRequest 调用时抛运行时错误) |
+
+### tsconfig 侧要求
+
+生成的 `declare module "virtual:request"` 声明内部 import 走 `alias`(如 `@/http/services/UserService`),因此消费方必须**同时**配置:
+
+- vite `resolve.alias`(运行时解析)
+- tsconfig `compilerOptions.paths`(编译期解析)
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+缺少 tsconfig 侧配置时,TS 无法解析声明链,`virtual:request` 的类型提示整条失效。
+
+### 多应用分组(groupStrategy)
+
+一个生成目录承载多个 OpenAPI 来源(`<output>/<app>/services/`)时,不同应用常存在同名 Service。缺省 `'http'` 策略只认路径中的 `http` 目录段,该布局下全部落入扁平结构,重名会直接报错。此时启用 `first-dir`:
+
+```ts
+request({
+  alias: '@',
+  dir: 'generated',
+  groupStrategy: 'first-dir', // 以扫描目录下第一级子目录名(PascalCase 后)作为分组
+})
+```
+
+```ts
+import { useRequest } from 'virtual:request'
+
+const authService = useRequest((s) => s.DsoService.AuthService)
+```
+
+分组重名/撞名(两个目录 PascalCase 后同名、组内 Service 重名、分组名与扁平 Service 名冲突)会在启动期给出明确报错,而非产出坏代码。
+
+### vitest 场景
+
+vitest 走 vite transform 管道,不执行 rollup 的 `buildStart`。插件已做惰性兜底(首次 `load` 现场扫描),但测试进程内生成仍会触发下载/写盘副作用,推荐配合关闭:
+
+```ts
+request({ alias: '@', dir: 'generated', generate: false })
+```
+
+### 快照热更新
+
+插件会监听 `.request/` 快照文件(vite dev / rollup --watch)。用 `request-download` 刷新接口后,dev server 自动重算 `virtual:request` 并触发页面重载,无需手动重启。
+
+### 路径解析基准
+
+`.request` 快照/账本与 `output` 相对路径统一以**配置文件所在目录**为基准解析,不依赖 vite 进程的 `cwd`——monorepo 中 vite 进程 cwd 为子包目录时快照/产物仍落在配置文件所在位置;插件扫描目录与生成产物使用同一基准,不会分叉。
 
 ### 使用虚拟模块
 
