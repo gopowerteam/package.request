@@ -489,4 +489,22 @@ describe('vite-plugin requestGeneratePlugin', () => {
 
     await expect(hooks.buildStart()).rejects.toThrow('request-generate 接口生成失败')
   })
+
+  it('watch 模式:buildStart 将 .request 快照文件加入 vite watch', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(
+      generateOptions({ output: 'src/http/services', baseDir: tmpRoot }),
+    )
+    fs.mkdirSync(path.join(tmpRoot, '.request'), { recursive: true })
+    fs.writeFileSync(path.join(tmpRoot, '.request', 'dso-service.json'), '{}')
+
+    const watched: string[] = []
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+    await hooks.buildStart.call({
+      addWatchFile: (p: string) => watched.push(p),
+    })
+
+    expect(watched).toContain(path.join(tmpRoot, '.request', 'dso-service.json'))
+  })
 })

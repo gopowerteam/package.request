@@ -1,4 +1,4 @@
-import type { PluginOption, ResolvedConfig } from 'vite'
+import type { PluginOption, ResolvedConfig, ViteDevServer } from 'vite'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import Handlebars from 'handlebars'
@@ -71,11 +71,18 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
   let viteConfig: ResolvedConfig | undefined
   let generatedCode = ''
   let generationPromise: Promise<void> | undefined
+  // 当前快照目录(watch 回调据此判断变更文件是否相关)
+  let snapshotDirPath = ''
+
+  /** 构建钩子上下文中用到的最小能力面(便于测试注入) */
+  interface PluginHookContext {
+    addWatchFile: (path: string) => void
+  }
 
   /**
    * 生成 + 扫描装配(幂等:结果记忆化,失败同样记忆化避免重复执行副作用)
    */
-  const doGenerate = async (): Promise<void> => {
+  const doGenerate = async (hookContext?: PluginHookContext): Promise<void> => {
     if (!viteConfig) {
       throw new Error('Vite 配置尚未解析完成,无法执行 request-generate 插件')
     }
@@ -129,6 +136,16 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
           generateDeclare(groups, flatServices, options, viteConfig)
         }
       }
+
+      // watch 模式(vite dev / rollup --watch):监听 .request 快照变更,实现「刷新接口 → 自动重载」
+      if (hookContext) {
+        snapshotDirPath = path.resolve(generateOptions.baseDir ?? viteConfig.root, '.request')
+        if (fs.existsSync(snapshotDirPath)) {
+          for (const file of fs.readdirSync(snapshotDirPath)) {
+            hookContext.addWatchFile(path.join(snapshotDirPath, file))
+          }
+        }
+      }
     }
     catch (error) {
       // throwOnError: false → 降级为警告 + 可加载的空实现(dev server 不被后端可用性阻塞)
@@ -141,8 +158,8 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
     }
   }
 
-  const ensureGenerated = (): Promise<void> => {
-    generationPromise ??= doGenerate()
+  const ensureGenerated = (hookContext?: PluginHookContext): Promise<void> => {
+    generationPromise ??= doGenerate(hookContext)
     return generationPromise
   }
 
@@ -152,7 +169,25 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
     configResolved(config) {
       viteConfig = config
     },
-    buildStart: () => ensureGenerated(),
+    buildStart() {
+      return ensureGenerated(this)
+    },
+    configureServer(server: ViteDevServer) {
+      server.watcher.on('change', async (file) => {
+        if (!snapshotDirPath || !file.startsWith(snapshotDirPath)) {
+          return
+        }
+
+        // 快照变更 → 重置装配结果,虚拟模块下次访问时现场重算
+        generationPromise = undefined
+        generatedCode = ''
+        const mod = await server.moduleGraph.getModuleByUrl(MODULE_ID)
+        if (mod) {
+          server.moduleGraph.invalidateModule(mod)
+          server.ws.send({ type: 'full-reload' })
+        }
+      })
+    },
     resolveId(id: string) {
       return id === MODULE_ID
         ? MODULE_ID
