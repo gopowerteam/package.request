@@ -1,5 +1,12 @@
 # @gopowerteam/request
 
+## 0.5.1
+
+### Patch Changes
+
+- b78da10: 新增 `FetchAdapter`，基于原生 `fetch` 实现，与 `AxiosAdapter` 行为对齐，可直接平行替换：共用查询参数序列化与 `timeout` 语义，支持相同的 Content-Type 推断、取消标记与异常转换。新增 `RequestSetupConfig.fetch` / `responseType` 配置项，并从 `@gopowerteam/request/adapters` 导出 `FetchAdapter`、`FetchAdapterConfig`、`ResponseError`。
+- b78da10: 查询参数序列化改为内置实现，不再依赖 `qs`；`RequestSetupConfig.qs` 类型由 `IStringifyOptions` 改为 `QueryStringifyOptions`，新增 `sort` / `filter` 选项以对齐原 qs 行为。`AxiosAdapter` 与 `toURL()` 现共用 `DEFAULT_QUERY_OPTIONS`，避免默认配置漂移。
+
 ## 0.3.3
 
 ### Patch Changes
