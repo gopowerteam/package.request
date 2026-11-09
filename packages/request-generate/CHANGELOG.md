@@ -1,5 +1,31 @@
 # @gopowerteam/request-generate
 
+## 0.5.1
+
+### Patch Changes
+
+- 8248e0b: 路径解析基准统一锚定 baseDir(配置文件所在目录)
+  
+  - `.request` 快照/账本、`output` 相对路径、宿主版本校验,全部以配置文件所在目录为解析基准,不再依赖 `process.cwd()`;vite 进程 cwd ≠ 仓库根的 monorepo 场景恢复可用
+  - `GenerateOptions` 新增可选 `baseDir`(配置显式声明优先);`loadConfigFile` 自动注入
+  - `safeClearGeneratedDir` 清空守卫同步改按 baseDir 判定(原按 cwd,会导致锚定后的产物目录被误拒)
+  - vite 插件扫描目录口径对齐:显式 `dir` 按 vite root,回退 `output` 按 baseDir,消除扫描与产物分叉
+  - 行为变化:曾从非配置文件目录的 cwd 运行过 CLI 的项目,快照/账本位置随锚定迁移,首次运行可能全量重新生成
+- edb6c1f: vite 插件虚拟模块补齐 Service 具名导出
+  
+  `virtual:request` 此前仅导出 `useRequest`,文档示例的 `import { UserService } from 'virtual:request'` 在运行时与类型层面均不可用(Missing export)。现对扁平 Service 与分组 Service(以别名导出 `Mall_OrderService as OrderService`)补齐具名导出,代码与 d.ts 同步,文档用法真实可用。
+- 5149daa: vite 插件新增 generate / throwOnError 选项 (#7)
+  
+  - `generate?: boolean`(缺省 `true`):设为 `false` 时跳过进程内 `Generate.startup`(交给外部管线,如 CI 预先运行 request-download/request-generate),插件仅扫描产物 + 装配虚拟模块/d.ts
+  - `throwOnError?: boolean`(缺省 `true`):设为 `false` 时生成/扫描失败降级为 `console.warn` + 可加载的空实现(useRequest 调用时抛出带原因链的明确运行时错误),「前端先于后端启动」的联调顺序不再被 dev server 启动失败阻塞;降级模式下不写出 d.ts(TS 侧显式缺模块声明优于静默空类型)
+- 301351c: vite 插件新增 groupStrategy 分组策略与重名/撞名防护 (#5)
+  
+  - `groupStrategy?: 'http' | 'first-dir' | 'none'`(缺省 `'http'`,完全向后兼容):
+    - `'first-dir'`:按扫描目录下第一级子目录分组,适配多应用布局 `<output>/<app>/services/`,使用形态 `useRequest((s) => s.DsoService.AuthService)`
+    - `'none'`:强制扁平
+  - 跨应用 Service 重名不再产出 TS1117 / 运行时静默覆盖,改为启动期明确报错:组内重名、分组名撞名(不同目录 PascalCase 后同名)、serviceMap 顶层键冲突(组名 ∪ 扁平名)、非法标识符分组名
+  - 修复:分组与扁平 Service 混合时,未分组 Service 被模板静默丢弃的问题(现为混合渲染,虚拟模块与 d.ts 同步)
+
 ## 0.4.7
 
 ### Patch Changes
