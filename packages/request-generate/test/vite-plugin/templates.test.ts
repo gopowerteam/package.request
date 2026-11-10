@@ -1,6 +1,7 @@
 import Handlebars from 'handlebars'
 import { describe, expect, it } from 'vitest'
 import { generateCodeTemplate, generateDeclareTemplate } from '../../src/vite-plugin/templates'
+import { expectNoDuplicates, exportedNames } from './helpers'
 
 describe('vite-plugin templates', () => {
   const flatServices = [
@@ -62,5 +63,62 @@ describe('vite-plugin templates', () => {
     expect(code).toContain('UserService')
     expect(code).toContain('export { UserService }')
     expect(code.trim().endsWith('}')).toBe(true)
+  })
+
+  // #9 回归:分组 Service 的名字以应用为作用域,不存在全局唯一裸名,
+  // 扁平再导出(export { DsoService_AuthService as AuthService })会产出重复 export
+  it('generateCodeTemplate 分组 Service 不产出顶层扁平再导出(#9)', () => {
+    const grouped = { name: 'AuthService', group: 'DsoService', path: '@/dso-service/services/AuthService' }
+    const code = Handlebars.compile(generateCodeTemplate)({
+      groups: [
+        {
+          name: 'DsoService',
+          services: [grouped],
+        },
+      ],
+    })
+
+    expect(exportedNames(code)).toEqual([])
+    // 分组导入别名与 serviceMap 不受影响(useRequest 路径保持完整)
+    expect(code).toContain('import { AuthService as DsoService_AuthService }')
+    expect(code).toContain('AuthService: DsoService_AuthService,')
+  })
+
+  // 0.5.1 的第二个活漏洞:扁平与分组同名时产出两条同名 export(解析失败)
+  it('generateCodeTemplate 分组与扁平同名时只导出扁平名(#9 混合同名场景)', () => {
+    const grouped = { name: 'UserService', group: 'Mall', path: '@/http/mall/UserService' }
+    const code = Handlebars.compile(generateCodeTemplate)({
+      groups: [
+        {
+          name: 'Mall',
+          services: [grouped],
+        },
+      ],
+      flatServices,
+    })
+
+    expect(exportedNames(code)).toEqual(['UserService'])
+    expectNoDuplicates(exportedNames(code))
+  })
+
+  // runtime 与 .d.ts 共用同一模板 → 导出面恒等,skipLibCheck 下不再分叉
+  it('generateDeclareTemplate 与 generateCodeTemplate 的导出面一致', () => {
+    const data = {
+      MODULE_ID: 'virtual:request',
+      groups: [
+        {
+          name: 'DsoService',
+          services: [
+            { name: 'AuthService', group: 'DsoService', path: '@/dso-service/services/AuthService' },
+          ],
+        },
+      ],
+      flatServices,
+    }
+    const code = Handlebars.compile(generateCodeTemplate)(data)
+    const declare = Handlebars.compile(generateDeclareTemplate)(data)
+
+    expect(exportedNames(declare)).toEqual(exportedNames(code))
+    expectNoDuplicates(exportedNames(code))
   })
 })

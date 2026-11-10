@@ -56,7 +56,7 @@ main()
 
 ## Vite 插件
 
-插件在 `buildStart` 阶段自动触发生成,并把所有 `*Service.ts` 聚合成虚拟模块 `virtual:request`,提供统一导入入口。
+插件在 `buildStart` 阶段自动触发生成,并把所有 `*Service.ts` 聚合成虚拟模块 `virtual:request`,提供 `useRequest` 统一取用入口(无分组布局下另有 Service 具名导出,见「使用虚拟模块」)。
 
 ### 接入
 
@@ -130,6 +130,8 @@ const authService = useRequest((s) => s.DsoService.AuthService)
 
 分组重名/撞名(两个目录 PascalCase 后同名、组内 Service 重名、分组名与扁平 Service 名冲突)会在启动期给出明确报错,而非产出坏代码。
 
+> **分组布局下没有 Service 具名导出**:不同应用的同名 Service 不存在全局唯一裸名,为分组 Service 生成 `export { <组>_<服务> as <服务> }` 会产出重复导出,导致 rolldown/rollup/vitest 解析失败。因此 `virtual:request` 的具名导出只来自无分组的扁平 Service;分组场景一律通过 `useRequest((s) => s.<Group>.<Service>)` 取用。若扫描根下的扁平 Service 文件名恰好等于「组名_服务名」(如 `DsoService_AuthService.ts` 与 `DsoService` 组内的 `AuthService.ts`),插件会在启动期报「局部绑定冲突」错误。
+
 ### vitest 场景
 
 vitest 走 vite transform 管道,不执行 rollup 的 `buildStart`。插件已做惰性兜底(首次 `load` 现场扫描),但测试进程内生成仍会触发下载/写盘副作用,推荐配合关闭:
@@ -148,10 +150,12 @@ request({ alias: '@', dir: 'generated', generate: false })
 
 ### 使用虚拟模块
 
+无分组布局下,Service 以具名导出提供:
+
 ```ts
 import { UserService, OrderService } from 'virtual:request'
 
 const userService = new UserService()
 ```
 
-> 前提:项目根目录存在有效的 `request.config.ts`。
+> 前提:项目根目录存在有效的 `request.config.ts`,且**未启用分组**——分组布局下插件不为分组 Service 生成具名导出(避免跨应用同名导致的重复导出解析失败,见「多应用分组」),请改用 `useRequest((s) => s.<Group>.<Service>)`。

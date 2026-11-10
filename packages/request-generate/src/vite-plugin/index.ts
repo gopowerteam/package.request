@@ -124,10 +124,12 @@ export default function requestGeneratePlugin(options: PluginOptions): PluginOpt
       const groups = getServiceGroups(services)
       const flatServices = services.filter(service => !service.group)
 
-      // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)
+      // 重名/撞名防护:组内重名、顶层键冲突(组名 ∪ 扁平名共享 serviceMap 顶层命名空间)、
+      // import 局部绑定冲突(扁平名 = 「组名_服务名」别名)
       groups.forEach(group => assertUniqueServiceNames(group.services, group.name))
       assertUniqueServiceNames(flatServices)
       assertUniqueTopLevelKeys(groups, flatServices)
+      assertUniqueImportBindings(groups, flatServices)
 
       if (services.length > 0) {
         generatedCode = renderCode(groups, flatServices)
@@ -411,6 +413,32 @@ function assertUniqueTopLevelKeys(groups: GroupItem[], flatServices: ServiceItem
   }
   for (const service of flatServices) {
     register(service.name, `Service "${service.path}"`)
+  }
+}
+
+/**
+ * 断言虚拟模块 import 局部绑定名唯一:分组绑定为 `${group}_${name}`,扁平绑定为 `name`。
+ * 组间因组名唯一(assertUniqueTopLevelKeys)而天然不撞,唯一可能的冲突是
+ * 扁平名恰好等于某个「组名_服务名」(如扫描根存在 DsoService_AuthService.ts 且
+ * DsoService 组内有 AuthService.ts),该场景会产出重复局部绑定 → 模块不可解析,
+ * 故启动期显式报错,而非交给打包器抛出难定位的 parse 错误
+ */
+function assertUniqueImportBindings(groups: GroupItem[], flatServices: ServiceItem[]): void {
+  const groupedBindings = new Map<string, string>()
+
+  for (const group of groups) {
+    for (const service of group.services) {
+      groupedBindings.set(`${group.name}_${service.name}`, `分组 "${group.name}" 下 "${service.name}"`)
+    }
+  }
+
+  for (const service of flatServices) {
+    const prev = groupedBindings.get(service.name)
+    if (prev) {
+      throw new Error(
+        `Service 局部绑定冲突: 扁平 "${service.name}" 与 ${prev} 的导入别名重名,请调整生成配置(serviceResolve)或目录命名`,
+      )
+    }
   }
 }
 

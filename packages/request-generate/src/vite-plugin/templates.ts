@@ -88,14 +88,13 @@ const serviceMap = {
 }
 `
 
+// 顶层具名导出只来自无分组 Service:
+// - 扁平名彼此唯一(assertUniqueServiceNames)且不与组名冲突(assertUniqueTopLevelKeys)
+// - 扫描只收 *Service.ts → 导出名恒以 Service 结尾,不可能撞保留导出 useRequest
+// 分组 Service 的名字以应用为作用域,不存在全局唯一裸名;若扁平再导出(export { G_N as N })
+// 会产出重复 export(rolldown/rollup 解析失败,见 issue #9),且同一内容写入 .d.ts 后在
+// skipLibCheck 下会静默解析为第一个声明(类型与运行时分叉)。分组场景请用 useRequest((s) => s.<Group>.<Name>)。
 const exportServiceTemplate = `
-{{#if groups}}
-{{#each groups}}
-{{#each services}}
-export { {{group}}_{{name}} as {{{name}}} }
-{{/each}}
-{{/each}}
-{{/if}}
 {{#if flatServices}}
 {{#each flatServices}}
 export { {{{name}}} }

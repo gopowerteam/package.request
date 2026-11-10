@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Generate } from '../../src/generate'
 import { loadConfigFile } from '../../src/load-config'
 import requestGeneratePlugin from '../../src/vite-plugin'
+import { expectNoDuplicates, exportedNames, localBindings } from './helpers'
 
 vi.mock('../../src/generate', () => ({
   Generate: {
@@ -506,5 +507,119 @@ describe('vite-plugin requestGeneratePlugin', () => {
     })
 
     expect(watched).toContain(path.join(tmpRoot, '.request', 'dso-service.json'))
+  })
+
+  // ===== #9 回归:分组 Service 不产出顶层扁平再导出 =====
+
+  it('#9 分组 Service 不产出顶层具名导出,useRequest 路径不受影响', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+    writeService(path.join(tmpRoot, 'generated/crm-service/services'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = (await hooks.load('virtual:request')) ?? ''
+    // 跨应用同名不再生成任何顶层具名导出(0.5.1 会产出重复 export 导致解析失败)
+    expect(exportedNames(code)).toEqual([])
+    expectNoDuplicates(localBindings(code))
+    // serviceMap 与 import 别名保持完整,useRequest((s) => s.DsoService.AuthService) 可用
+    expect(code).toContain('AuthService: DsoService_AuthService,')
+    expect(code).toContain('AuthService: CrmService_AuthService,')
+
+    const dts = fs.readFileSync(path.join(tmpRoot, 'request.d.ts'), 'utf-8')
+    expect(exportedNames(dts)).toEqual([])
+  })
+
+  it('#9 扁平 Service 与分组内 Service 同名时不产出重复导出(0.5.1 的混合同名洞)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated'), 'FooService')
+    writeService(path.join(tmpRoot, 'generated/mall-service/services'), 'FooService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = (await hooks.load('virtual:request')) ?? ''
+    expect(exportedNames(code)).toEqual(['FooService'])
+    expectNoDuplicates(exportedNames(code))
+  })
+
+  it('扁平 Service 名与「组名_服务名」导入别名重名时报出明确错误(而非产出不可解析的重复局部绑定)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated'), 'DsoService_AuthService')
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+
+    await expect(hooks.buildStart()).rejects.toThrow(/局部绑定冲突/)
+  })
+
+  it('兼容基线:分组且零重名时顶层导出面为空(与 0.4.4 产物形状一致)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'generated' }))
+    writeService(path.join(tmpRoot, 'generated/dso-service/services'), 'AuthService')
+    writeService(path.join(tmpRoot, 'generated/crm-service/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({
+      alias: '@',
+      dts: true,
+      dir: 'generated',
+      groupStrategy: 'first-dir',
+    })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot, path.join(tmpRoot, 'generated')))
+    await hooks.buildStart()
+
+    const code = (await hooks.load('virtual:request')) ?? ''
+    expect(exportedNames(code)).toEqual([])
+  })
+
+  it('无分组布局下扁平 Service 具名导出仍保留(文档示例依赖)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'src/http' }))
+    writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
+    writeService(path.join(tmpRoot, 'src/http/services'), 'OrderService')
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+    await hooks.buildStart()
+
+    const code = (await hooks.load('virtual:request')) ?? ''
+    expect(exportedNames(code).sort()).toEqual(['OrderService', 'UserService'])
+    expect(exportedNames(code)).not.toContain('useRequest')
+  })
+
+  it('request.d.ts 与虚拟模块的导出面一致(防两边模板漂移)', async () => {
+    vi.mocked(loadConfigFile).mockResolvedValue(generateOptions({ output: 'src/http' }))
+    writeService(path.join(tmpRoot, 'src/http/services'), 'UserService')
+
+    const plugin = requestGeneratePlugin({ alias: '@', dts: true })
+    const hooks = getHooks(plugin)
+    hooks.configResolved(createViteConfig(tmpRoot))
+    await hooks.buildStart()
+
+    const code = (await hooks.load('virtual:request')) ?? ''
+    const dts = fs.readFileSync(path.join(tmpRoot, 'request.d.ts'), 'utf-8')
+    expect(exportedNames(dts)).toEqual(exportedNames(code))
   })
 })
